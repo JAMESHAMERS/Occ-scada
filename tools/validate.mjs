@@ -31,7 +31,7 @@ for (const st of ["run","limit","fault","maint","comm","stop","idle"]) used.add(
 for (const i of [1,2,3,4]) { used.add("p" + i); used.add("L" + i); }
 for (const p of X.PERMS) used.add("perm_" + p);
 for (const ty of new Set(X.STATIONS.map(s => s.type))) used.add("plantType_" + ty);
-for (const pg of ["overview","gis","twin","alarms","kpis","pcurve","loss","downtime","curtail","bench","reports","users","audit","sources"]) used.add("sub_" + pg);
+for (const pg of ["overview","gis","twin","alarms","kpis","pcurve","loss","downtime","curtail","bench","custom","reports","users","audit","sources"]) used.add("sub_" + pg);
 for (const k of used) if (!(k in X.DICT)) err(`text "${k}" is used in the code but missing from src/10_i18n.js`);
 for (const m of rd("src/02_body.html").matchAll(/data-i="([A-Za-z0-9_]+)"/g)) if (!(m[1] in X.DICT)) err(`text "${m[1]}" (02_body.html) missing`);
 

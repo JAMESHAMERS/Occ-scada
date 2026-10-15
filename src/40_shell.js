@@ -1,10 +1,10 @@
 // ===================== Shell, navigation, router =====================
 const NAV = [
   {g:"g_mon", items:[["overview","grid","overview"],["gis","map","overview"],["stations","station","station"],["twin","cube","station"],["alarms","bell","alarm"]]},
-  {g:"g_ana", items:[["kpis","gauge","analytics"],["pcurve","curve","analytics"],["loss","down","analytics"],["downtime","stop","analytics"],["curtail","sliders","analytics"],["bench","bars","analytics"],["reports","file","reports"]]},
+  {g:"g_ana", items:[["kpis","gauge","analytics"],["pcurve","curve","analytics"],["loss","down","analytics"],["downtime","stop","analytics"],["curtail","sliders","analytics"],["bench","bars","analytics"],["custom","layers","analytics"],["reports","file","reports"]]},
   {g:"g_sys", items:[["sources","server","sources"],["users","users","users"],["audit","log","audit"]]},
 ];
-const PAGE_PERM = {overview:"overview",gis:"overview",station:"station",twin:"station",alarms:"alarm",kpis:"analytics",pcurve:"analytics",loss:"analytics",downtime:"analytics",curtail:"analytics",bench:"analytics",reports:"reports",sources:"sources",users:"users",audit:"audit"};
+const PAGE_PERM = {custom:"analytics",overview:"overview",gis:"overview",station:"station",twin:"station",alarms:"alarm",kpis:"analytics",pcurve:"analytics",loss:"analytics",downtime:"analytics",curtail:"analytics",bench:"analytics",reports:"reports",sources:"sources",users:"users",audit:"audit"};
 let navOpenStations = true;
 function renderShell(){
   const u=S.user; const nAl=activeAlarms().length;
@@ -73,7 +73,7 @@ function go(page, param=null, keep){
   renderShell();
   const fn=PAGES[page]; v.innerHTML=`<div class="view-in" id="vin"></div>`; fn($("#vin"), param);
 }
-const PAGE_LVL={overview:1,gis:1,station:2,alarms:2,kpis:2,pcurve:3,loss:2,downtime:3,curtail:2,bench:1,reports:2,twin:4,sources:3,users:2,audit:2};
+const PAGE_LVL={custom:3,overview:1,gis:1,station:2,alarms:2,kpis:2,pcurve:3,loss:2,downtime:3,curtail:2,bench:1,reports:2,twin:4,sources:3,users:2,audit:2};
 function setTitle(a,b){ $("#pgT").textContent=a; $("#pgS").textContent=b; const l=PAGE_LVL[S.page]||1; $("#pgL").textContent=`L${l} · ${t("L"+l)}`; }
 function subClock(key){ return `${t(key)} · ${fmtTime(new Date())} (UTC+7)`; }
 

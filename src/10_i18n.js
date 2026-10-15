@@ -155,6 +155,10 @@ Object.assign(DICT,{
   L1:["Tổng quan","Overview","总览"], L2:["Khu vực","Area","区域"], L3:["Thiết bị","Equipment","设备"], L4:["Chẩn đoán","Diagnostics","诊断"],
   alBand:["Cảnh báo theo mức ưu tiên — bấm để mở","Alarms by priority — click to open","按优先级的告警 — 点击打开"],
   srvName:["OCC-APP-01 · Ia Pếch","OCC-APP-01 · Ia Pech","OCC-APP-01 · IA Pech"],
+  custom:["Phân tích tùy chỉnh","Custom analysis","自定义分析"], sub_custom:["Đa tham số theo thời gian, tương quan X-Y, phân bố","Multi-parameter trends, X-Y correlation, distribution","多参数时序、散点 X-Y 与分布"],
+  cMulti:["Đa tham số","Multi-parameter","多参数时序"], cXY:["Tương quan X-Y","X-Y scatter","散点 X-Y"], cHist:["Phân bố","Distribution","分布直方图"],
+  cParams:["Tham số (tối đa 4)","Parameters (max 4)","参数（最多4个）"], cLimit:["Tối đa 4 tham số và 2 trục Y để đồ thị dễ đọc.","Up to 4 parameters and 2 Y axes keep the chart readable.","限4个参数、2个Y轴以保证可读性。"],
+  cRange:["Khoảng","Range","范围"], cDays:["{n} ngày","{n} days","{n} 天"], cSrc:["Dữ liệu 10 phút · {n} điểm","10-min data · {n} samples","10分钟数据 · {n} 行"], left:["Trái","Left","左"], right:["Phải","Right","右"], cX:["Trục X","X axis","X 轴"], cY:["Trục Y","Y axis","Y 轴"], cBins:["Số khoảng","Bins","分组数"], count:["Số mẫu","Samples","样本数"], unit:["Thiết bị","Unit","设备"], cStats:["Thống kê theo tham số","Statistics by parameter","参数统计"], sMin:["Nhỏ nhất","Min","最小值"], sAvg:["Trung bình","Mean","平均值"], sMax:["Lớn nhất","Max","最大值"], sStd:["Độ lệch chuẩn","Std. dev.","标准差"], sP95:["P95","P95","P95"], sCorr:["Tương quan với công suất","Correlation with power","与功率相关性"], param:["Tham số","Parameter","参数"],
 });
 DICT.hsPts=["điểm dữ liệu ({NP} nhà máy)","data points ({NP} plants)","数据点（{NP} 座电站）"];
 DICT.brandSub2=["{NP} nhà máy · {MW} MW","{NP} plants · {MW} MW","{NP} 座 · {MW} MW"];
