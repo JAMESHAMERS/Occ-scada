@@ -106,7 +106,7 @@ PAGES.station=(el,id)=>{
   <div class="grid g-st">
     <div class="grid" style="gap:14px;min-width:0">
       <div class="panel"><div class="ph"><h3>${t("twin3d")}</h3><span class="sub">${t("twin3dS")}</span></div><div class="pb flush" style="padding-top:10px"><div class="twin-w" id="st3d"><div class="twin-load">${t("loading3d")}</div></div></div></div>
-      <div class="panel"><div class="ph"><h3>${t(isW?"turbines":"inverters")}</h3><span class="sub">${t("lastValid")}</span>${s.id==="LXS"||s.id==="VHO"?`<span class="act"><div class="inp" style="height:30px;width:180px">${ic("search","sm")}<input id="uq" placeholder="INV-…" aria-label="Filter"></div></span>`:""}</div><div class="pb"><div class="st-bar" id="stBar"></div><div class="tgrid" id="stG" style="margin-top:12px"></div></div></div>
+      <div class="panel"><div class="ph"><h3>${t(isW?"turbines":"inverters")}</h3><span class="sub">${t("lastValid")}</span>${s.id==="LXS"||s.id==="VHO"?`<span class="act"><div class="inp" style="height:30px;width:180px">${ic("search","sm")}<input id="uq" placeholder="INV-…" aria-label="Filter"></div></span>`:""}</div><div class="pb"><div class="st-bar" id="unitBar"></div><div class="tgrid" id="stG" style="margin-top:12px"></div></div></div>
     </div>
     <div class="grid" style="gap:14px;align-content:start;min-width:0">
       <div class="panel"><div class="ph"><h3>${t("hourly")}</h3><span class="sub">${t("blankFut")}</span></div><div class="pb"><div class="chart" id="stC" style="height:300px"></div></div></div>
@@ -142,7 +142,7 @@ PAGES.station=(el,id)=>{
       kpi("thermo","bg-warn",t("modT"), nf(L0.tm,1),"°C", `${t("ambT")} ${nf(L0.amb,1)} °C`) ];
     $("#stK").innerHTML=tiles.join("");
     const units=L0.units; const cnt={}; units.forEach(u=>cnt[u.st]=(cnt[u.st]||0)+1);
-    $("#stBar").innerHTML=["run","limit","stop","fault","maint","comm"].filter(k=>cnt[k]).map(k=>`<span class="sb-it bg-${ST_CLS[k]}" style="${k==="run"?"flex:"+cnt[k]:""}">${ic(ST_IC[k],"sm")}${t("st_"+k)} <b class="num" style="font-size:14px">${cnt[k]}</b></span>`).join("");
+    $("#unitBar").innerHTML=["run","limit","stop","fault","maint","comm"].filter(k=>cnt[k]).map(k=>`<span class="sb-it bg-${ST_CLS[k]}" style="${k==="run"?"flex:"+cnt[k]:""}">${ic(ST_IC[k],"sm")}${t("st_"+k)} <b class="num" style="font-size:14px">${cnt[k]}</b></span>`).join("");
     const q=filterQ.toLowerCase();
     $("#stG").innerHTML=s.feeders.map(([f,ids])=>{ const us=ids.map(id=>units.find(u=>u.id===id)).filter(u=>!q||u.id.toLowerCase().includes(q)); if(!us.length) return ""; return `<div class="feeder"><h5>${isW?t("feeder",{n:f}):s.id==="VHO"?t("block",{n:f}):t("roof",{n:f})}</h5><div class="tiles ${isW?"":"inv"}">${us.map(u=>unitTile(s,u,units.indexOf(u))).join("")}</div></div>`; }).join("");
     const al=ALARMS.filter(a=>a.st===s.id&&!a.cleared).sort((a,b)=>a.sev-b.sev||b.t-a.t); $("#stAlN").textContent=al.length;
@@ -183,8 +183,8 @@ function openUnit(stId, uid){
   // today chart for unit
   if(window.echarts){ const el=$("#drC"); const c=echarts.init(el); DRAWER.ch=c; const d0=dayStart(Date.now()); const xs=[],p=[],w=[]; const r=unitRated(s,uid); const st=unitState(s,uid);
     for(let tt=d0; tt<=Date.now(); tt+=600e3){ xs.push(fmtTime(new Date(tt),false)); if(isW){ const v=windAt(s,tt,k); w.push(+v.toFixed(2)); p.push(st==="comm"||s.notOper?null:+(pcurve(v,r)*1000*(st==="run"||st==="limit"||tt<Date.now()-3*HOUR?1:0)).toFixed(0)); } else { const g=irrAt(s,tt); w.push(+g.toFixed(0)); const sh=Math.min(acCap(s),g/1000*s.capDC*0.86)/s.n; p.push(st==="comm"?null:+(Math.min(r,sh)*1000*(st==="fault"&&tt>Date.now()-0.5*HOUR?0:1)).toFixed(1)); } }
-    c.setOption(Object.assign(chartBase(),{grid:{left:44,right:40,top:30,bottom:24},legend:{data:["P",isW?t("windSpd"):t("irr")]},xAxis:axisX(xs,{axisLabel:{interval:23,color:css("--muted"),fontSize:10.5}}),yAxis:[axisY("kW"),axisY(isW?"m/s":"W/m²",{splitLine:{show:false}})],
-      series:[{name:"P",type:"line",data:p,showSymbol:false,lineStyle:{width:1.6,color:isW?css("--wind"):css("--solar")},itemStyle:{color:isW?css("--wind"):css("--solar")},areaStyle:{opacity:.12}},{name:isW?t("windSpd"):t("irr"),type:"line",yAxisIndex:1,data:w,showSymbol:false,lineStyle:{width:1.2,color:css("--accent")},itemStyle:{color:css("--accent")}}]}));
+    c.setOption(Object.assign(chartBase(),{grid:{left:44,right:40,top:30,bottom:24},legend:Object.assign({},chartBase().legend,{data:[t("power"),isW?t("windSpd"):t("irr")]}),xAxis:axisX(xs,{axisLabel:{interval:23,color:css("--muted"),fontSize:10.5}}),yAxis:[axisY("kW"),axisY(isW?"m/s":"W/m²",{splitLine:{show:false}})],
+      series:[{name:t("power"),type:"line",data:p,showSymbol:false,lineStyle:{width:1.6,color:isW?css("--wind"):css("--solar")},itemStyle:{color:isW?css("--wind"):css("--solar")},areaStyle:{opacity:.12}},{name:isW?t("windSpd"):t("irr"),type:"line",yAxisIndex:1,data:w,showSymbol:false,lineStyle:{width:1.2,color:css("--accent")},itemStyle:{color:css("--accent")}}]}));
     const ro=new ResizeObserver(()=>c.resize()); ro.observe(el); }
   THREE3D.unit($("#dr3d"), s, uid, idx).then(sc=>{ if(!sc) return; if(!DRAWER||!$("#dr3d")){ sc.dispose(); return; } DRAWER.sc=sc; });
 }

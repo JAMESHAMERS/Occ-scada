@@ -67,6 +67,10 @@ for token in ("__H_", "__BUILD__"):
 
 banner = ("<!-- GENERATED FILE – do not edit. Source: src/ + data/ in this repository; rebuild with build.py.\n"
           "     HINO OCC SCADA %s · build %s · HINO Systech Vietnam Co., Ltd. -->\n" % (VERSION, BUILD["id"]))
-html = banner + read(src_files[0]) + "\n" + read(src_files[1]) + "\n<script>" + geo_js + "</script>\n<script type=\"module\">\n" + js + "\n</script>\n"
+# Standards-mode document (a page without <!doctype> renders in quirks mode, where e.g. #id selectors ignore case)
+head = ('<!doctype html>\n<html lang="vi">\n<head>\n<meta charset="utf-8">\n'
+        '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n')
+html = (head + banner + read(src_files[0]) + "\n</head>\n<body>\n" + read(src_files[1]) + "\n<script>" + geo_js +
+        "</script>\n<script type=\"module\">\n" + js + "\n</script>\n</body>\n</html>\n")
 with open(OUT, "w", encoding="utf-8", newline="\n") as f: f.write(html)
 print("build %s → %s (%d KB)" % (BUILD["id"], os.path.relpath(OUT, ROOT) if OUT.startswith(ROOT) else OUT, len(html.encode()) // 1024))
