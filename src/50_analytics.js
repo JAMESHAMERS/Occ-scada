@@ -1,7 +1,7 @@
 // ===================== Analytics, reports, administration =====================
 const STC = () => ({IAP1:css("--accent"),IAP2:css("--wind"),TTN:css("--maint"),DKH:css("--ok"),BTH:css("--off"),VHO:css("--solar"),LXS:"#E8795B"});
 function aggSt(id, idx){ const rows=HIST.st[id]; let e=0,th=0,res=0,av=0,nAv=0,loss=[0,0,0,0,0],stopH=0,curtE=0; idx.forEach(i=>{ const r=rows[i]; e+=r.e; th+=r.th; res+=r.res; if(r.avail!=null){av+=r.avail;nAv++;} r.loss.forEach((x,j)=>loss[j]+=x); stopH+=r.stopH; curtE+=r.curtE; });
-  const s=ST[id]; return {e,th,res:s.type==="wind"? res/idx.length : res, avail:nAv?av/nAv:null, cf:100*e/(s.cap*24*idx.length), eqh:e/(s.type==="wind"?s.cap:s.capDC), loss, lsum:loss.reduce((a,b)=>a+b,0), stopH, curtE}; }
+  const s=ST[id]; return {e,th,res:s.type==="wind"? res/idx.length : res, avail:nAv?av/nAv:null, cf:100*e/(acCap(s)*24*idx.length), eqh:e/(s.type==="wind"?s.cap:s.capDC), loss, lsum:loss.reduce((a,b)=>a+b,0), stopH, curtE}; }
 function anaHead(key){ setTitle(t(key), t("sub_"+key)); }
 
 PAGES.kpis=(el)=>{
@@ -13,7 +13,7 @@ PAGES.kpis=(el)=>{
   function render(){ const idx=histRange(per); const ids=scopeIds().filter(i=>st==="all"||i===st); const H=HIST; const col=STC();
     $("#kN").textContent=`${idx.length} ${S.lang==="en"?"days":S.lang==="zh"?"天":"ngày"}`;
     c&&c.setOption({legend:{data:ids},grid:{left:52,right:18,top:36,bottom:56},dataZoom:[{type:"inside"},{type:"slider",height:18,bottom:8,borderColor:css("--line"),textStyle:{color:css("--muted")}}],xAxis:axisX(idx.map(i=>fmtDate(new Date(H.days[i])).slice(0,5))),yAxis:axisY(metric==="e"?"MWh":metric==="res"?"m/s · kWh/m²":"%"),
-      series:ids.map(id=>({name:id,type:metric==="e"?"bar":"line",stack:metric==="e"?"e":undefined,showSymbol:false,data:idx.map(i=>{ const r=H.st[id][i]; const s=ST[id]; const v= metric==="e"?r.e: metric==="res"?r.res: metric==="avail"?r.avail: 100*r.e/(s.cap*24); return v==null?null:+v.toFixed(2); }),itemStyle:{color:col[id]},lineStyle:{width:1.4}}))},true);
+      series:ids.map(id=>({name:id,type:metric==="e"?"bar":"line",stack:metric==="e"?"e":undefined,showSymbol:false,data:idx.map(i=>{ const r=H.st[id][i]; const s=ST[id]; const v= metric==="e"?r.e: metric==="res"?r.res: metric==="avail"?r.avail: 100*r.e/(acCap(s)*24); return v==null?null:+v.toFixed(2); }),itemStyle:{color:col[id]},lineStyle:{width:1.4}}))},true);
     const rows=ids.map(id=>[id,aggSt(id,idx)]);
     $("#kT").innerHTML=`<table class="t"><thead><tr><th>${t("station")}</th><th class="r">${t("energyMWh")}</th><th class="r">${t("eqHh")}</th><th class="r">${t("resource")}</th><th class="r">${t("availPct")}</th><th class="r">${t("cfPct")}</th><th class="r">${t("totLoss")}</th></tr></thead><tbody>${rows.sort((a,b)=>b[1].e-a[1].e).map(([id,a])=>{const s=ST[id]; return `<tr class="click" data-go="station" data-p="${id}"><td><span class="row" style="gap:8px"><i class="dot" style="background:${col[id]}"></i>${esc(stName(s))}</span></td><td class="r num">${nf(a.e,1)}</td><td class="r num">${nf(a.eqh,1)}</td><td class="r num">${s.type==="wind"?nf(a.res,2)+" m/s":nf(a.res,1)+" kWh/m²"}</td><td class="r num">${a.avail==null?"—":nf(a.avail,2)}</td><td class="r num">${nf(a.cf,1)}</td><td class="r num">${nf(a.lsum,1)}</td></tr>`;}).join("")}</tbody></table>`;
     $("#kX").onclick=()=>exportCSV("kpi_"+per,[["Station","Energy MWh","Eq. hours","Resource","Availability %","CF %","Loss MWh"],...rows.map(([id,a])=>[id,a.e.toFixed(1),a.eqh.toFixed(1),a.res.toFixed(2),a.avail==null?"":a.avail.toFixed(2),a.cf.toFixed(1),a.lsum.toFixed(1)])]); }
@@ -135,7 +135,7 @@ PAGES.reports=(el)=>{
 };
 function openReport(k){
   const ids=scopeIds(); const now=new Date(); const tri=(key)=>DICT[key]? `${DICT[key][0]} / ${DICT[key][2]}`:key;
-  const rows=ids.map(id=>{ const s=ST[id], L0=LIVE.st[id]; return [stName(s), s.notOper?"—":nf(L0.e,1), s.notOper?"—":nf(L0.pmax,2), L0.avail==null?"—":nf(L0.avail,2), s.notOper?"—":nf(L0.e/s.cap,2), ALARMS.filter(a=>a.st===id&&!a.cleared).length, s.notOper?"—":nf(L0.e*0.6592,1)]; });
+  const rows=ids.map(id=>{ const s=ST[id], L0=LIVE.st[id]; return [stName(s), s.notOper?"—":nf(L0.e,1), s.notOper?"—":nf(L0.pmax,2), L0.avail==null?"—":nf(L0.avail,2), s.notOper?"—":nf(L0.e/(s.capDC||s.cap),2), ALARMS.filter(a=>a.st===id&&!a.cleared).length, s.notOper?"—":nf(L0.e*0.6592,1)]; });
   const tot=ids.reduce((a,id)=>a+LIVE.st[id].e,0);
   const m=modal(`<div class="mh">${ic("file")}<h3>${t(k)}</h3><span style="margin-left:auto" class="row"><button class="btn sm" id="rX">${ic("dl","sm")} ${t("excel")}</button><button class="ibtn" data-close aria-label="${t("close")}">${ic("x")}</button></span></div>
     <div class="mb"><div class="paper"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:2px solid #0E2A55;padding-bottom:10px"><div><h2>${t("repTitle")}</h2><div style="color:#4A5C78;margin-top:2px">${DICT.repTitle[0]} · ${DICT.repTitle[2]}</div></div><div style="text-align:right;color:#4A5C78">OCC · IA PECH<br>${fmtDate(now)} · ${fmtTime(now,false)}</div></div>

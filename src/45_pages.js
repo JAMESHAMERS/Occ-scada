@@ -68,7 +68,7 @@ PAGES.overview=(el)=>{
       <div class="legend">${[["ok","online"],["warn","warning"],["crit","fault"],["off","interrupted"]].map(([k,l])=>`<div><span class="dot ${k}"></span><b>${cnt[k]}</b><span class="muted">${t(l)}</span></div>`).join("")}</div></div>
       <div class="mini3"><div><b class="c-ok">${P.avail==null?"—":nf(P.avail,1)}<small style="font-size:12px"> %</small></b><span>${t("avail")}</span></div><div><b class="c-wind">${nf(cf,1)}<small style="font-size:12px"> %</small></b><span>${t("capFactor")}</span></div><div><b class="c-warn">${nf(comm,0)}<small style="font-size:12px"> %</small></b><span>${t("comms")}</span></div></div>`;
     $("#ovT").innerHTML=`<table class="t"><thead><tr><th>${t("station")}</th><th class="r">${t("capMW")}</th><th class="r">${t("nowMW")}</th><th class="r">${t("availPct")}</th><th class="c">${ic("bell","sm")}</th><th class="c">${t("healthSc")}</th></tr></thead><tbody>
-      ${P.ss.map(s=>{const L0=LIVE.st[s.id]; const n=ALARMS.filter(a=>a.st===s.id&&!a.cleared).length; return `<tr class="click" data-go="station" data-p="${s.id}"><td><span class="row" style="gap:8px"><span class="dot ${stStatus(s)}"></span>${esc(stName(s))}</span></td><td class="r num">${nf(s.cap,1)}</td><td class="r num">${s.notOper?"—":nf(L0.p,1)}</td><td class="r num">${L0.avail==null?"—":nf(L0.avail,1)}</td><td class="c num ${n?"c-crit":""}">${n}</td><td class="c">${healthChip(healthScore(s))}</td></tr>`;}).join("")}</tbody></table>`;
+      ${P.ss.map(s=>{const L0=LIVE.st[s.id]; const n=ALARMS.filter(a=>a.st===s.id&&!a.cleared).length; return `<tr class="click" data-go="station" data-p="${s.id}"><td><span class="row" style="gap:8px"><span class="dot ${stStatus(s)}"></span>${esc(stName(s))}</span></td><td class="r num">${capLabel(s)}</td><td class="r num">${s.notOper?"—":nf(L0.p,1)}</td><td class="r num">${L0.avail==null?"—":nf(L0.avail,1)}</td><td class="c num ${n?"c-crit":""}">${n}</td><td class="c">${healthChip(healthScore(s))}</td></tr>`;}).join("")}</tbody></table>`;
     const card=(type)=>{ const arr=P.ss.filter(s=>type==="wind"?s.type==="wind":s.type!=="wind"); if(!arr.length) return ""; const live=arr.filter(s=>!s.notOper); const p=arr.reduce((a,s)=>a+LIVE.st[s.id].p,0), cap=arr.reduce((a,s)=>a+s.cap,0), e=arr.reduce((a,s)=>a+LIVE.st[s.id].e,0), pl=arr.reduce((a,s)=>a+s.plan,0), m=arr.reduce((a,s)=>a+(s.plan?LIVE.st[s.id].mtd+LIVE.st[s.id].e:0),0); const cl=live.reduce((a,s)=>a+s.cap,0); const av=cl?live.reduce((a,s)=>a+LIVE.st[s.id].avail*s.cap,0)/cl:null;
       const res = type==="wind"? [t("avgWind"), live.length? nf(live.reduce((a,s)=>a+LIVE.st[s.id].v,0)/live.length,1)+" m/s":"—"] : [t("irr"), live.length? nf(live.reduce((a,s)=>a+LIVE.st[s.id].g,0)/live.length,0)+" W/m²":"—"];
       return `<div class="asset-c"><h4><span class="sw" style="background:var(--${type==="wind"?"wind":"solar"})"></span>${t(type==="wind"?"windP":"solarP")} <span class="muted" style="font-weight:400;font-size:12px">· ${arr.length} ${t("stCount")}</span></h4>
@@ -122,7 +122,7 @@ PAGES.station=(el,id)=>{
         {name:isW?t("windSpd"):t("irr"),type:"line",yAxisIndex:1,smooth:.35,showSymbol:false,data:L0.hrs.map((x,h)=>h<=cur?+x.w.toFixed(isW?2:0):null),lineStyle:{width:2,color:css("--accent")},itemStyle:{color:css("--accent")}}]},true); }
   function upd(){ const L0=LIVE.st[s.id]; head(); const hrs=(Date.now()-dayStart(Date.now()))/HOUR; const loss=Math.max(0,L0.eth-L0.e);
     $("#stLive").innerHTML= s.notOper? `<span class="chip bg-off">${t("st_comm")}</span>` : `<i></i>${t("updated",{t:fmtTime(new Date()),s:L0.updAgo})}`;
-    const pct=s.notOper?0:100*L0.p/s.cap;
+    const pct=s.notOper?0:100*L0.p/acCap(s);
     const tiles = isW? [
       kpi("zap","",t("pNow"), s.notOper?"—":nf(L0.p,2),"MW", `${nf(pct,1)} % / ${nf(s.cap,2)} MW`, `<div class="bar"><i style="width:${pct}%"></i></div>`),
       kpi("wind","bg-wind",t("windNow"), s.notOper?"—":nf(L0.v,2),"m/s", s.notOper?"—":t("windSrc")+` · ${Math.round(L0.dir)}°`),
@@ -132,7 +132,7 @@ PAGES.station=(el,id)=>{
       kpi("okc","bg-ok",t("availIEC"), L0.avail==null?"—":nf(L0.avail,2),"%", "IEC 61400-26 (T)"),
       kpi("clock","bg-wind",t("eqHours"), s.notOper?"—":nf(L0.e/s.cap,2),"h", t("today")),
       kpi("plug","bg-solar",t("aux"), s.notOper?"—":nf(L0.aux,2),"%", t("auxS")) ] : [
-      kpi("zap","",t("pNow"), nf(L0.p,2),"MW", `${nf(pct,1)} % / ${nf(s.cap,2)} MW · ${nf(s.capDC,2)} MWp`, `<div class="bar"><i style="width:${pct}%"></i></div>`),
+      kpi("zap","",t("pNow"), nf(L0.p,2),"MW", `${nf(pct,1)} % / ${nf(acCap(s),2)} MWac · ${nf(s.capDC,3)} MWp`, `<div class="bar"><i style="width:${pct}%"></i></div>`),
       kpi("sun","bg-solar",t("poa"), nf(L0.g,0),"W/m²", t("weatherSt",{w:s.wx})),
       kpi("sun","bg-solar",t("eDay"), nf(L0.e,1),"MWh", t("theoryX",{e:nf(L0.eth,1)})),
       kpi("down","bg-crit",t("eLoss"), nf(loss,1),"MWh", t("lossPct",{p:nf(L0.eth?100*loss/L0.eth:0,1)})),
@@ -182,7 +182,7 @@ function openUnit(stId, uid){
   upd(); DRAWER.iv=setInterval(()=>{ if(!$("#drM")) return; upd(); },2000);
   // today chart for unit
   if(window.echarts){ const el=$("#drC"); const c=echarts.init(el); DRAWER.ch=c; const d0=dayStart(Date.now()); const xs=[],p=[],w=[]; const r=unitRated(s,uid); const st=unitState(s,uid);
-    for(let tt=d0; tt<=Date.now(); tt+=600e3){ xs.push(fmtTime(new Date(tt),false)); if(isW){ const v=windAt(s,tt,k); w.push(+v.toFixed(2)); p.push(st==="comm"||s.notOper?null:+(pcurve(v,r)*1000*(st==="run"||st==="limit"||tt<Date.now()-3*HOUR?1:0)).toFixed(0)); } else { const g=irrAt(s,tt); w.push(+g.toFixed(0)); const sh=Math.min(s.cap,g/1000*s.capDC*0.86)/s.n; p.push(st==="comm"?null:+(Math.min(r,sh)*1000*(st==="fault"&&tt>Date.now()-0.5*HOUR?0:1)).toFixed(1)); } }
+    for(let tt=d0; tt<=Date.now(); tt+=600e3){ xs.push(fmtTime(new Date(tt),false)); if(isW){ const v=windAt(s,tt,k); w.push(+v.toFixed(2)); p.push(st==="comm"||s.notOper?null:+(pcurve(v,r)*1000*(st==="run"||st==="limit"||tt<Date.now()-3*HOUR?1:0)).toFixed(0)); } else { const g=irrAt(s,tt); w.push(+g.toFixed(0)); const sh=Math.min(acCap(s),g/1000*s.capDC*0.86)/s.n; p.push(st==="comm"?null:+(Math.min(r,sh)*1000*(st==="fault"&&tt>Date.now()-0.5*HOUR?0:1)).toFixed(1)); } }
     c.setOption(Object.assign(chartBase(),{grid:{left:44,right:40,top:30,bottom:24},legend:{data:["P",isW?t("windSpd"):t("irr")]},xAxis:axisX(xs,{axisLabel:{interval:23,color:css("--muted"),fontSize:10.5}}),yAxis:[axisY("kW"),axisY(isW?"m/s":"W/m²",{splitLine:{show:false}})],
       series:[{name:"P",type:"line",data:p,showSymbol:false,lineStyle:{width:1.6,color:isW?css("--wind"):css("--solar")},itemStyle:{color:isW?css("--wind"):css("--solar")},areaStyle:{opacity:.12}},{name:isW?t("windSpd"):t("irr"),type:"line",yAxisIndex:1,data:w,showSymbol:false,lineStyle:{width:1.2,color:css("--accent")},itemStyle:{color:css("--accent")}}]}));
     const ro=new ResizeObserver(()=>c.resize()); ro.observe(el); }

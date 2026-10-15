@@ -6,13 +6,13 @@ const OCC_LL = [107.902, 13.975];
 const STATIONS = [
   { id:"IAP1", code:"IAP1", plant:"IAP", type:"wind", ll:[107.886,13.990], cap:49.5, rated:3.3,
     name:{vi:"Ia Pếch 1",en:"Ia Pech 1",zh:"IA Pech 1 风电场"}, full:{vi:"NMĐG Ia Pếch 1",en:"Ia Pech 1 Wind Farm",zh:"IA Pech 1 风电场"},
-    prov:{vi:"Gia Lai",en:"Gia Lai",zh:"嘉莱省"}, old:null, model:"Windey WD164-3300", rotor:164, hubH:110,
+    prov:{vi:"Gia Lai",en:"Gia Lai",zh:"嘉莱省"}, old:null, model:"Windey WD164-3300", rotor:164, hubH:95,
     scada:"CYG PRS-7000", ppc:"CYG PRS-7910", gw:"GW-IAP-01", cod:"01/2026", proto:"IEC 104 · Modbus TCP", pts:2000, kv:"110 kV",
     feeders:[["XT1",["WT16","WT17","WT18","WT20","WT21"]],["XT2",["WT22","WT23","WT24","WT25","WT26"]],["XT3",["WT27","WT28","WT29","WT30","WT31"]]],
     states:{WT21:"fault",WT27:"maint",WT16:"limit",WT17:"limit",WT18:"limit"}, pset:32.0, base:7.1, seed:11, plan:12150 },
   { id:"IAP2", code:"IAP2", plant:"IAP", type:"wind", ll:[107.918,13.962], cap:49.5, rated:3.3,
     name:{vi:"Ia Pếch 2",en:"Ia Pech 2",zh:"IA Pech 2 风电场"}, full:{vi:"NMĐG Ia Pếch 2",en:"Ia Pech 2 Wind Farm",zh:"IA Pech 2 风电场"},
-    prov:{vi:"Gia Lai",en:"Gia Lai",zh:"嘉莱省"}, old:null, model:"Windey WD164-3300", rotor:164, hubH:110,
+    prov:{vi:"Gia Lai",en:"Gia Lai",zh:"嘉莱省"}, old:null, model:"Windey WD164-3300", rotor:164, hubH:95,
     scada:"CYG PRS-7000", ppc:"CYG PRS-7910", gw:"GW-IAP-01", cod:"01/2026", proto:"IEC 104 · Modbus TCP", pts:2000, kv:"110 kV",
     feeders:[["XT1",["WT01","WT02","WT03","WT04","WT05"]],["XT2",["WT06","WT07","WT08","WT09","WT10"]],["XT3",["WT11","WT12","WT13","WT14","WT15"]]],
     states:{WT06:"stop"}, base:7.5, seed:23, plan:12150 },
@@ -35,15 +35,15 @@ const STATIONS = [
     scada:"NR PCS-9700", ppc:"Envision ENV-EMS-II", gw:"GW-BTH-01", cod:"—", proto:"IEC 104", pts:1000, kv:"110 kV",
     feeders:[["XT1",["WT01","WT02","WT03","WT04","WT05"]],["XT2",["WT06","WT07","WT08","WT09"]]],
     states:"comm", notOper:true, base:6.6, seed:53, plan:0 },
-  { id:"VHO", code:"VHO", plant:"VHO", type:"solar", ll:[108.733,11.282], cap:29.99, capDC:34.25,
+  { id:"VHO", code:"VHO", plant:"VHO", type:"solar", ll:[108.733,11.282], cap:29.99, capAC:29.99, capDC:34.25, capUnit:"MWac",
     name:{vi:"Vĩnh Hảo",en:"Vinh Hao",zh:"永好光伏电站"}, full:{vi:"NMĐMT Vĩnh Hảo",en:"Vinh Hao Solar Plant",zh:"永好光伏电站"},
     prov:{vi:"Lâm Đồng",en:"Lam Dong",zh:"林同省"}, old:{vi:"Bình Thuận",en:"Binh Thuan",zh:"平顺"}, model:"Sungrow SG630MX", invKW:630,
     scada:"NARI NS3000", ppc:"AGC/AVC NS3000", gw:"GW-VHO-01", cod:"06/2019", proto:"IEC 104 · Modbus TCP", pts:10400, kv:"110 kV", wx:"TRM-ZS1",
     feeders:Array.from({length:12},(_,b)=>[String(b+1).padStart(2,"0"),[1,2,3,4].map(k=>`INV-${String(b+1).padStart(2,"0")}-${k}`)]),
     states:{"INV-07-3":"fault","INV-04-1":"comm","INV-10-2":"limit"}, seed:61, plan:4350 },
-  { id:"LXS", code:"LXS", plant:"LXS", type:"roof", ll:[106.121,21.256], cap:19.93, capDC:20.048,
+  { id:"LXS", code:"LXS", plant:"LXS", type:"roof", ll:[106.121,21.256], cap:20.048, capAC:17.49, capDC:20.048, capUnit:"MWp",
     name:{vi:"Lập Tốn (mái nhà)",en:"Lap Ton (rooftop)",zh:"立讯屋顶光伏"}, full:{vi:"ĐMT mái nhà Lập Tốn",en:"Lap Ton Rooftop Solar",zh:"立讯屋顶光伏"},
-    prov:{vi:"Bắc Ninh",en:"Bac Ninh",zh:"北宁省"}, old:{vi:"Bắc Giang",en:"Bac Giang",zh:"北江"}, model:"Solis S5-GC110K / 150K", invKW:125,
+    prov:{vi:"Bắc Ninh",en:"Bac Ninh",zh:"北宁省"}, old:{vi:"Bắc Giang",en:"Bac Giang",zh:"北江"}, model:"Solis S5-GC110K", invKW:110,
     surveyed:false, scada:"CYG SUNRI (HINO)", ppc:"Zero Export CYG · 9 POI", gw:"GW-LXS-01", cod:"12/2023", proto:"IEC 104 (HINO)", pts:8000, kv:"22 kV", wx:"WS01",
     feeders:null, states:{"INV-D2-14-03":"limit","INV-C3-8-05":"comm","INV-C2-5-02":"fault"}, seed:71, plan:2380 },
 ];
@@ -103,7 +103,10 @@ function solarPos(ll, ms){
 function irrAt(s, ms){ const {el}=solarPos(s.ll,ms); if(el<=0) return 0; const m=ms/60000; const cloud=clamp(0.80+0.30*fbm(m/38,s.seed)+0.08*fbm(m/6,s.seed+5),0.28,1.02); return 1060*Math.pow(Math.sin(el*Math.PI/180),1.18)*cloud*1.04; }
 function ambAt(s, ms){ const h=localH(ms); const base = s.id==="LXS"?25.5 : (s.id==="VHO"||s.id==="BTH")?27.5 : 22.5; return base+5.2*Math.sin(2*Math.PI*(h-9)/24)+0.8*fbm(ms/3.6e6,s.seed); }
 function unitState(s,id){ if(s.states==="comm") return "comm"; return (s.states&&s.states[id])||"run"; }
-function unitRated(s,id){ return s.type==="wind" ? (s.ratedOf? s.ratedOf(id): s.rated) : (s.type==="solar"? s.invKW/1000 : s.cap/s.n); }
+function unitRated(s,id){ return s.type==="wind" ? (s.ratedOf? s.ratedOf(id): s.rated) : s.invKW/1000; }
+// cap = installed capacity as stated in the proposal (MW for wind, MWac Vĩnh Hảo, MWp Lập Tốn); acCap = grid-side AC limit used for physics
+const acCap = s => s.capAC ?? s.cap;
+const capLabel = (s,d=1) => nf(s.cap, s.capUnit==="MWp"?3 : s.capUnit==="MWac"?2 : d)+(s.capUnit && s.capUnit!=="MW" ? " "+s.capUnit : "");
 
 // Station power at time ms. Returns {p, th, units?}
 function stationPower(s, ms, detail=false){
@@ -116,7 +119,7 @@ function stationPower(s, ms, detail=false){
     if(s.notOper){ p=0; th=0; if(detail) out.forEach(o=>{o.p=null;o.v=null;}); }
   } else {
     const g=irrAt(s,ms), amb=ambAt(s,ms), tm=amb+g*0.032, der=1-0.0038*Math.max(0,tm-25);
-    const dc = g/1000*s.capDC*0.86*der, acCap=s.cap; th=Math.min(acCap,dc);
+    const dc = g/1000*s.capDC*0.86*der, acc=acCap(s); th=Math.min(acc,dc);
     s.units.forEach((u,i)=>{ const r=unitRated(s,u.id), st=unitState(s,u.id); const share=th/s.n*(1+0.035*hsh(i*13+s.seed));
       let pu = st==="run"? Math.min(r,share) : st==="limit"? Math.min(r*0.72,share) : 0; if(detail) out.push({id:u.id,f:u.f,p:pu,pa:share,st,r,g}); p+=pu; });
   }
@@ -162,7 +165,7 @@ function inScope(id){ return scopeIds().includes(id); }
 function stStatus(s){ // ok | warn | crit | off
   if(s.notOper) return "off"; const al=ALARMS.filter(a=>a.st===s.id&&!a.cleared); if(al.some(a=>a.sev===1&&!a.acked)) return "crit"; if(al.some(a=>a.sev===1||(a.sev===2&&!a.acked))) return "warn"; return "ok"; }
 function healthScore(s){ if(s.notOper) return null; const L0=LIVE.st[s.id]; const al=ALARMS.filter(a=>a.st===s.id&&!a.cleared); let h=100-al.reduce((a,x)=>a+[0,9,5,3,1][x.sev],0)-(100-(L0.avail||100))*1.4; return Math.round(clamp(h,40,100)); }
-function cfToday(s){ const L0=LIVE.st[s.id]; const hrs=(LIVE.t-dayStart(LIVE.t))/HOUR; return hrs>0? 100*L0.e/(s.cap*hrs):0; }
+function cfToday(s){ const L0=LIVE.st[s.id]; const hrs=(LIVE.t-dayStart(LIVE.t))/HOUR; return hrs>0? 100*L0.e/(acCap(s)*hrs):0; }
 
 // ===================== Alarms =====================
 const AT = { // alarm text templates
@@ -220,7 +223,7 @@ function buildHist(){
   if(HIST) return HIST; const now=Date.now(), d0=dayStart(now); const days=[]; for(let i=364;i>=0;i--) days.push(d0-i*DAY);
   HIST={days, st:{}};
   STATIONS.forEach((s,si)=>{ const rows=[]; const r=rnd(s.seed*97);
-    days.forEach((d,di)=>{ let e=0, th=0, res=0; for(let h=0;h<24;h++){ const t=d+h*HOUR+30*60e3; if(s.type==="wind"){ const v=windAt(s,t); const pa=pcurve(v,s.cap/s.n*1.0)*s.n; th+=pa; res+=v; } else { const g=irrAt(s,t); th+=Math.min(s.cap,g/1000*s.capDC*0.86); res+=g/1000; } }
+    days.forEach((d,di)=>{ let e=0, th=0, res=0; for(let h=0;h<24;h++){ const t=d+h*HOUR+30*60e3; if(s.type==="wind"){ const v=windAt(s,t); const pa=pcurve(v,s.cap/s.n*1.0)*s.n; th+=pa; res+=v; } else { const g=irrAt(s,t); th+=Math.min(acCap(s),g/1000*s.capDC*0.86); res+=g/1000; } }
       if(s.notOper){ rows.push({d,e:0,th:0,res:s.type==="wind"?res/24:res,avail:null,loss:[0,0,0,0,0],stopH:0,curtE:0}); return; }
       const fault=th*(0.006+0.03*Math.max(0,r()-0.55)), maint=th*(0.004+0.02*Math.max(0,r()-0.7)), curt=(s.id==="IAP1"||s.id==="IAP2"||s.id==="TTN"||s.id==="VHO")? th*(0.01+0.06*Math.max(0,r()-0.5)) : th*0.004*r(), grid=th*0.006, conv=th*(s.type==="wind"?0.012:0.02);
       const loss=[fault,maint,curt,grid,conv]; const lsum=loss.reduce((a,b)=>a+b,0); e=Math.max(0,th-lsum);

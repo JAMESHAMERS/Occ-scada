@@ -1,0 +1,12 @@
+{
+  "_source": "OCC proposal (OCC_Proposal VN-CN.pptx), mục 18 – Nguồn dữ liệu và điểm kết nối theo nhà máy; bảng 'Quy mô / thiết bị'. Bảng chuẩn để tools/validate.mjs đối chiếu với src/20_data.js.",
+  "plants": {
+    "IAP": { "name": "Ia Pech (Gia Lai)",        "mw": 99,     "units": 30,  "model": "WD164-3300" },
+    "TTN": { "name": "Tân Tấn Nhật (Kon Tum)",   "mw": 50,     "units": 18,  "model": "Windey" },
+    "DKH": { "name": "Đắk Hòa (Đắk Nông)",       "mw": 49.5,   "units": 15,  "model": "EN-156-3.3" },
+    "BTH": { "name": "Bình Thuận (Phong Điện 1)", "mw": 29.7,  "units": 9,   "model": "EN-156-3.3" },
+    "VHO": { "name": "Vĩnh Hảo (Bình Thuận)",    "mwac": 29.99, "mwp": 34.25, "units": 48, "unit_kw": 630, "model": "SG630MX" },
+    "LXS": { "name": "Lập Tốn (Bắc Giang)",      "mwp": 20.048, "units": 159, "unit_kw": 110, "model": "S5-GC110K", "roofs": 21 }
+  },
+  "totals": { "wind_mw": 228.2, "solar_mw_approx": 50, "all_mw_approx": 278 }
+}

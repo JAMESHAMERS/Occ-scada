@@ -52,6 +52,22 @@ for (const s of X.STATIONS) {
   if (s.type === "wind") { const sum = s.units.reduce((a, u) => a + X.unitRated(s, u.id), 0); if (Math.abs(sum - s.cap) / s.cap > 0.05) err(`${tag}: turbines add up to ${sum.toFixed(2)} MW but cap is ${s.cap} MW`); }
   if (!(s.plan >= 0)) err(`${tag}: monthly plan (MWh) missing`);
 }
+// 2b. Plant figures must match the proposal reference table (data/plants-reference.json)
+const REF = JSON.parse(rd("data/plants-reference.json")).plants; const near = (a, b) => Math.abs(a - b) < 0.0005 * Math.max(1, b);
+for (const [pid, r] of Object.entries(REF)) {
+  const ss = X.STATIONS.filter(s => s.plant === pid); if (!ss.length) { err(`plant ${pid} (${r.name}) in reference table but not in STATIONS`); continue; }
+  const units = ss.reduce((a, s) => a + s.n, 0), cap = ss.reduce((a, s) => a + s.cap, 0);
+  if (units !== r.units) err(`plant ${pid}: ${units} units in data, reference says ${r.units}`);
+  if (r.model && !ss.every(s => s.model.includes(r.model))) err(`plant ${pid}: model should contain "${r.model}" (data: ${ss.map(s => s.model).join(", ")})`);
+  if (r.mw != null && !near(cap, r.mw)) err(`plant ${pid}: ${cap} MW in data, reference says ${r.mw} MW`);
+  if (r.mwac != null && !ss.every(s => near(s.capAC ?? s.cap, r.mwac))) err(`plant ${pid}: AC capacity should be ${r.mwac} MWac`);
+  if (r.mwp != null && !ss.every(s => near(s.capDC, r.mwp))) err(`plant ${pid}: DC capacity should be ${r.mwp} MWp`);
+  if (r.unit_kw != null) for (const s of ss) { if (s.invKW !== r.unit_kw) err(`plant ${pid}: inverter rating ${s.invKW} kW, reference ${r.unit_kw} kW`);
+    const invAC = s.n * s.invKW / 1000, ac = s.capAC ?? s.cap; if (invAC + 1e-6 < ac) err(`plant ${pid}: inverters give ${invAC.toFixed(2)} MWac, less than AC capacity ${ac}`); }
+  if (r.roofs != null && !ss.every(s => s.feeders.length === r.roofs)) err(`plant ${pid}: ${ss[0].feeders.length} roof projects, reference ${r.roofs}`);
+}
+for (const s of X.STATIONS) if (s.type !== "wind" && s.capAC != null && s.capDC < s.capAC) err(`station ${s.id}: MWp below MWac`);
+
 // 3. Alarms point at real stations and devices
 const SITE_DEV = /^(TBA|Tủ|Gateway)/;
 for (const a of X.ALARMS.filter(a => !a.cleared)) { const s = X.ST[a.st]; if (!s) { err(`alarm ${a.id}: unknown station ${a.st}`); continue; }
@@ -68,7 +84,7 @@ for (const lit of [String(derived.MW) + " MW", X.PTS_TOTAL.toLocaleString("vi-VN
 // Report
 const sum = (f) => X.STATIONS.filter(f).reduce((a, s) => a + s.pts, 0);
 console.log("OCC SCADA · data summary (derived from src/20_data.js)");
-console.table(X.STATIONS.map(s => ({ station: s.id, plant: s.plant, type: s.type, MW: s.cap, units: s.n, points: s.pts, surveyed: s.surveyed !== false })));
+console.table(X.STATIONS.map(s => ({ station: s.id, plant: s.plant, type: s.type, installed: s.cap + " " + (s.capUnit || "MW"), MWac: s.capAC ?? s.cap, MWp: s.capDC ?? "", units: s.n, model: s.model, points: s.pts })));
 console.log(`plants ${derived.NP} · stations ${derived.NS} · ${derived.MW} MW · points surveyed ${X.PTS_SURVEYED} · points total ${X.PTS_TOTAL} (check ${sum(() => true)})`);
 warns.forEach(w => console.log("! " + w));
 if (errors.length) { console.error(`\n✗ ${errors.length} problem(s):`); errors.forEach(e => console.error("  - " + e)); process.exit(1); }
