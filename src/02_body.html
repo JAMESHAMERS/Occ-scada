@@ -1,0 +1,50 @@
+<div id="app">
+  <section class="login" id="login" aria-label="Đăng nhập">
+    <div class="login-hero">
+      <div class="hero-3d" id="hero3d"></div>
+      <div class="hero-veil"></div>
+      <div class="hero-copy">
+        <span data-logo="full" data-fixed style="width:176px;display:block;margin-bottom:26px"></span>
+        <div class="hero-k"><i></i><span data-i="heroK"></span></div>
+        <h2 class="hero-h" data-i="heroH"></h2>
+        <p class="hero-p" data-i="heroP"></p>
+      </div>
+      <div class="hero-stats">
+        <div><b id="hsNpV">–</b><span data-i="hsPlants"></span></div>
+        <div><b id="hsMwV">–</b><span data-i="hsCap"></span></div>
+        <div><b id="hsPtsV">–</b><span data-i="hsPts"></span></div>
+        <div><b>≤ 5 s</b><span data-i="hsLat"></span></div>
+      </div>
+    </div>
+    <div class="login-side">
+      <div class="login-card" id="loginCard"></div>
+    </div>
+  </section>
+
+  <div class="shell" id="shell" hidden>
+    <aside class="sb" id="sb">
+      <div class="sb-brand"><span data-logo="mark"></span><div class="sb-prod"><b>OCC SCADA</b><span data-i="brandSub2"></span></div></div>
+      <nav class="sb-nav" id="nav" aria-label="Navigation"></nav>
+      <div class="sb-foot" id="sbFoot"></div>
+    </aside>
+    <div class="main">
+      <header class="top">
+        <button class="ibtn hamb" id="hamb" aria-label="Menu"></button>
+        <div class="top-t"><span class="lvl" id="pgL">L1</span><div style="min-width:0"><h1 id="pgT"></h1><p id="pgS"></p></div></div>
+        <div class="alsum" id="alSum" role="group" aria-label="Alarm summary"></div>
+        <div class="search" id="search"></div>
+        <div class="seg hide-sm" id="langSeg" role="group" aria-label="Language"></div>
+        <button class="ibtn" id="themeBtn" aria-label="Theme"></button>
+        <div style="position:relative"><button class="user" id="userBtn" aria-haspopup="true"></button><div id="userMenu"></div></div>
+      </header>
+      <main class="view" id="view"></main>
+      <footer class="stbar" id="stbar"></footer>
+    </div>
+  </div>
+  <div id="drawerHost"></div>
+  <div id="modalHost"></div>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>

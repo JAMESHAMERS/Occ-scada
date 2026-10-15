@@ -1,6 +1,8 @@
+<!-- GENERATED FILE – do not edit. Source: src/ + data/ in this repository; rebuild with build.py.
+     HINO OCC SCADA 1.0 · build 261015.3b413ac · HINO Systech Vietnam Co., Ltd. -->
 <title>OCC SCADA Ia Pech</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="HINO OCC SCADA – Trung tâm giám sát tập trung 6 nhà máy điện gió, điện mặt trời · HINO Systech Vietnam Co., Ltd.">
+<meta name="description" content="HINO OCC SCADA – Trung tâm giám sát tập trung các nhà máy điện gió, điện mặt trời · HINO Systech Vietnam Co., Ltd.">
 <meta name="author" content="HINO Systech Vietnam Co., Ltd.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -505,9 +507,9 @@ table.t td.num,table.t .r{font-family:var(--f-num);font-variant-numeric:tabular-
         <p class="hero-p" data-i="heroP"></p>
       </div>
       <div class="hero-stats">
-        <div><b>6</b><span data-i="hsPlants"></span></div>
-        <div><b>≈278 MW</b><span data-i="hsCap"></span></div>
-        <div><b id="hsPtsV">≈26.900</b><span data-i="hsPts"></span></div>
+        <div><b id="hsNpV">–</b><span data-i="hsPlants"></span></div>
+        <div><b id="hsMwV">–</b><span data-i="hsCap"></span></div>
+        <div><b id="hsPtsV">–</b><span data-i="hsPts"></span></div>
         <div><b>≤ 5 s</b><span data-i="hsLat"></span></div>
       </div>
     </div>
@@ -551,8 +553,8 @@ table.t td.num,table.t .r{font-family:var(--f-num);font-variant-numeric:tabular-
 // ===================== i18n (VI · EN · 中文) =====================
 const DICT = {
   brandSub:["Trung tâm giám sát tập trung","Operations Control Centre","集中监控中心"],
-  brandSub2:["6 nhà máy · 278 MW","6 plants · 278 MW","6 座电站 · 278 MW"],
-  heroH:["Một nền tảng giám sát cho sáu nhà máy điện gió và điện mặt trời","One monitoring platform for six wind and solar plants","六座风电、光伏电站统一监控平台"],
+  brandSub2:["{NP} nhà máy · {MW} MW","{NP} plants · {MW} MW","{NP} 座电站 · {MW} MW"],
+  heroH:["Một nền tảng giám sát cho {NP} nhà máy điện gió và điện mặt trời","One monitoring platform for {NP} wind and solar plants","{NP} 座风电、光伏电站统一监控平台"],
   heroP:["Trung tâm OCC đặt tại NMĐG Ia Pech. Kết nối chỉ đọc qua IEC 104, Modbus TCP, OPC UA tới SCADA của từng hãng; không gửi lệnh điều khiển.","OCC hosted at Ia Pech wind farm. Read-only links over IEC 104, Modbus TCP and OPC UA to each vendor SCADA; no control commands are sent.","OCC 中心设于 IA Pech 风电场。经 IEC 104、Modbus TCP、OPC UA 只读接入各厂家 SCADA，不下发任何控制命令。"],
   hsPlants:["nhà máy","plants","座电站"], hsCap:["công suất lắp đặt","installed capacity","装机容量"], hsPts:["điểm dữ liệu","data points","数据点"], hsLat:["độ trễ cảnh báo","alarm latency","告警延迟"],
   login:["Đăng nhập","Sign in","登录"], loginSub:["Dùng tài khoản do quản trị viên OCC cấp.","Use the account issued by your OCC administrator.","请使用 OCC 管理员分配的账号。"],
@@ -576,7 +578,7 @@ const DICT = {
   overview:["Tổng quan","Overview","总览"], gis:["Bản đồ GIS","GIS map","GIS 地图"], stations:["Trạm","Stations","场站"], twin:["Digital Twin 3D","3D digital twin","3D 数字孪生"], alarms:["Cảnh báo","Alarms","告警"],
   kpis:["Chỉ số vận hành","Operating metrics","运行指标"], pcurve:["Đường cong công suất","Power curve","功率曲线"], loss:["Tổn thất điện năng","Energy loss","电量损失"], downtime:["Phân tích dừng máy","Downtime analysis","停机分析"], curtail:["Hạn chế công suất","Curtailment","限电分析"], bench:["So sánh ngang","Benchmarking","横向对标"],
   reports:["Báo cáo","Reports","报表"], users:["Người dùng & phân quyền","Users & roles","用户与权限"], audit:["Nhật ký kiểm toán","Audit log","审计日志"], sources:["Nguồn dữ liệu","Data sources","数据源"],
-  sub_overview:["Toàn danh mục 6 nhà máy · 7 trạm","Portfolio of 6 plants · 7 stations","6 座电站 · 7 个场站总览"],
+  sub_overview:["Toàn danh mục {NP} nhà máy · {NS} trạm","Portfolio of {NP} plants · {NS} stations","{NP} 座电站 · {NS} 个场站总览"],
   sub_gis:["Vị trí địa lý chuẩn WGS84 · đường truyền về OCC Ia Pech","WGS84 locations · links to OCC Ia Pech","WGS84 坐标 · 至 IA Pech OCC 链路"],
   sub_twin:["Mô hình 3D gắn trạng thái vận hành từng thiết bị","3D models bound to live equipment state","设备三维模型关联实时状态"],
   sub_alarms:["Thời gian thực · lịch sử · thống kê (IEC 62682)","Live · history · statistics (IEC 62682)","实时 · 历史 · 统计（IEC 62682）"],
@@ -680,7 +682,10 @@ const DICT = {
 };
 const LANGS = ["vi","en","zh"];
 const LOCALE = {vi:"vi-VN", en:"en-GB", zh:"zh-CN"};
-function t(k, v){ const row = DICT[k]; let s = row ? (row[LANGS.indexOf(S.lang)] ?? row[0]) : k; if(v) for(const x in v) s = s.split("{"+x+"}").join(v[x]); return s; }
+// Global figures, always derived from the plant master data (src/20_data.js) — never typed into texts.
+function FIG(){ return { NP: new Set(STATIONS.map(s=>s.plant)).size, NS: STATIONS.length, NSURV: new Set(STATIONS.filter(s=>s.surveyed!==false).map(s=>s.plant)).size,
+  MW: Math.round(STATIONS.reduce((a,s)=>a+s.cap,0)), PTS: nf(PTS_TOTAL,0), BUILD: BUILD.id }; }
+function t(k, v){ const row = DICT[k]; let s = row ? (row[LANGS.indexOf(S.lang)] ?? row[0]) : k; if(v) for(const x in v) s = s.split("{"+x+"}").join(v[x]); if(s.includes("{")){ const g=FIG(); for(const x in g) s = s.split("{"+x+"}").join(g[x]); } return s; }
 function L(o){ return o ? (o[S.lang] ?? o.vi ?? o.en) : ""; }
 const nfCache = {};
 function nf(v, d=1){ if(v==null || Number.isNaN(v)) return "—"; const key=S.lang+d; nfCache[key] ||= new Intl.NumberFormat(LOCALE[S.lang],{minimumFractionDigits:d,maximumFractionDigits:d}); return nfCache[key].format(v); }
@@ -690,23 +695,25 @@ function fmtDate(d){ return d.toLocaleDateString(LOCALE[S.lang],{year:"numeric",
 function fmtDur(h){ const hh=Math.floor(h), mm=Math.round((h-hh)*60); return S.lang==="zh"? `${hh}小时${mm}分` : S.lang==="en" ? `${hh} h ${mm} min` : `${hh} giờ ${mm} phút`; }
 Object.assign(DICT,{
   heroK:["HINO OCC Platform · Global Services from Japan","HINO OCC Platform · Global Services from Japan","HINO OCC 平台 · 源自日本的全球服务"],
-  prodSub:["Trung tâm giám sát tập trung 6 nhà máy","Central monitoring for 6 plants","6 座电站集中监控中心"],
+  prodSub:["Trung tâm giám sát tập trung {NP} nhà máy","Central monitoring for {NP} plants","{NP} 座电站集中监控中心"],
   devBy:["Thiết kế và phát triển bởi","Designed and developed by","设计与开发"],
   hinoName:["Công ty TNHH HINO Systech Việt Nam","HINO Systech Vietnam Co., Ltd.","HINO Systech 越南有限公司"],
   hinoTag:["Keep challenging with Valued Customers","Keep challenging with Valued Customers","Keep challenging with Valued Customers"],
   about:["Thông tin hệ thống","About this system","系统信息"], version:["Phiên bản","Version","版本"], standards:["Tiêu chuẩn áp dụng","Standards applied","适用标准"], website:["Website","Website","网站"], customer:["Chủ đầu tư","Owner","业主"], customerV:["Công ty Năng lượng tái tạo Quốc tế Việt Nam","Vietnam International Renewable Energy Co.","越南国际可再生能源公司"],
   stdV:["ISA-101 (HMI), ISA-18.2 / IEC 62682 (cảnh báo), IEC 61400-26 (khả dụng), IEC 62443 / 62351 (an ninh)","ISA-101 (HMI), ISA-18.2 / IEC 62682 (alarms), IEC 61400-26 (availability), IEC 62443 / 62351 (security)","ISA-101（HMI）、ISA-18.2 / IEC 62682（告警）、IEC 61400-26（可利用率）、IEC 62443 / 62351（安全）"],
-  ptsTot:["Tổng điểm dữ liệu","Total data points","数据点总数"], pts5:["Tổng 5 nhà máy đã khảo sát","Total of 5 surveyed plants","已勘察 5 座合计"], pts6:["Tổng 6 nhà máy (sơ bộ)","Total of 6 plants (preliminary)","6 座合计（初步）"],
+  ptsTot:["Tổng điểm dữ liệu","Total data points","数据点总数"], pts5:["Tổng {NSURV} nhà máy đã khảo sát","Total of {NSURV} surveyed plants","已勘察 {NSURV} 座合计"], pts6:["Tổng {NP} nhà máy (sơ bộ)","Total of {NP} plants (preliminary)","{NP} 座合计（初步）"],
   ptsNote:["Số điểm cập nhật theo thực tế khảo sát và SCADA HINO tại Lập Tốn; Vĩnh Hảo gồm dòng string. Dùng để định cỡ máy chủ, lưu trữ ≥ 5 năm và bản quyền.","Point counts updated from the site survey and the HINO SCADA at Lap Ton; Vinh Hao includes string currents. Used to size servers, ≥ 5-year storage and licences.","数据点数按勘察实际及立讯 HINO SCADA 更新；永好含组串电流。用于测算服务器、≥5 年存储及授权。"],
   ptsUnit:["điểm","points","点"],
   L1:["Tổng quan","Overview","总览"], L2:["Khu vực","Area","区域"], L3:["Thiết bị","Equipment","设备"], L4:["Chẩn đoán","Diagnostics","诊断"],
   alBand:["Cảnh báo theo mức ưu tiên — bấm để mở","Alarms by priority — click to open","按优先级的告警 — 点击打开"],
   srvName:["OCC-APP-01 · Ia Pếch","OCC-APP-01 · Ia Pech","OCC-APP-01 · IA Pech"],
 });
-DICT.hsPts=["điểm dữ liệu (6 nhà máy)","data points (6 plants)","数据点（6 座电站）"];
-DICT.brandSub2=["6 nhà máy · 278 MW","6 plants · 278 MW","6 座 · 278 MW"];
+DICT.hsPts=["điểm dữ liệu ({NP} nhà máy)","data points ({NP} plants)","数据点（{NP} 座电站）"];
+DICT.brandSub2=["{NP} nhà máy · {MW} MW","{NP} plants · {MW} MW","{NP} 座 · {MW} MW"];
 
 // ---- 20_data.js
+// Build stamp is injected by build.py (date + git commit), so every published copy can be compared at a glance.
+const BUILD = {"version": "1.0", "id": "261015.3b413ac", "date": "2026-10-15"};
 // ===================== Plant registry =====================
 // Coordinates: WGS84, public reference sources (gem.wiki / thewindpower / news), tolerance a few km.
 const OCC_LL = [107.902, 13.975];
@@ -751,7 +758,7 @@ const STATIONS = [
   { id:"LXS", code:"LXS", plant:"LXS", type:"roof", ll:[106.121,21.256], cap:19.93, capDC:20.048,
     name:{vi:"Lập Tốn (mái nhà)",en:"Lap Ton (rooftop)",zh:"立讯屋顶光伏"}, full:{vi:"ĐMT mái nhà Lập Tốn",en:"Lap Ton Rooftop Solar",zh:"立讯屋顶光伏"},
     prov:{vi:"Bắc Ninh",en:"Bac Ninh",zh:"北宁省"}, old:{vi:"Bắc Giang",en:"Bac Giang",zh:"北江"}, model:"Solis S5-GC110K / 150K", invKW:125,
-    scada:"CYG SUNRI (HINO)", ppc:"Zero Export CYG · 9 POI", gw:"GW-LXS-01", cod:"12/2023", proto:"IEC 104 (HINO)", pts:8000, kv:"22 kV", wx:"WS01",
+    surveyed:false, scada:"CYG SUNRI (HINO)", ppc:"Zero Export CYG · 9 POI", gw:"GW-LXS-01", cod:"12/2023", proto:"IEC 104 (HINO)", pts:8000, kv:"22 kV", wx:"WS01",
     feeders:null, states:{"INV-D2-14-03":"limit","INV-C3-8-05":"comm","INV-C2-5-02":"fault"}, seed:71, plan:2380 },
 ];
 // Lập Tốn: 21 roof projects, 159 inverters
@@ -983,7 +990,7 @@ function audit(action, obj, result="ok", user){ AUDIT.unshift({t:Date.now(), u:u
   rows.forEach(([u,a,o,r,m])=>AUDIT.push({t:now-m*60e3,u,a,o,r:typeof r==="function"?"ok":r,ip:"10.20.1."+(30+u.length)})); AUDIT.sort((a,b)=>b.t-a.t); })();
 function can(p){ return !!S.user && ROLES[S.user.role].perm.includes(p); }
 
-const PTS_SURVEYED = STATIONS.filter(s=>s.id!=="LXS").reduce((a,s)=>a+s.pts,0); // ≈ 18 900
+const PTS_SURVEYED = STATIONS.filter(s=>s.surveyed!==false).reduce((a,s)=>a+s.pts,0); // sites surveyed in 09/2026 (Lập Tốn excluded: HINO SCADA)
 const PTS_TOTAL = STATIONS.reduce((a,s)=>a+s.pts,0); // ≈ 26 900
 
 // ---- 30_core.js
@@ -1067,7 +1074,7 @@ function closeModal(){ $("#modalHost").innerHTML=""; }
 function applyTheme(th){ S.theme=th; if(th) document.documentElement.setAttribute("data-theme",th); else document.documentElement.removeAttribute("data-theme"); store.set("theme",th); }
 function isDark(){ const a=document.documentElement.getAttribute("data-theme"); if(a) return a==="dark"; return !window.matchMedia("(prefers-color-scheme: light)").matches; }
 function setLang(l){ S.lang=l; store.set("lang",l); document.documentElement.lang = l==="zh"?"zh-CN":l; document.body.classList.toggle("zh",l==="zh"); nfCache && Object.keys(nfCache).forEach(k=>delete nfCache[k]); applyStatic(); if(S.user){ renderShell(); go(S.page,S.param,true); } else renderLogin(); }
-function applyStatic(){ $$("[data-i]").forEach(el=>el.textContent=t(el.dataset.i)); const hp=document.getElementById("hsPtsV"); if(hp) hp.textContent="≈"+nf(PTS_TOTAL,0); applyLogos(); }
+function applyStatic(){ $$("[data-i]").forEach(el=>el.textContent=t(el.dataset.i)); const g=FIG(); const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; }; set("hsPtsV","≈"+g.PTS); set("hsNpV",g.NP); set("hsMwV","≈"+g.MW+" MW"); applyLogos(); }
 function langSeg(id){ return `<div class="seg" role="group" aria-label="Language" ${id?`id="${id}"`:""}>${[["vi","VI"],["en","EN"],["zh","中文"]].map(([k,l])=>`<button data-lang="${k}" aria-pressed="${S.lang===k}">${l}</button>`).join("")}</div>`; }
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-lang]"); if(b) setLang(b.dataset.lang); });
 
@@ -1094,7 +1101,7 @@ function renderLogin(){
         ${["admin","manager","occ","iapech","maint","guest"].map(u=>{const x=USERS.find(y=>y.u===u); return `<button class="demo-acc" data-demo="${u}"><b>${u}</b><span>${t("r_"+x.role)}${x.mfa?" · 2FA":""}</span></button>`;}).join("")}
       </div><div class="faint" style="font-size:11px">${t("pwPolicy")}</div></div>
       <div class="sec-foot"><span>${ic("lock","sm")}${t("secTls")}</span><span>${ic("shield","sm")}${t("secRbac")}</span><span>${ic("log","sm")}${t("secAudit")}</span><span>${ic("eye","sm")}${t("secRo")}</span></div>
-      <div class="login-legal"><span>${t("devBy")} <b>${t("hinoName")}</b></span><span>Global Services from Japan · www.hino-systechvn.com</span><span>© 2026 HINO Systech Vietnam Co., Ltd. · OCC SCADA v1.0</span></div>`;
+      <div class="login-legal"><span>${t("devBy")} <b>${t("hinoName")}</b></span><span>Global Services from Japan · www.hino-systechvn.com</span><span>© 2026 HINO Systech Vietnam Co., Ltd. · OCC SCADA v${BUILD.version} · build ${BUILD.id}</span></div>`;
     $("#pwEye").onclick=()=>{ const p=$("#lp"); p.type=p.type==="password"?"text":"password"; $("#pwEye").innerHTML=ic(p.type==="password"?"eye":"eyeOff","sm"); };
     $("#forgot").onclick=()=>toast(t("forgot"),t("forgotMsg"));
     $$("[data-demo]").forEach(b=>b.onclick=()=>{ $("#lu").value=b.dataset.demo; $("#lp").value=DEMO_PW[b.dataset.demo]; $("#lp").focus(); });
@@ -1196,10 +1203,10 @@ function toggleUserMenu(){ const m=$("#userMenu"); if(m.innerHTML){ m.innerHTML=
   <div class="menu-h" style="gap:6px"><div class="kv"><span>${t("scope")}</span><b style="font-family:var(--f-ui);font-size:12px;text-align:right">${esc(sc)}</b></div><div class="kv"><span>${t("mfa")}</span><b style="font-size:12px">${u.mfa?"TOTP":"—"}</b></div><div class="kv"><span>${t("session")}</span><b style="font-size:12px">${mins} min · 15 min idle</b></div><div class="kv"><span>${t("lastLogin")}</span><b style="font-size:12px">${esc(u.last)}</b></div></div><hr>
   <button class="mi" id="miAbout">${ic("info")}${t("about")}</button><button class="mi" id="miLogout">${ic("logout")}${t("logout")}</button></div>`; $("#miLogout").onclick=()=>logout(); $("#miAbout").onclick=()=>{ m.innerHTML=""; openAbout(); }; }
 function openAbout(){ modal(`<div class="mh">${ic("info")}<h3>${t("about")}</h3><span style="margin-left:auto"><button class="ibtn" data-close aria-label="${t("close")}">${ic("x")}</button></span></div><div class="mb about"><span data-logo="full" style="width:220px;display:block"></span>
-  <dl class="dl"><dt>${t("model")}</dt><dd>HINO OCC SCADA</dd><dt>${t("version")}</dt><dd class="mono">1.0 · build 2610.2</dd><dt>${t("devBy")}</dt><dd>${t("hinoName")}</dd><dt>${t("website")}</dt><dd class="mono">www.hino-systechvn.com</dd><dt>${t("customer")}</dt><dd>${t("customerV")}</dd><dt>OCC</dt><dd>NMĐG Ia Pếch · ${t("srvName")}</dd><dt>${t("ptsTot")}</dt><dd class="num">${nf(PTS_TOTAL,0)}</dd><dt>${t("standards")}</dt><dd style="white-space:normal;max-width:300px;margin-left:auto">${t("stdV")}</dd></dl>
+  <dl class="dl"><dt>${t("model")}</dt><dd>HINO OCC SCADA</dd><dt>${t("version")}</dt><dd class="mono">${BUILD.version} · build ${BUILD.id}${BUILD.sha?" · "+BUILD.sha:""}</dd><dt>${t("devBy")}</dt><dd>${t("hinoName")}</dd><dt>${t("website")}</dt><dd class="mono">www.hino-systechvn.com</dd><dt>${t("customer")}</dt><dd>${t("customerV")}</dd><dt>OCC</dt><dd>NMĐG Ia Pếch · ${t("srvName")}</dd><dt>${t("ptsTot")}</dt><dd class="num">${nf(PTS_TOTAL,0)}</dd><dt>${t("standards")}</dt><dd style="white-space:normal;max-width:300px;margin-left:auto">${t("stdV")}</dd></dl>
   <div class="faint" style="font-size:11.5px">Global Services from Japan · ${t("hinoTag")} · © 2026 HINO Systech Vietnam Co., Ltd.</div></div>`); applyLogos(); }
 function renderStatusBar(){ const el=$("#stbar"); if(!el||!S.user) return; const nConn=scopeIds().filter(id=>!ST[id].notOper).length;
-  el.innerHTML=`<span>HINO SYSTECH VIETNAM</span><span class="hide-md">OCC SCADA 1.0 · build 2610.2</span><span class="hide-md">${t("srvName")}</span><span><i></i>IEC 104 ${nConn}/${scopeIds().length}</span><span class="hide-md">${ic("lock","sm")} ${t("readOnly")} · TLS 1.3</span><span class="grow">${esc(S.user.u)} · ${t("r_"+S.user.role)} · ${t("simData")}</span><span class="clk" id="stClk">${fmtDate(new Date())} ${fmtTime(new Date())} ICT</span>`; }
+  el.innerHTML=`<span>HINO SYSTECH VIETNAM</span><span class="hide-md">OCC SCADA ${BUILD.version} · build ${BUILD.id}</span><span class="hide-md">${t("srvName")}</span><span><i></i>IEC 104 ${nConn}/${scopeIds().length}</span><span class="hide-md">${ic("lock","sm")} ${t("readOnly")} · TLS 1.3</span><span class="grow">${esc(S.user.u)} · ${t("r_"+S.user.role)} · ${t("simData")}</span><span class="clk" id="stClk">${fmtDate(new Date())} ${fmtTime(new Date())} ICT</span>`; }
 setInterval(()=>{ const c=document.getElementById("stClk"); if(c) c.textContent=`${fmtDate(new Date())} ${fmtTime(new Date())} ICT`; },1000);
 function bindSearch(){ const q=$("#q"), box=$("#sres"); let sel=0, items=[];
   q.oninput=()=>{ const v=q.value.trim().toLowerCase(); if(!v){ box.hidden=true; return; } items=[];
@@ -1674,7 +1681,7 @@ PAGES.sources=(el)=>{
   function render(){ const ids=scopeIds();
     el.innerHTML=`<div class="banner">${ic("shield","c-curt")}<span>${t("ppcChain")}</span></div>
     <div class="panel"><div class="ph"><h3>${t("gateways")}</h3><span class="sub">${t("ptsNote")}</span></div><div class="pb flush tw"><table class="t"><thead><tr><th>${t("station")}</th><th>Gateway</th><th>${t("protocol")}</th><th>SCADA</th><th class="r">${t("points")}</th><th>${t("status")}</th><th class="r">${t("latency")}</th><th>${t("lastUpd")}</th><th class="r">${t("buffer")}</th><th class="r">${t("distOCC")}</th></tr></thead><tbody>
-    ${ids.map(id=>{ const s=ST[id]; const off=s.notOper; const lat=off?null:Math.round(40+distKm(s.ll,OCC_LL)*0.35+20*Math.abs(hsh(Math.floor(Date.now()/4000)+s.seed))); return `<tr><td>${esc(stName(s))}</td><td class="mono">${s.gw}</td><td>${s.proto}</td><td>${esc(s.scada)}</td><td class="r num">≈ ${nf(s.pts,0)}${s.id==="VHO"?`<div class="faint" style="font-size:10.5px">${S.lang==="zh"?"含组串":S.lang==="en"?"incl. strings":"gồm dòng string"}</div>`:""}</td><td><span class="chip ${off?"bg-off":"bg-ok"}">${off?t("standby"):t("up")}</span></td><td class="r num">${lat==null?"—":lat+" ms"}</td><td class="num">${off?"10/10/2026 13:07":fmtTime(new Date(Date.now()-LIVE.st[id].updAgo*1000))}</td><td class="r num">${off?"72 h":"0 / 72 h"}</td><td class="r num">${nf(distKm(s.ll,OCC_LL),0)} km</td></tr>`; }).join("")}${(()=>{ const p5=ids.filter(i=>i!=="LXS").reduce((a,i)=>a+ST[i].pts,0), p6=ids.reduce((a,i)=>a+ST[i].pts,0); return (ids.includes("LXS")&&ids.length>1?`<tr class="pts-total"><td colspan="4">${t("pts5")}</td><td class="r num">≈ ${nf(p5,0)}</td><td colspan="5"></td></tr>`:"")+`<tr class="pts-total"><td colspan="4">${ids.length===STATIONS.length?t("pts6"):t("ptsTot")}</td><td class="r num" style="color:var(--accent)">≈ ${nf(p6,0)}</td><td colspan="5"></td></tr>`; })()}</tbody></table></div></div>
+    ${ids.map(id=>{ const s=ST[id]; const off=s.notOper; const lat=off?null:Math.round(40+distKm(s.ll,OCC_LL)*0.35+20*Math.abs(hsh(Math.floor(Date.now()/4000)+s.seed))); return `<tr><td>${esc(stName(s))}</td><td class="mono">${s.gw}</td><td>${s.proto}</td><td>${esc(s.scada)}</td><td class="r num">≈ ${nf(s.pts,0)}${s.id==="VHO"?`<div class="faint" style="font-size:10.5px">${S.lang==="zh"?"含组串":S.lang==="en"?"incl. strings":"gồm dòng string"}</div>`:""}</td><td><span class="chip ${off?"bg-off":"bg-ok"}">${off?t("standby"):t("up")}</span></td><td class="r num">${lat==null?"—":lat+" ms"}</td><td class="num">${off?"10/10/2026 13:07":fmtTime(new Date(Date.now()-LIVE.st[id].updAgo*1000))}</td><td class="r num">${off?"72 h":"0 / 72 h"}</td><td class="r num">${nf(distKm(s.ll,OCC_LL),0)} km</td></tr>`; }).join("")}${(()=>{ const p5=ids.filter(i=>ST[i].surveyed!==false).reduce((a,i)=>a+ST[i].pts,0), p6=ids.reduce((a,i)=>a+ST[i].pts,0); return (ids.some(i=>ST[i].surveyed===false)&&ids.length>1?`<tr class="pts-total"><td colspan="4">${t("pts5")}</td><td class="r num">≈ ${nf(p5,0)}</td><td colspan="5"></td></tr>`:"")+`<tr class="pts-total"><td colspan="4">${ids.length===STATIONS.length?t("pts6"):t("ptsTot")}</td><td class="r num" style="color:var(--accent)">≈ ${nf(p6,0)}</td><td colspan="5"></td></tr>`; })()}</tbody></table></div></div>
     <div class="grid g2"><div class="panel"><div class="ph"><h3>${t("servers")}</h3><span class="sub">Linux · RAID · 7×24 · UPS ≥ 30 min</span></div><div class="pb"><div class="grid g2">${[["srvDB",38,61,44],["srvApp",27,48,22],["srvAcq",33,40,18],["srvNas",9,22,57]].map(([k,c,r,d],i)=>{ const j=x=>clamp(x+6*fbm(Date.now()/9e4,i*5+x),2,98); return `<div class="asset-c"><h4>${ic("server","sm c-acc")}${t(k)} <span class="chip bg-ok" style="margin-left:auto">${t("up")}</span></h4><div class="srv">${[["cpu",j(c)],["ram",j(r)],["disk",d]].map(([l,v])=>`<div class="meter"><span class="muted">${t(l)}</span><div class="bar"><i style="width:${v}%;background:${v>80?"var(--crit)":v>60?"var(--warn)":"var(--accent)"}"></i></div><span class="num r" style="text-align:right">${nf(v,0)} %</span></div>`).join("")}</div></div>`; }).join("")}</div></div></div>
     <div class="panel"><div class="ph"><h3>${t("wan")}</h3><span class="sub">IPsec VPN · TLS 1.3</span></div><div class="pb flush tw"><table class="t"><thead><tr><th>${t("link")}</th><th class="r">${t("distOCC")}</th><th class="r">${t("latency")}</th><th>${t("status")}</th></tr></thead><tbody>${["IAP","TTN","DKH","BTH","VHO","LXS"].filter(p=>ids.some(i=>ST[i].plant===p)).map(p=>{ const s=STATIONS.find(x=>x.plant===p); const d=distKm(s.ll,OCC_LL); return `<tr><td>${p} → OCC Ia Pech</td><td class="r num">${nf(d,0)} km</td><td class="r num">${s.notOper?"—":Math.round(8+d*0.06)+" ms"}</td><td><span class="chip ${s.notOper?"bg-off":"bg-ok"}">${s.notOper?t("standby"):t("up")}</span></td></tr>`; }).join("")}</tbody></table></div></div></div>`; }
   render(); PAGE_UPD=render;
