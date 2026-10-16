@@ -83,7 +83,19 @@ function langSeg(id){ return `<div class="seg" role="group" aria-label="Language
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-lang]"); if(b) setLang(b.dataset.lang); });
 
 // ===================== Auth / login =====================
-const LOGIN = { step:"cred", pending:null, err:null, busy:false };
+const LOGIN = { step:"cred", pending:null, err:null, busy:false, method:"app", mail:null };
+// ---- Email one-time code (2FA): a Google Apps Script web app (tools/mail-otp/Code.gs) creates the code,
+// e-mails it from the owner's Gmail and verifies it; the code never exists in this page.
+// Recipient addresses live in the script, not here. Empty MAIL_OTP.url → authenticator only.
+const mailOtpOn = u => !!(MAIL_OTP.url && MAIL_OTP.users.includes(u));
+async function otpApi(q){ const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),15000);
+  try{ const r=await fetch(MAIL_OTP.url+"?"+new URLSearchParams(q), {cache:"no-store", redirect:"follow", signal:ctl.signal}); return await r.json(); }
+  catch(e){ return {ok:false, err: e.name==="AbortError"? "timeout" : "network"}; } finally{ clearTimeout(to); } }
+async function sendMailOtp(){ const u=LOGIN.pending; if(!u) return; LOGIN.mail={state:"sending"}; LOGIN.err=null; renderLogin();
+  const r=await otpApi({action:"send", u:u.u}); if(LOGIN.pending!==u) return;
+  if(r.ok){ LOGIN.mail={state:"sent", hint:r.hint||"email", until:Date.now()+60e3}; audit("a_mfa","Email OTP · "+t("sent"),"ok",u.u); }
+  else { LOGIN.mail={state:"fail"}; LOGIN.err= r.err==="rate"? t("rateLim") : t("mailFail",{r:r.err||"error"}); audit("a_mfa","Email OTP · send","fail",u.u); }
+  renderLogin(); }
 function lockInfo(u){ const x=store.get("lock."+u)||{n:0,until:0}; return x; }
 function setLock(u,x){ store.set("lock."+u,x); }
 function totp(u, slot){ const seed=[...u].reduce((a,c)=>a*31+c.charCodeAt(0),7)|0; const h=Math.abs(hsh(seed ^ (slot??Math.floor(Date.now()/30000))*2654435761)); return String(Math.floor(h*1e6)).padStart(6,"0"); }
@@ -113,28 +125,39 @@ function renderLogin(){
     if(!remembered) setTimeout(()=>$("#lu")?.focus(),50);
   } else {
     const u=LOGIN.pending; const slot=Math.floor(Date.now()/30000), left=30-Math.floor(Date.now()/1000)%30;
+    const viaMail=LOGIN.method==="mail", M=LOGIN.mail||{}; const sending=viaMail&&M.state==="sending", wait=viaMail&&M.until? Math.max(0,Math.ceil((M.until-Date.now())/1000)) : 0;
+    const sub= viaMail? (sending? t("mfaSending") : M.state==="sent"? t("mfaMailS",{e:M.hint}) : t("mfaMailFailS")) : t("mfaS");
     c.innerHTML=`
       <div class="login-top"><button class="btn ghost sm" id="otpBack">${ic("chevR","sm")} ${t("back")}</button>${langSeg()}</div>
-      <div><h2 class="login-h">${t("mfaT")}</h2><p class="login-sub">${t("mfaS")}</p></div>
+      <div><h2 class="login-h">${t("mfaT")}</h2><p class="login-sub" id="otpSub">${viaMail?ic(sending?"clock":"check","sm")+" ":""}${esc(sub)}</p></div>
       ${LOGIN.err?`<div class="err" role="alert">${ic("alert","sm")}<span>${esc(LOGIN.err)}</span></div>`:""}
-      <form id="of" class="grid" style="gap:14px"><div class="otp">${[0,1,2,3,4,5].map(i=>`<input inputmode="numeric" maxlength="1" aria-label="Digit ${i+1}" id="o${i}" autocomplete="${i===0?"one-time-code":"off"}">`).join("")}</div>
-      <button class="btn primary lg">${t("verify")}</button></form>
-      <div class="totp"><div><div class="faint" style="font-size:11px">${t("mfaDemo")} · ${esc(u.u)}</div><b id="totpCode">${totp(u.u,slot)}</b></div>
+      <form id="of" class="grid" style="gap:14px"><div class="otp">${[0,1,2,3,4,5].map(i=>`<input inputmode="numeric" maxlength="1" aria-label="Digit ${i+1}" id="o${i}" autocomplete="${i===0?"one-time-code":"off"}" ${sending?"disabled":""}>`).join("")}</div>
+      <button class="btn primary lg" id="otpBtn" ${sending||LOGIN.busy?"disabled":""}>${LOGIN.busy?t("verifying"):t("verify")}</button></form>
+      ${viaMail? `<div class="between"><button type="button" class="link" id="otpResend" ${wait||sending?"disabled":""}>${wait? t("resendIn",{s:wait}) : t("resend")}</button><button type="button" class="link" id="otpSwitch">${t("useApp")}</button></div>`
+      : `<div class="totp"><div><div class="faint" style="font-size:11px">${t("mfaDemo")} · ${esc(u.u)}</div><b id="totpCode">${totp(u.u,slot)}</b></div>
       <svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="none" stroke="var(--line-2)" stroke-width="3"/><circle id="totpRing" cx="18" cy="18" r="15" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="94.2" stroke-dashoffset="${94.2*(1-left/30)}" transform="rotate(-90 18 18)" stroke-linecap="round"/></svg></div>
-      <div class="sec-foot"><span>${ic("key","sm")}TOTP RFC 6238 · 30 s</span></div>
+      ${mailOtpOn(u.u)?`<div class="between"><span></span><button type="button" class="link" id="otpSwitch">${t("useMail")}</button></div>`:""}`}
+      <div class="sec-foot"><span>${ic("key","sm")}${viaMail? t("mfaMailBadge") : "TOTP RFC 6238 · 30 s"}</span></div>
       <div class="login-legal"><span>${t("devBy")} <b>${t("hinoName")}</b></span></div>`;
     $("#otpBack").firstChild.style.transform="rotate(180deg)";
-    $("#otpBack").onclick=()=>{ LOGIN.step="cred"; LOGIN.err=null; renderLogin(); };
+    $("#otpBack").onclick=()=>{ LOGIN.step="cred"; LOGIN.err=null; LOGIN.pending=null; LOGIN.mail=null; renderLogin(); };
     const ins=$$(".otp input"); ins.forEach((inp,i)=>{ inp.oninput=()=>{ inp.value=inp.value.replace(/\D/g,"").slice(-1); if(inp.value&&i<5) ins[i+1].focus(); if(ins.every(x=>x.value)) $("#of").requestSubmit(); };
       inp.onkeydown=e=>{ if(e.key==="Backspace"&&!inp.value&&i>0) ins[i-1].focus(); };
       inp.onpaste=e=>{ const d=(e.clipboardData.getData("text")||"").replace(/\D/g,"").slice(0,6); if(d.length===6){ e.preventDefault(); ins.forEach((x,j)=>x.value=d[j]); $("#of").requestSubmit(); } }; });
-    $("#totpCode").onclick=()=>{ const d=$("#totpCode").textContent; ins.forEach((x,j)=>x.value=d[j]); };
-    $("#of").onsubmit=e=>{ e.preventDefault(); const code=ins.map(x=>x.value).join(""); const s=Math.floor(Date.now()/30000);
+    if($("#totpCode")) $("#totpCode").onclick=()=>{ const d=$("#totpCode").textContent; ins.forEach((x,j)=>x.value=d[j]); };
+    if($("#otpSwitch")) $("#otpSwitch").onclick=()=>{ LOGIN.err=null; if(viaMail){ LOGIN.method="app"; renderLogin(); } else { LOGIN.method="mail"; if(!LOGIN.mail||LOGIN.mail.state==="fail") sendMailOtp(); else renderLogin(); } };
+    if($("#otpResend")) $("#otpResend").onclick=()=>sendMailOtp();
+    $("#of").onsubmit=async e=>{ e.preventDefault(); const code=ins.map(x=>x.value).join(""); if(code.length<6||LOGIN.busy) return;
+      if(viaMail){ LOGIN.busy=true; renderLogin(); const r=await otpApi({action:"verify", u:u.u, code}); LOGIN.busy=false; if(LOGIN.pending!==u) return;
+        if(r.ok){ audit("a_mfa","Email OTP","ok",u.u); finishLogin(u); return; }
+        audit("a_mfa","Email OTP","fail",u.u); LOGIN.err= r.err==="bad"? t("otpLeft",{n:r.left??0}) : r.err==="locked"? t("otpLocked") : r.err==="expired"? t("otpExpired") : t("mailFail",{r:r.err||"error"}); renderLogin(); return; }
+      const s=Math.floor(Date.now()/30000);
       if(code===totp(u.u,s)||code===totp(u.u,s-1)){ audit("a_mfa","TOTP","ok",u.u); finishLogin(u); } else { audit("a_mfa","TOTP","fail",u.u); LOGIN.err=t("badOtp"); renderLogin(); } };
     setTimeout(()=>ins[0]?.focus(),50);
   }
   applyStatic();
 }
+setInterval(()=>{ if(LOGIN.step==="otp" && !S.user && LOGIN.method==="mail"){ const b=$("#otpResend"), M=LOGIN.mail; if(b&&M&&M.until){ const w=Math.max(0,Math.ceil((M.until-Date.now())/1000)); b.disabled=w>0||M.state==="sending"; b.textContent= w? t("resendIn",{s:w}) : t("resend"); } } },1000);
 setInterval(()=>{ if(LOGIN.step==="otp" && !S.user){ const el=$("#totpCode"), ring=$("#totpRing"); if(!el) return; el.textContent=totp(LOGIN.pending.u); const left=30-Math.floor(Date.now()/1000)%30; ring.setAttribute("stroke-dashoffset",94.2*(1-left/30)); } },1000);
 async function doLogin(u, pw, rem){
   LOGIN.err=null; const lk=lockInfo(u); const now=Date.now();
@@ -144,7 +167,7 @@ async function doLogin(u, pw, rem){
   if(!acc || acc.h!==h){ lk.n=(lk.n||0)+1; if(lk.n>=5){ lk.until=now+5*60e3; lk.n=0; audit("a_lock",u,"fail",u||"unknown"); LOGIN.err=t("locked",{t:`5 ${S.lang==="en"?"min":S.lang==="zh"?"分钟":"phút"}`}); } else LOGIN.err=t("badCred",{n:5-lk.n}); setLock(u,lk); audit("a_login","", "fail", u||"unknown"); renderLogin(); return; }
   if(!acc.enabled){ LOGIN.err=t("disabledAcc"); audit("a_login","disabled","fail",u); renderLogin(); return; }
   setLock(u,{n:0,until:0}); store.set("rememberU", rem?u:"");
-  if(acc.mfa){ LOGIN.step="otp"; LOGIN.pending=acc; renderLogin(); return; }
+  if(acc.mfa){ LOGIN.step="otp"; LOGIN.pending=acc; LOGIN.mail=null; LOGIN.method= mailOtpOn(acc.u)? "mail" : "app"; if(LOGIN.method==="mail") sendMailOtp(); else renderLogin(); return; }
   finishLogin(acc);
 }
 // ---- Session: kept in sessionStorage = this browser tab only. A reload (F5) keeps the user signed in

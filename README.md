@@ -36,6 +36,21 @@ Mỗi lần có thay đổi trong `src/` hoặc `data/`, GitHub Actions (`.githu
 Mã build (ví dụ `261015.3b413ac` = ngày + mã nội dung) hiện ở trang đăng nhập, thanh trạng thái và mục "Thông tin hệ thống".
 Hai bản giống nhau thì mã build giống nhau – dùng để kiểm tra mọi bản sao đã đồng nhất.
 
+## Gửi mã xác thực 2 bước qua email
+
+Tài khoản có xác thực 2 bước (admin, manager, zhang.wei) nhận mã 6 số qua email khi đăng nhập.
+Mã do một Google Apps Script chạy trên Gmail của chủ hệ thống tạo, gửi và kiểm tra (`tools/mail-otp/Code.gs`);
+trang web chỉ gửi tên tài khoản, không chứa mã và không chứa địa chỉ email.
+
+1. Mở script.google.com bằng Gmail dùng để gửi mã → **Dự án mới** → dán nội dung `tools/mail-otp/Code.gs`,
+   sửa danh sách `RECIPIENTS` (tài khoản → email nhận mã).
+2. Chạy hàm `testSend` một lần để cấp quyền gửi email (sẽ nhận được một mã thử).
+3. **Triển khai → Tùy chọn triển khai mới → Ứng dụng web**: *Thực thi với tư cách* = Tôi, *Ai có quyền truy cập* = Bất kỳ ai → Triển khai.
+4. Sao chép URL ứng dụng web (kết thúc bằng `/exec`) vào `MAIL_OTP.url` trong `src/20_data.js` rồi đẩy lên GitHub.
+
+Khi `MAIL_OTP.url` để trống, đăng nhập 2 bước dùng ứng dụng xác thực mô phỏng như trước.
+Mã có hiệu lực 5 phút, sai tối đa 5 lần, tối đa 5 mã/10 phút cho mỗi tài khoản.
+
 ## Chạy trên máy
 
 ```
