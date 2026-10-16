@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- GENERATED FILE – do not edit. Source: src/ + data/ in this repository; rebuild with build.py.
-     HINO OCC SCADA 1.0 · build 261016.efd2af1 · HINO Systech Vietnam Co., Ltd. -->
+     HINO OCC SCADA 1.0 · build 261016.21ba029 · HINO Systech Vietnam Co., Ltd. -->
 <title>OCC SCADA Ia Pech</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="HINO OCC SCADA – Trung tâm giám sát tập trung các nhà máy điện gió, điện mặt trời · HINO Systech Vietnam Co., Ltd.">
@@ -333,7 +333,7 @@ table.t td.num,table.t .r{font-family:var(--f-num);font-variant-numeric:tabular-
 .map-tip{position:absolute;pointer-events:none;z-index:5;background:var(--surface);border:1px solid var(--line-2);box-shadow:var(--shadow);padding:8px 10px;font-size:12px;min-width:190px;transform:translate(12px,-50%)}
 .map-tip b{display:block;font-size:12.5px;margin-bottom:3px}
 .map-presets{position:absolute;left:8px;top:8px;z-index:2}
-.gis{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:12px;min-height:calc(100vh - 150px)}
+.gis{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:12px;min-height:calc(100vh - 150px);min-height:calc(100dvh - 150px)}
 .gis-side{display:flex;flex-direction:column;gap:12px;min-width:0}
 .plist{display:flex;flex-direction:column}
 .plist button{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:9px 12px;border:0;border-bottom:1px solid var(--line);border-left:3px solid transparent;background:transparent;text-align:left;color:var(--text)}
@@ -506,6 +506,76 @@ table.t td.num,table.t .r{font-family:var(--f-num);font-variant-numeric:tabular-
   .stbar .grow{display:flex!important}
   .ov-side{border-left:0;padding-left:0}
 }
+/* ===== Responsive refinements: laptop · tablet · phone ===== */
+.cgrid{display:grid;grid-template-columns:220px minmax(0,1fr);gap:14px}
+.cside{border-right:1px solid var(--line);padding-right:12px}
+.show-sm{display:none}
+/* wide tables never squeeze or get cut: they scroll sideways inside their panel */
+.pb:has(> table.t),.panel:has(> table.t){overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+/* 7 overview KPIs / 5 analysis KPIs: no empty cells when the grid wraps */
+@media (max-width:1400px) and (min-width:721px){
+  .g-kpi{grid-template-columns:repeat(12,minmax(0,1fr))!important} .g-kpi>*{grid-column:span 3} .g-kpi>:nth-child(n+5){grid-column:span 4}
+}
+@media (max-width:1100px) and (min-width:721px){
+  .g-kpi5{grid-template-columns:repeat(6,minmax(0,1fr))!important} .g-kpi5>*{grid-column:span 2} .g-kpi5>:nth-child(n+4){grid-column:span 3}
+}
+/* laptops with short screens (1366×768, 1280×720, 1440×900) */
+@media (min-width:1101px) and (max-height:900px){
+  .top{height:50px} .alsum button{height:34px} .alsum b{font-size:15px}
+  .nav{min-height:30px;padding-top:3px;padding-bottom:3px} .nav-sub .nav{min-height:25px}
+  .sb-foot{padding:7px 16px;gap:3px;font-size:11.5px} .sb-foot>:nth-child(n+3){display:none}
+  .kpi{padding:9px 14px 10px} .kpi-v{font-size:25px}
+  .twin-big{height:calc(100dvh - 160px);min-height:420px}
+}
+/* tablets (iPad portrait/landscape) and small laptops */
+@media (max-width:1100px){
+  #pgL,.user-n{display:none}
+  .top{gap:8px}
+  .cgrid{grid-template-columns:minmax(0,1fr)} .cside{border-right:0;padding-right:0;border-bottom:1px solid var(--line);padding-bottom:10px}
+  #cSide .between{display:inline-flex;width:calc(50% - 8px);margin-right:8px;vertical-align:top}
+  .g-twin>.twin-big{order:-1;height:min(64dvh,620px);min-height:360px}
+  .eq-list{max-height:280px}
+  .drawer{width:min(560px,100vw)}
+}
+/* touch screens: comfortable hit targets */
+@media (pointer:coarse){
+  .seg button{min-height:34px} .nav{min-height:40px} .nav-sub .nav{min-height:36px}
+  .ibtn,.hamb{min-width:38px;min-height:38px} .eq-list button{min-height:38px} .chk input{width:18px;height:18px}
+}
+/* phones */
+@media (max-width:720px){
+  .show-sm{display:flex} hr.show-sm{display:block}
+  .view{padding:10px;padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px))}
+  .toasts{left:8px;right:8px;max-width:none}
+  .top{height:52px;padding:0 8px;gap:6px}
+  .top-t h1{font-size:15px}
+  .alsum button{min-width:30px;height:36px;padding:0 3px} .alsum b{font-size:14px} .alsum span{font-size:8.5px}
+  .g-kpi>:last-child:nth-child(odd),.g-kpi5>:last-child:nth-child(odd){grid-column:1/-1}
+  #cSide .between{width:100%;display:flex;margin-right:0}
+  .twin-w{height:min(56dvh,360px)}
+  .twin-hud .chip:nth-child(n+3){display:none}
+  .twin-ctl{top:auto;bottom:8px;right:8px;left:8px;justify-content:flex-end}
+  .twin-ctl .seg button{padding:0 8px;font-size:11.5px}
+  .twin-leg{bottom:auto;top:40px;flex-wrap:wrap;max-width:calc(100% - 16px)}
+  .g-twin>.twin-big{height:58dvh;min-height:320px}
+  .drawer{width:100vw;border-left:0}
+  input,select,textarea{font-size:16px!important}   /* iOS: no auto-zoom when a field gets focus */
+  table.t th:first-child,table.t td:first-child{position:sticky;left:0;z-index:1;background:var(--surface);box-shadow:1px 0 0 var(--line)}
+  table.t th:first-child{z-index:2}
+  /* alarm lists become cards: level · station · ack / description / device · time · state */
+  table.al-t{min-width:0!important} table.al-t thead{display:none} table.al-t,table.al-t tbody{display:block;width:100%}
+  table.al-t tr{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"sev st ack" "desc desc desc" "dev t clr";gap:5px 10px;padding:10px 12px;border-bottom:1px solid var(--line)}
+  table.al-t td{border:0!important;padding:0!important;background:none!important;white-space:normal;min-width:0!important;position:static!important;box-shadow:none!important}
+  table.al-t .c-sev{grid-area:sev} table.al-t .c-st{grid-area:st;align-self:center;font-weight:500;color:var(--text)} table.al-t .c-ack{grid-area:ack;justify-self:end;align-self:center}
+  table.al-t .c-desc{grid-area:desc;color:var(--text)} table.al-t .c-dev{grid-area:dev;color:var(--muted)} table.al-t .c-t{grid-area:t;color:var(--muted);font-size:11.5px;align-self:center} table.al-t .c-clr{grid-area:clr;justify-self:end}
+}
+.twin-w .twin-hud{max-width:calc(100% - 16px - min(58%,420px))} .twin-w .twin-ctl{max-width:58%}
+.twin-hud .chip{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.show-xs{display:none}
+@media (max-width:420px){
+  #themeBtn,#userBtn>.i{display:none} .show-xs{display:flex}
+  .top{gap:4px} .alsum button{min-width:27px}
+}
 @media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }
 </style>
 
@@ -657,7 +727,7 @@ const DICT = {
   explode:["Tách lớp vỏ","X-ray nacelle","透视机舱"], cabinet:["Tủ inverter","Inverter cabinet","逆变器柜"], brakeHyd:["Phanh & thủy lực","Brake & hydraulics","制动与液压"], cooling:["Hệ làm mát","Cooling system","冷却系统"],
   dcLink:["Tụ DC-link","DC-link capacitors","直流母线电容"], filter:["Cuộn lọc LCL","LCL filter","LCL 滤波器"], trafo:["Máy biến áp trung thế","MV transformer","中压变压器"],
   vExt:["Bên ngoài","Exterior","外观"], vCut:["Cắt lớp","Cutaway","剖视"], vExp:["Tách rời","Exploded","爆炸图"], vFull:["Toàn cảnh","Full view","全景"],
-  brakeRel:["nhả phanh","released","已释放"], brakeOn:["đang phanh","applied","制动中"], powerFlow:["Dòng công suất","Power flow","功率流"], heatMap:["Bản đồ hiệu suất","Performance map","性能热图"], hmLow:["Thấp","Low","低"], hmHigh:["Cao","High","高"], roofsN:["mái","roofs","屋面"], dcIn:["Đầu vào DC / MPPT","DC input / MPPT","直流输入 / MPPT"], igbtMod:["Module IGBT","IGBT module","IGBT 模块"], fans:["Quạt làm mát","Cooling fans","散热风扇"], acOut:["Đầu ra AC","AC output","交流输出"], pvArr:["Dàn pin","PV array","光伏阵列"],
+  brakeRel:["nhả phanh","released","已释放"], brakeOn:["đang phanh","applied","制动中"], powerFlow:["Dòng công suất","Power flow","功率流"], heatMap:["Bản đồ hiệu suất","Performance map","性能热图"], hmLow:["Thấp","Low","低"], hmHigh:["Cao","High","高"], roofsN:["mái","roofs","屋面"], language:["Ngôn ngữ","Language","语言"], themeT:["Giao diện sáng / tối","Light / dark theme","浅色 / 深色主题"], dcIn:["Đầu vào DC / MPPT","DC input / MPPT","直流输入 / MPPT"], igbtMod:["Module IGBT","IGBT module","IGBT 模块"], fans:["Quạt làm mát","Cooling fans","散热风扇"], acOut:["Đầu ra AC","AC output","交流输出"], pvArr:["Dàn pin","PV array","光伏阵列"],
   // GIS
   presetAll:["Toàn quốc","Nationwide","全国"], presetHigh:["Tây Nguyên – Nam Trung Bộ","Central Highlands – South Central","西原–南中部"], presetNorth:["Bắc Ninh","Bac Ninh","北宁"],
   view2d:["2D chuẩn xác","2D precise","2D 精确"], view3d:["3D trực quan","3D visual","3D 立体"],
@@ -689,7 +759,7 @@ const DICT = {
   r_admin:["Quản trị hệ thống","System administrator","系统管理员"], r_manager:["Ban quản lý","Management","管理层"], r_occ:["Trực ban OCC","OCC operator","OCC 值班员"], r_plant:["Vận hành nhà máy","Plant operator","电站运行人员"], r_maint:["Bảo trì","Maintenance","检修维护"], r_viewer:["Khách xem","Viewer","访客"],
   // audit
   time:["Thời gian","Time","时间"], user:["Người dùng","User","用户"], action:["Hành động","Action","操作"], object:["Đối tượng","Object","对象"], ip:["Địa chỉ IP","IP address","IP 地址"], result:["Kết quả","Result","结果"], ok:["Thành công","Success","成功"], fail:["Thất bại","Failed","失败"], deniedR:["Từ chối","Denied","拒绝"],
-  a_login:["Đăng nhập","Sign-in","登录"], a_logout:["Đăng xuất","Sign-out","退出"], a_mfa:["Xác thực 2 bước","Two-step verification","双因素认证"], a_ack:["Xác nhận cảnh báo","Acknowledge alarm","确认告警"], a_export:["Xuất dữ liệu","Export data","导出数据"], a_view:["Truy cập chức năng","Open function","访问功能"], a_role:["Đổi vai trò/phạm vi","Change role/scope","修改角色/范围"], a_lock:["Khóa tài khoản","Account lock","账号锁定"], a_timeout:["Hết phiên","Session timeout","会话超时"],
+  a_login:["Đăng nhập","Sign-in","登录"], a_logout:["Đăng xuất","Sign-out","退出"], a_mfa:["Xác thực 2 bước","Two-step verification","双因素认证"], a_ack:["Xác nhận cảnh báo","Acknowledge alarm","确认告警"], a_export:["Xuất dữ liệu","Export data","导出数据"], a_view:["Truy cập chức năng","Open function","访问功能"], a_role:["Đổi vai trò/phạm vi","Change role/scope","修改角色/范围"], a_lock:["Khóa tài khoản","Account lock","账号锁定"], a_timeout:["Hết phiên","Session timeout","会话超时"], a_resume:["Khôi phục phiên (tải lại trang)","Session resumed (page reload)","会话恢复（刷新页面）"], secSess:["Giữ phiên khi tải lại · kết thúc khi đóng tab","Stays signed in on reload · ends when the tab closes","刷新保持登录 · 关闭标签页即结束"],
   // sources
   gateways:["Gateway thu thập (chỉ đọc)","Acquisition gateways (read-only)","采集网关（只读）"], protocol:["Giao thức","Protocol","协议"], points:["Số điểm","Points","点数"], lastUpd:["Cập nhật","Last update","最后更新"], buffer:["Bộ đệm","Buffer","缓存"], servers:["Máy chủ tại OCC","OCC servers","OCC 服务器"], wan:["Đường truyền WAN","WAN links","广域网链路"], cpu:["CPU","CPU","CPU"], ram:["RAM","RAM","内存"], disk:["Ổ đĩa","Disk","磁盘"], srvDB:["Máy chủ CSDL","Database server","数据库服务器"], srvApp:["Máy chủ ứng dụng & Web","Application & web server","应用与 Web 服务器"], srvAcq:["Máy chủ thu thập & giao diện","Acquisition & interface server","采集与接口服务器"], srvNas:["Sao lưu / NAS","Backup / NAS","备份 / NAS"], up:["Hoạt động","Up","运行"], down:["Gián đoạn","Down","中断"], standby:["Chờ cấp phép","Awaiting licence","待许可"],
   ppcChain:["Chuỗi dữ liệu: SCADA hãng → gateway chỉ đọc → WAN mã hóa → máy chủ thu thập tại OCC. Kênh điều độ A0/A2/A3 giữ nguyên.","Data chain: vendor SCADA → read-only gateway → encrypted WAN → acquisition server at OCC. Dispatch channels A0/A2/A3 stay unchanged.","数据链路：厂家 SCADA → 只读网关 → 加密广域网 → OCC 采集服务器。A0/A2/A3 调度通道保持不变。"],
@@ -736,7 +806,7 @@ DICT.brandSub2=["{NP} nhà máy · {MW} MW","{NP} plants · {MW} MW","{NP} 座 �
 
 // ---- 20_data.js
 // Build stamp is injected by build.py (date + git commit), so every published copy can be compared at a glance.
-const BUILD = {"version": "1.0", "id": "261016.efd2af1", "date": "2026-10-16"};
+const BUILD = {"version": "1.0", "id": "261016.21ba029", "date": "2026-10-16"};
 // ===================== Plant registry =====================
 // Coordinates: WGS84, public reference sources (gem.wiki / thewindpower / news), tolerance a few km.
 const OCC_LL = [107.902, 13.975];
@@ -1126,7 +1196,7 @@ function renderLogin(){
       <div class="demo"><div class="demo-h"><span>${t("demoAcc")}</span><span>${t("demoHint")}</span></div><div class="demo-list">
         ${["admin","manager","occ","iapech","maint","guest"].map(u=>{const x=USERS.find(y=>y.u===u); return `<button class="demo-acc" data-demo="${u}"><b>${u}</b><span>${t("r_"+x.role)}${x.mfa?" · 2FA":""}</span></button>`;}).join("")}
       </div><div class="faint" style="font-size:11px">${t("pwPolicy")}</div></div>
-      <div class="sec-foot"><span>${ic("lock","sm")}${t("secTls")}</span><span>${ic("shield","sm")}${t("secRbac")}</span><span>${ic("log","sm")}${t("secAudit")}</span><span>${ic("eye","sm")}${t("secRo")}</span></div>
+      <div class="sec-foot"><span>${ic("clock","sm")}${t("secSess")}</span><span>${ic("lock","sm")}${t("secTls")}</span><span>${ic("shield","sm")}${t("secRbac")}</span><span>${ic("log","sm")}${t("secAudit")}</span><span>${ic("eye","sm")}${t("secRo")}</span></div>
       <div class="login-legal"><span>${t("devBy")} <b>${t("hinoName")}</b></span><span>Global Services from Japan · www.hino-systechvn.com</span><span>© 2026 HINO Systech Vietnam Co., Ltd. · OCC SCADA v${BUILD.version} · build ${BUILD.id}</span></div>`;
     $("#pwEye").onclick=()=>{ const p=$("#lp"); p.type=p.type==="password"?"text":"password"; $("#pwEye").innerHTML=ic(p.type==="password"?"eye":"eyeOff","sm"); };
     $("#forgot").onclick=()=>toast(t("forgot"),t("forgotMsg"));
@@ -1169,16 +1239,29 @@ async function doLogin(u, pw, rem){
   if(acc.mfa){ LOGIN.step="otp"; LOGIN.pending=acc; renderLogin(); return; }
   finishLogin(acc);
 }
+// ---- Session: kept in sessionStorage = this browser tab only. A reload (F5) keeps the user signed in
+// and on the same page; closing the tab/window ends it. Idle limit (15 min) and a 12 h maximum still apply.
+// (Demo page: everything runs in the browser, so this is convenience, not server-side session security.)
+const SESSION_KEY="occ.sess", SESSION_MAX=12*3600e3, IDLE_LIM=15*60;
+const sess={ get(){ try{ return JSON.parse(sessionStorage.getItem(SESSION_KEY)); }catch(e){ return null; } },
+  set(v){ try{ v? sessionStorage.setItem(SESSION_KEY,JSON.stringify(v)) : sessionStorage.removeItem(SESSION_KEY); }catch(e){} } };
+function saveSession(){ if(!S.user) return; S._saved=Date.now(); sess.set({u:S.user.u, loginAt:S.loginAt, lastAct:S.lastAct, page:S.page, param:S.param}); }
+function resumeSession(){ const x=sess.get(); if(!x||!x.u) return false; const acc=USERS.find(u=>u.u===x.u), now=Date.now();
+  const idle=(now-(x.lastAct||0))/1000;
+  if(!acc||!acc.enabled||now-(x.loginAt||0)>SESSION_MAX||idle>IDLE_LIM){ sess.set(null); if(acc&&idle>IDLE_LIM) LOGIN.err=t("expired"); return false; }
+  S.user=acc; S.loginAt=x.loginAt; S.lastAct=now; audit("a_resume","","ok",acc.u);
+  $("#login").hidden=true; $("#shell").hidden=false; renderShell();
+  const pg = x.page && PAGES[x.page] ? x.page : (can("overview")? "overview" : "alarms"); go(pg, x.param??null); return true; }
+window.addEventListener("pagehide", saveSession);
 function finishLogin(acc){
   S.user=acc; LOGIN.step="cred"; LOGIN.err=null; LOGIN.pending=null; S.lastAct=Date.now(); S.loginAt=Date.now(); audit("a_login","","ok",acc.u);
   stopHero(); $("#login").hidden=true; $("#shell").hidden=false; renderShell();
   const first = can("overview")? "overview" : "alarms"; go(first);
-  store.set("session",{u:acc.u,t:Date.now()});
 }
-function logout(reason){ audit(reason==="timeout"?"a_timeout":"a_logout",""); S.user=null; teardown(); store.set("session",null); $("#shell").hidden=true; $("#login").hidden=false; $("#drawerHost").innerHTML=""; closeModal(); LOGIN.step="cred"; LOGIN.err= reason==="timeout"? t("expired") : null; renderLogin(); startHero(); }
+function logout(reason){ audit(reason==="timeout"?"a_timeout":"a_logout",""); S.user=null; teardown(); sess.set(null); $("#shell").hidden=true; $("#login").hidden=false; $("#drawerHost").innerHTML=""; closeModal(); LOGIN.step="cred"; LOGIN.err= reason==="timeout"? t("expired") : null; renderLogin(); startHero(); }
 // idle timeout 15 min
-["pointerdown","keydown","wheel","touchstart"].forEach(ev=>document.addEventListener(ev,()=>{ S.lastAct=Date.now(); if($("#idleBox")){ $("#idleBox").remove(); } },{passive:true}));
-setInterval(()=>{ if(!S.user) return; const idle=(Date.now()-S.lastAct)/1000; const lim=15*60; if(idle>lim){ logout("timeout"); return; }
+["pointerdown","keydown","wheel","touchstart"].forEach(ev=>document.addEventListener(ev,()=>{ S.lastAct=Date.now(); if($("#idleBox")){ $("#idleBox").remove(); } if(S.user&&Date.now()-(S._saved||0)>5000) saveSession(); },{passive:true}));
+setInterval(()=>{ if(!S.user) return; const idle=(Date.now()-S.lastAct)/1000; const lim=IDLE_LIM; if(idle>lim){ logout("timeout"); return; }
   if(idle>lim-60){ let b=$("#idleBox"); if(!b){ b=document.createElement("div"); b.id="idleBox"; b.className="timeout toast"; document.body.appendChild(b); } b.innerHTML=`${ic("clock","c-warn")}<div><b>${t("idleT")}</b><div class="muted">${t("idleS",{s:Math.ceil(lim-idle)})}</div><button class="btn sm primary" style="margin-top:8px">${t("stay")}</button></div>`; } },1000);
 
 // ---- 40_shell.js
@@ -1226,8 +1309,8 @@ document.addEventListener("keydown",e=>{ if(e.key==="/" && S.user && document.ac
 function toggleUserMenu(){ const m=$("#userMenu"); if(m.innerHTML){ m.innerHTML=""; return; } const u=S.user; const sc=u.scope==="all"?t("allPlants"):u.scope.map(id=>stName(ST[id])).join(", ");
   const mins=Math.floor((Date.now()-S.loginAt)/60000);
   m.innerHTML=`<div class="menu" role="menu"><div class="menu-h"><b>${esc(u.name)}</b><span class="muted" style="font-size:12px">${esc(u.u)} · ${t("r_"+u.role)}</span></div><hr>
-  <div class="menu-h" style="gap:6px"><div class="kv"><span>${t("scope")}</span><b style="font-family:var(--f-ui);font-size:12px;text-align:right">${esc(sc)}</b></div><div class="kv"><span>${t("mfa")}</span><b style="font-size:12px">${u.mfa?"TOTP":"—"}</b></div><div class="kv"><span>${t("session")}</span><b style="font-size:12px">${mins} min · 15 min idle</b></div><div class="kv"><span>${t("lastLogin")}</span><b style="font-size:12px">${esc(u.last)}</b></div></div><hr>
-  <button class="mi" id="miAbout">${ic("info")}${t("about")}</button><button class="mi" id="miLogout">${ic("logout")}${t("logout")}</button></div>`; $("#miLogout").onclick=()=>logout(); $("#miAbout").onclick=()=>{ m.innerHTML=""; openAbout(); }; }
+  <div class="menu-h" style="gap:6px"><div class="kv"><span>${t("scope")}</span><b style="font-family:var(--f-ui);font-size:12px;text-align:right">${esc(sc)}</b></div><div class="kv"><span>${t("mfa")}</span><b style="font-size:12px">${u.mfa?"TOTP":"—"}</b></div><div class="kv"><span>${t("session")}</span><b style="font-size:12px">${mins} min · 15 min idle</b></div><div class="kv"><span>${t("lastLogin")}</span><b style="font-size:12px">${esc(u.last)}</b></div></div><hr><div class="menu-h show-sm"><span class="cap muted">${t("language")}</span>${langSeg()}</div><hr class="show-sm">
+  <button class="mi show-xs" id="miTheme">${ic("moon")}${t("themeT")}</button><button class="mi" id="miAbout">${ic("info")}${t("about")}</button><button class="mi" id="miLogout">${ic("logout")}${t("logout")}</button></div>`; $("#miLogout").onclick=()=>logout(); $("#miTheme").onclick=()=>{ m.innerHTML=""; $("#themeBtn").click(); }; $("#miAbout").onclick=()=>{ m.innerHTML=""; openAbout(); }; }
 function openAbout(){ modal(`<div class="mh">${ic("info")}<h3>${t("about")}</h3><span style="margin-left:auto"><button class="ibtn" data-close aria-label="${t("close")}">${ic("x")}</button></span></div><div class="mb about"><span data-logo="full" style="width:220px;display:block"></span>
   <dl class="dl"><dt>${t("model")}</dt><dd>HINO OCC SCADA</dd><dt>${t("version")}</dt><dd class="mono">${BUILD.version} · build ${BUILD.id}${BUILD.sha?" · "+BUILD.sha:""}</dd><dt>${t("devBy")}</dt><dd>${t("hinoName")}</dd><dt>${t("website")}</dt><dd class="mono">www.hino-systechvn.com</dd><dt>${t("customer")}</dt><dd>${t("customerV")}</dd><dt>OCC</dt><dd>NMĐG Ia Pếch · ${t("srvName")}</dd><dt>${t("ptsTot")}</dt><dd class="num">${nf(PTS_TOTAL,0)}</dd><dt>${t("standards")}</dt><dd style="white-space:normal;max-width:300px;margin-left:auto">${t("stdV")}</dd></dl>
   <div class="faint" style="font-size:11.5px">Global Services from Japan · ${t("hinoTag")} · © 2026 HINO Systech Vietnam Co., Ltd.</div></div>`); applyLogos(); }
@@ -1256,6 +1339,7 @@ function go(page, param=null, keep){
   if(page!==prevPage||param!==prevParam) audit("a_view",page+(param?" · "+param:""),"ok");
   renderShell();
   const fn=PAGES[page]; v.innerHTML=`<div class="view-in" id="vin"></div>`; fn($("#vin"), param);
+  saveSession();
 }
 const PAGE_LVL={custom:3,overview:1,gis:1,station:2,alarms:2,kpis:2,pcurve:3,loss:2,downtime:3,curtail:2,bench:1,reports:2,twin:4,sources:3,users:2,audit:2};
 function setTitle(a,b){ $("#pgT").textContent=a; $("#pgS").textContent=b; const l=PAGE_LVL[S.page]||1; $("#pgL").textContent=`L${l} · ${t("L"+l)}`; }
@@ -1430,7 +1514,7 @@ PAGES.station=(el,id)=>{
     const q=filterQ.toLowerCase();
     $("#stG").innerHTML=s.feeders.map(([f,ids])=>{ const us=ids.map(id=>units.find(u=>u.id===id)).filter(u=>!q||u.id.toLowerCase().includes(q)); if(!us.length) return ""; return `<div class="feeder"><h5>${isW?t("feeder",{n:f}):s.id==="VHO"?t("block",{n:f}):t("roof",{n:f})}</h5><div class="tiles ${isW?"":"inv"}">${us.map(u=>unitTile(s,u,units.indexOf(u))).join("")}</div></div>`; }).join("");
     const al=ALARMS.filter(a=>a.st===s.id&&!a.cleared).sort((a,b)=>a.sev-b.sev||b.t-a.t); $("#stAlN").textContent=al.length;
-    $("#stAl").innerHTML= al.length? `<table class="t"><thead><tr><th>${t("level")}</th><th>${t("device")}</th><th>${t("desc")}</th><th>${t("start")}</th><th>${t("ack")}</th></tr></thead><tbody>${al.map(a=>alarmRow(a,true)).join("")}</tbody></table>` : `<div class="empty">${ic("okc","i")}<span>—</span></div>`;
+    $("#stAl").innerHTML= al.length? `<table class="t al-t"><thead><tr><th>${t("level")}</th><th>${t("device")}</th><th>${t("desc")}</th><th>${t("start")}</th><th>${t("ack")}</th></tr></thead><tbody>${al.map(a=>alarmRow(a,true)).join("")}</tbody></table>` : `<div class="empty">${ic("okc","i")}<span>—</span></div>`;
     S.scenes.forEach(sc=>sc.update&&sc.update());
   }
   $("#stG").onclick=e=>{ const b=e.target.closest("[data-unit]"); if(b) openUnit(s.id,b.dataset.unit); };
@@ -1440,7 +1524,7 @@ PAGES.station=(el,id)=>{
   THREE3D.station($("#st3d"), s).then(sc=>{ if(sc){ if(S.page!=="station"||S.param!==id){ sc.dispose(); return; } S.scenes.push(sc); sc.onPick=uid=>openUnit(s.id,uid); } });
 };
 function alarmRow(a, compact){ const ackCell = a.acked? `<span class="muted">${esc(a.ackBy)}</span>` : (can("ack")? `<button class="btn sm" data-ack="${a.id}">${t("ack")}</button>` : `<span class="c-crit" title="${t("noPermAck")}">${t("unacked")}</span>`);
-  return `<tr><td>${sevChip(a.sev)}</td>${compact?"":`<td>${esc(stName(ST[a.st]))}</td>`}<td class="mono">${esc(a.dev)}</td><td style="white-space:normal;min-width:200px">${esc(alarmText(a))}</td><td class="num">${fmtDT(new Date(a.t))}</td>${compact?"":`<td class="num">${a.cleared?fmtDT(new Date(a.clrT)):`<span class="chip bg-crit">${t("active")}</span>`}</td>`}<td>${ackCell}</td></tr>`; }
+  return `<tr><td class="c-sev">${sevChip(a.sev)}</td>${compact?"":`<td class="c-st">${esc(stName(ST[a.st]))}</td>`}<td class="mono c-dev">${esc(a.dev)}</td><td class="c-desc" style="white-space:normal;min-width:200px">${esc(alarmText(a))}</td><td class="num c-t">${fmtDT(new Date(a.t))}</td>${compact?"":`<td class="num c-clr">${a.cleared?fmtDT(new Date(a.clrT)):`<span class="chip bg-crit">${t("active")}</span>`}</td>`}<td class="c-ack">${ackCell}</td></tr>`; }
 function bindAck(root, after){ root.addEventListener("click",e=>{ const b=e.target.closest("[data-ack]"); if(!b) return; const a=ALARMS.find(x=>x.id===+b.dataset.ack); if(!a) return; if(!can("ack")){ toast(t("noPermAck"),"","warn"); audit("a_ack",a.dev,"denied"); return; } a.acked=true; a.ackBy=S.user.u; a.ackT=Date.now(); audit("a_ack",`${a.st} · ${a.dev}`,"ok"); toast(t("ackDone",{d:`${a.st} · ${a.dev}`}),alarmText(a),"ok"); after&&after(); renderShell(); }); }
 
 // ---------- Unit drawer ----------
@@ -1486,7 +1570,7 @@ PAGES.alarms=(el)=>{
       c&&c.setOption({legend:{data:[1,2,3,4].map(i=>t("p"+i))},xAxis:axisX(ids),yAxis:axisY(""),series:[1,2,3,4].map(i=>({name:t("p"+i),type:"bar",stack:"a",barWidth:"50%",data:ids.map(id=>all.filter(a=>a.st===id&&a.sev===i).length),itemStyle:{color:[0,css("--crit"),css("--warn"),css("--solar"),css("--accent")][i]}}))});
       const cnt={}; all.forEach(a=>{const k=a.st+" "+a.dev; cnt[k]=(cnt[k]||0)+1;}); const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,12).reverse(); const c2=mkChart($("#alC2"),{});
       c2&&c2.setOption({grid:{left:120,right:20,top:10,bottom:24},tooltip:{trigger:"axis"},xAxis:axisY(""),yAxis:axisX(top.map(x=>x[0])),series:[{type:"bar",data:top.map(x=>x[1]),itemStyle:{color:css("--accent"),borderRadius:[0,3,3,0]},barWidth:"55%"}]}); return; }
-    const r=rows(); $("#alT").innerHTML= r.length? `<table class="t"><thead><tr><th>${t("level")}</th><th>${t("station")}</th><th>${t("device")}</th><th>${t("desc")}</th><th>${t("start")}</th><th>${t("state")}</th><th>${t("ackBy")}</th></tr></thead><tbody>${r.slice(0,300).map(a=>alarmRow(a,false)).join("")}</tbody></table>` : `<div class="empty">${ic("okc","i")}<span>${t("noResult")}</span></div>`; }
+    const r=rows(); $("#alT").innerHTML= r.length? `<table class="t al-t"><thead><tr><th>${t("level")}</th><th>${t("station")}</th><th>${t("device")}</th><th>${t("desc")}</th><th>${t("start")}</th><th>${t("state")}</th><th>${t("ackBy")}</th></tr></thead><tbody>${r.slice(0,300).map(a=>alarmRow(a,false)).join("")}</tbody></table>` : `<div class="empty">${ic("okc","i")}<span>${t("noResult")}</span></div>`; }
   function teardownCharts(){ S.charts.forEach(c=>c.dispose()); S.charts=[]; }
   $("#alTab").onclick=e=>{ const b=e.target.closest("button"); if(!b) return; S.alarmTab=b.dataset.k; $$("#alTab button").forEach(x=>x.setAttribute("aria-pressed",x===b)); teardownCharts(); render(); };
   $("#fSev").onchange=e=>{F.sev=e.target.value;render();}; $("#fSt").onchange=e=>{F.st=e.target.value;render();}; $("#fAck").onchange=e=>{F.ack=e.target.value;render();}; $("#fQ").oninput=e=>{F.q=e.target.value.toLowerCase();render();};
@@ -1737,7 +1821,7 @@ PAGES.custom=(el)=>{
   let sel={p:"L",v:"R"}, xy=["v","p"], hk="p", bins=30;
   el.innerHTML=`<div class="fbar"><label>${t("station")}</label><select class="sel" id="cSt"></select><label>${t("unit")}</label><select class="sel" id="cU"></select><label>${t("cRange")}</label><div class="seg" id="cR">${[7,14,30].map(d=>`<button data-d="${d}" aria-pressed="${d===days}">${t("cDays",{n:d})}</button>`).join("")}</div><span class="faint mono" id="cN" style="margin-left:auto;font-size:11px"></span></div>
   <div class="panel"><div class="ph"><h3>${t("custom")}</h3><span class="act"><div class="seg" id="cM">${[["multi","cMulti"],["xy","cXY"],["hist","cHist"]].map(([k,l])=>`<button data-k="${k}" aria-pressed="${k===mode}">${t(l)}</button>`).join("")}</div></span></div>
-    <div class="pb" style="display:grid;grid-template-columns:220px minmax(0,1fr);gap:14px"><div id="cSide" style="border-right:1px solid var(--line);padding-right:12px"></div><div class="chart tall" id="cC" style="height:400px"></div></div></div>
+    <div class="pb cgrid"><div id="cSide" class="cside"></div><div class="chart tall" id="cC" style="height:400px"></div></div></div>
   <div class="panel" style="margin-top:12px"><div class="ph"><h3>${t("cStats")}</h3><span class="faint mono" id="cSN" style="font-size:11px"></span></div><div class="pb" style="padding:0"><table class="t" id="cStat" style="width:100%"></table></div></div>`;
   const c=mkChart($("#cC"),{});
   const fillSel=()=>{ $("#cSt").innerHTML=scopeIds().filter(i=>!ST[i].notOper).map(i=>`<option value="${i}" ${i===sid?"selected":""}>${esc(stName(ST[i]))}</option>`).join(""); $("#cU").innerHTML=s.units.map(u=>`<option ${u.id===uid?"selected":""}>${u.id}</option>`).join(""); };
@@ -3121,7 +3205,7 @@ function stopHero(){ if(HERO&&HERO!=="pending") HERO.dispose(); HERO=null; }
 (function boot(){
   const th=store.get("theme"); applyTheme(th||"dark");
   const lg=store.get("lang"); S.lang = LANGS.includes(lg)? lg : "vi"; document.documentElement.lang = S.lang==="zh"?"zh-CN":S.lang; document.body.classList.toggle("zh",S.lang==="zh");
-  initHistory(); seedAlarms(); applyStatic(); renderLogin(); startHero();
+  initHistory(); seedAlarms(); applyStatic(); renderLogin(); if(!resumeSession()){ renderLogin(); startHero(); }
   setInterval(()=>{ tick(); if(!S.user) return; if(PAGE_UPD){ try{ PAGE_UPD(); }catch(e){ console.warn(e); } } }, 2000);
   setInterval(()=>{ if(!S.user||!can("alarm")) return; if(Math.random()<0.5){ const a=randomAlarm(); if(a){ toast(t("newAlarm",{s:`${a.st} · ${a.dev}`}), alarmText(a), a.sev<=2?"warn":"info"); renderShell(); } } // clear an old non-critical one
       const old=ALARMS.filter(a=>!a.cleared&&a.sev>=3&&a.acked&&Date.now()-a.t>40*60e3); if(old.length){ const a=old[0]; a.cleared=true; a.clrT=Date.now(); } }, 75000);

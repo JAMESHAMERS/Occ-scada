@@ -104,7 +104,7 @@ function renderLogin(){
       <div class="demo"><div class="demo-h"><span>${t("demoAcc")}</span><span>${t("demoHint")}</span></div><div class="demo-list">
         ${["admin","manager","occ","iapech","maint","guest"].map(u=>{const x=USERS.find(y=>y.u===u); return `<button class="demo-acc" data-demo="${u}"><b>${u}</b><span>${t("r_"+x.role)}${x.mfa?" · 2FA":""}</span></button>`;}).join("")}
       </div><div class="faint" style="font-size:11px">${t("pwPolicy")}</div></div>
-      <div class="sec-foot"><span>${ic("lock","sm")}${t("secTls")}</span><span>${ic("shield","sm")}${t("secRbac")}</span><span>${ic("log","sm")}${t("secAudit")}</span><span>${ic("eye","sm")}${t("secRo")}</span></div>
+      <div class="sec-foot"><span>${ic("clock","sm")}${t("secSess")}</span><span>${ic("lock","sm")}${t("secTls")}</span><span>${ic("shield","sm")}${t("secRbac")}</span><span>${ic("log","sm")}${t("secAudit")}</span><span>${ic("eye","sm")}${t("secRo")}</span></div>
       <div class="login-legal"><span>${t("devBy")} <b>${t("hinoName")}</b></span><span>Global Services from Japan · www.hino-systechvn.com</span><span>© 2026 HINO Systech Vietnam Co., Ltd. · OCC SCADA v${BUILD.version} · build ${BUILD.id}</span></div>`;
     $("#pwEye").onclick=()=>{ const p=$("#lp"); p.type=p.type==="password"?"text":"password"; $("#pwEye").innerHTML=ic(p.type==="password"?"eye":"eyeOff","sm"); };
     $("#forgot").onclick=()=>toast(t("forgot"),t("forgotMsg"));
@@ -147,14 +147,27 @@ async function doLogin(u, pw, rem){
   if(acc.mfa){ LOGIN.step="otp"; LOGIN.pending=acc; renderLogin(); return; }
   finishLogin(acc);
 }
+// ---- Session: kept in sessionStorage = this browser tab only. A reload (F5) keeps the user signed in
+// and on the same page; closing the tab/window ends it. Idle limit (15 min) and a 12 h maximum still apply.
+// (Demo page: everything runs in the browser, so this is convenience, not server-side session security.)
+const SESSION_KEY="occ.sess", SESSION_MAX=12*3600e3, IDLE_LIM=15*60;
+const sess={ get(){ try{ return JSON.parse(sessionStorage.getItem(SESSION_KEY)); }catch(e){ return null; } },
+  set(v){ try{ v? sessionStorage.setItem(SESSION_KEY,JSON.stringify(v)) : sessionStorage.removeItem(SESSION_KEY); }catch(e){} } };
+function saveSession(){ if(!S.user) return; S._saved=Date.now(); sess.set({u:S.user.u, loginAt:S.loginAt, lastAct:S.lastAct, page:S.page, param:S.param}); }
+function resumeSession(){ const x=sess.get(); if(!x||!x.u) return false; const acc=USERS.find(u=>u.u===x.u), now=Date.now();
+  const idle=(now-(x.lastAct||0))/1000;
+  if(!acc||!acc.enabled||now-(x.loginAt||0)>SESSION_MAX||idle>IDLE_LIM){ sess.set(null); if(acc&&idle>IDLE_LIM) LOGIN.err=t("expired"); return false; }
+  S.user=acc; S.loginAt=x.loginAt; S.lastAct=now; audit("a_resume","","ok",acc.u);
+  $("#login").hidden=true; $("#shell").hidden=false; renderShell();
+  const pg = x.page && PAGES[x.page] ? x.page : (can("overview")? "overview" : "alarms"); go(pg, x.param??null); return true; }
+window.addEventListener("pagehide", saveSession);
 function finishLogin(acc){
   S.user=acc; LOGIN.step="cred"; LOGIN.err=null; LOGIN.pending=null; S.lastAct=Date.now(); S.loginAt=Date.now(); audit("a_login","","ok",acc.u);
   stopHero(); $("#login").hidden=true; $("#shell").hidden=false; renderShell();
   const first = can("overview")? "overview" : "alarms"; go(first);
-  store.set("session",{u:acc.u,t:Date.now()});
 }
-function logout(reason){ audit(reason==="timeout"?"a_timeout":"a_logout",""); S.user=null; teardown(); store.set("session",null); $("#shell").hidden=true; $("#login").hidden=false; $("#drawerHost").innerHTML=""; closeModal(); LOGIN.step="cred"; LOGIN.err= reason==="timeout"? t("expired") : null; renderLogin(); startHero(); }
+function logout(reason){ audit(reason==="timeout"?"a_timeout":"a_logout",""); S.user=null; teardown(); sess.set(null); $("#shell").hidden=true; $("#login").hidden=false; $("#drawerHost").innerHTML=""; closeModal(); LOGIN.step="cred"; LOGIN.err= reason==="timeout"? t("expired") : null; renderLogin(); startHero(); }
 // idle timeout 15 min
-["pointerdown","keydown","wheel","touchstart"].forEach(ev=>document.addEventListener(ev,()=>{ S.lastAct=Date.now(); if($("#idleBox")){ $("#idleBox").remove(); } },{passive:true}));
-setInterval(()=>{ if(!S.user) return; const idle=(Date.now()-S.lastAct)/1000; const lim=15*60; if(idle>lim){ logout("timeout"); return; }
+["pointerdown","keydown","wheel","touchstart"].forEach(ev=>document.addEventListener(ev,()=>{ S.lastAct=Date.now(); if($("#idleBox")){ $("#idleBox").remove(); } if(S.user&&Date.now()-(S._saved||0)>5000) saveSession(); },{passive:true}));
+setInterval(()=>{ if(!S.user) return; const idle=(Date.now()-S.lastAct)/1000; const lim=IDLE_LIM; if(idle>lim){ logout("timeout"); return; }
   if(idle>lim-60){ let b=$("#idleBox"); if(!b){ b=document.createElement("div"); b.id="idleBox"; b.className="timeout toast"; document.body.appendChild(b); } b.innerHTML=`${ic("clock","c-warn")}<div><b>${t("idleT")}</b><div class="muted">${t("idleS",{s:Math.ceil(lim-idle)})}</div><button class="btn sm primary" style="margin-top:8px">${t("stay")}</button></div>`; } },1000);

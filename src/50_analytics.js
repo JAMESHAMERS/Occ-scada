@@ -200,7 +200,7 @@ PAGES.custom=(el)=>{
   let sel={p:"L",v:"R"}, xy=["v","p"], hk="p", bins=30;
   el.innerHTML=`<div class="fbar"><label>${t("station")}</label><select class="sel" id="cSt"></select><label>${t("unit")}</label><select class="sel" id="cU"></select><label>${t("cRange")}</label><div class="seg" id="cR">${[7,14,30].map(d=>`<button data-d="${d}" aria-pressed="${d===days}">${t("cDays",{n:d})}</button>`).join("")}</div><span class="faint mono" id="cN" style="margin-left:auto;font-size:11px"></span></div>
   <div class="panel"><div class="ph"><h3>${t("custom")}</h3><span class="act"><div class="seg" id="cM">${[["multi","cMulti"],["xy","cXY"],["hist","cHist"]].map(([k,l])=>`<button data-k="${k}" aria-pressed="${k===mode}">${t(l)}</button>`).join("")}</div></span></div>
-    <div class="pb" style="display:grid;grid-template-columns:220px minmax(0,1fr);gap:14px"><div id="cSide" style="border-right:1px solid var(--line);padding-right:12px"></div><div class="chart tall" id="cC" style="height:400px"></div></div></div>
+    <div class="pb cgrid"><div id="cSide" class="cside"></div><div class="chart tall" id="cC" style="height:400px"></div></div></div>
   <div class="panel" style="margin-top:12px"><div class="ph"><h3>${t("cStats")}</h3><span class="faint mono" id="cSN" style="font-size:11px"></span></div><div class="pb" style="padding:0"><table class="t" id="cStat" style="width:100%"></table></div></div>`;
   const c=mkChart($("#cC"),{});
   const fillSel=()=>{ $("#cSt").innerHTML=scopeIds().filter(i=>!ST[i].notOper).map(i=>`<option value="${i}" ${i===sid?"selected":""}>${esc(stName(ST[i]))}</option>`).join(""); $("#cU").innerHTML=s.units.map(u=>`<option ${u.id===uid?"selected":""}>${u.id}</option>`).join(""); };
