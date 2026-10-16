@@ -32,6 +32,9 @@ for (const i of [1,2,3,4]) { used.add("p" + i); used.add("L" + i); }
 for (const p of X.PERMS) used.add("perm_" + p);
 for (const ty of new Set(X.STATIONS.map(s => s.type))) used.add("plantType_" + ty);
 for (const pg of ["overview","gis","twin","alarms","kpis","pcurve","loss","downtime","curtail","bench","custom","reports","users","audit","sources"]) used.add("sub_" + pg);
+// Digital-twin component names (lists in 45_pages.js) and view-mode labels are looked up at run time
+for (const m of rd("src/45_pages.js").matchAll(/const COMP_[A-Z]=\[([^\]]*)\]\.map/g)) for (const k of m[1].matchAll(/"([A-Za-z0-9_]+)"/g)) used.add(k[1]);
+for (const m of rd("src/80_three.js").matchAll(/\["(?:ext|cut|exp)","([A-Za-z0-9_]+)"\]/g)) used.add(m[1]);
 for (const k of used) if (!(k in X.DICT)) err(`text "${k}" is used in the code but missing from src/10_i18n.js`);
 for (const m of rd("src/02_body.html").matchAll(/data-i="([A-Za-z0-9_]+)"/g)) if (!(m[1] in X.DICT)) err(`text "${m[1]}" (02_body.html) missing`);
 

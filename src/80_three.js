@@ -1,8 +1,8 @@
 // ===================== 3D (three.js r160) =====================
 const THREE3D = (()=>{
   let T=null, loading=null;
-  async function lib(){ if(T) return T; if(!loading) loading=(async()=>{ try{ const [three,oc,c2,rb]=await Promise.all([import("three"),import("three/addons/controls/OrbitControls.js"),import("three/addons/renderers/CSS2DRenderer.js"),import("three/addons/geometries/RoundedBoxGeometry.js")]);
-      T=Object.assign({},three,{OrbitControls:oc.OrbitControls,CSS2DRenderer:c2.CSS2DRenderer,CSS2DObject:c2.CSS2DObject,RoundedBoxGeometry:rb.RoundedBoxGeometry}); return T; }catch(e){ console.warn("three load failed",e); return null; } })(); return loading; }
+  async function lib(){ if(T) return T; if(!loading) loading=(async()=>{ try{ const [three,oc,c2,rb,re]=await Promise.all([import("three"),import("three/addons/controls/OrbitControls.js"),import("three/addons/renderers/CSS2DRenderer.js"),import("three/addons/geometries/RoundedBoxGeometry.js"),import("three/addons/environments/RoomEnvironment.js")]);
+      T=Object.assign({},three,{OrbitControls:oc.OrbitControls,CSS2DRenderer:c2.CSS2DRenderer,CSS2DObject:c2.CSS2DObject,RoundedBoxGeometry:rb.RoundedBoxGeometry,RoomEnvironment:re.RoomEnvironment}); return T; }catch(e){ console.warn("three load failed",e); return null; } })(); return loading; }
   const RM = ()=>window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const COL = {ok:0x34D399,warn:0xF5A524,crit:0xF4475E,off:0x6B7C99,maint:0xA88BFF,curt:0x5AA9FF,acc:0x4FA3FF};
   const stCol = st => ({run:COL.ok,limit:COL.curt,fault:COL.crit,maint:COL.maint,comm:COL.off,stop:COL.warn,idle:COL.off})[st]||COL.off;
@@ -59,43 +59,14 @@ const THREE3D = (()=>{
     const tip=pos.length/3; pos.push(0,R+0.3,0); for(let j=0;j<M;j++) idx.push(N*M+j, tip, N*M+(j+1)%M);
     const g=new T.BufferGeometry(); g.setAttribute("position",new T.Float32BufferAttribute(pos,3)); g.setIndex(idx); g.computeVertexNormals(); return g; }
   const geoCache={};
-  function turbine(o={}){ // meters; rotor faces +X; returns group with refs
-    const hub=o.hub||110, D=o.rotor||156, R=D/2-2.2; const white=new T.MeshStandardMaterial({color:0xF1F4F8,roughness:0.42,metalness:0.06});
-    const g=new T.Group(); const tH=hub-1.9;
-    const tower=new T.Mesh(new T.CylinderGeometry(1.45,2.35,tH,40,1),white.clone()); tower.position.y=tH/2; tower.castShadow=true; tower.receiveShadow=true; tower.userData.comp="tower"; g.add(tower);
-    const fnd=new T.Mesh(new T.CylinderGeometry(6.5,7,0.8,32),new T.MeshStandardMaterial({color:0x8E9196,roughness:0.9})); fnd.position.y=0.2; fnd.receiveShadow=true; g.add(fnd);
-    const door=new T.Mesh(new T.BoxGeometry(0.2,2.4,1.1),new T.MeshStandardMaterial({color:0x5D6B7E,roughness:0.6})); door.position.set(2.3,1.9,0); g.add(door);
-    const yawG=new T.Group(); yawG.position.y=hub; g.add(yawG);
-    const tilt=new T.Group(); tilt.rotation.z=5*Math.PI/180; yawG.add(tilt);
-    const shellMat=white.clone(); shellMat.transparent=true; shellMat.opacity=1;
-    const shell=new T.Mesh(new T.RoundedBoxGeometry(12.5,4.4,4.6,4,1.1),shellMat); shell.position.set(-4.2,0.4,0); shell.castShadow=true; shell.userData.comp="shell"; tilt.add(shell);
-    const yawRing=new T.Mesh(new T.TorusGeometry(1.75,0.32,10,40),new T.MeshStandardMaterial({color:0x7A8696,metalness:0.5,roughness:0.4})); yawRing.rotation.x=Math.PI/2; yawRing.position.y=-1.85; yawRing.userData.comp="yaw"; yawG.add(yawRing);
-    // internals
-    const inner=new T.Group(); tilt.add(inner);
-    const mk=(geo,col,comp,pos,rot)=>{ const m=new T.Mesh(geo,new T.MeshStandardMaterial({color:col,metalness:0.45,roughness:0.45})); m.position.set(...pos); if(rot) m.rotation.set(...rot); m.userData.comp=comp; inner.add(m); return m; };
-    mk(new T.CylinderGeometry(0.45,0.45,4.2,20),0x9AA6B5,"mainBear",[0.2,0.5,0],[0,0,Math.PI/2]);
-    mk(new T.CylinderGeometry(0.95,0.95,1.2,24),0x6E7C8F,"mainBear",[0.7,0.5,0],[0,0,Math.PI/2]);
-    mk(new T.RoundedBoxGeometry(2.6,2.4,2.4,2,0.3),0x4C6A8A,"gearbox",[-2.6,0.4,0]);
-    mk(new T.CylinderGeometry(1.15,1.15,2.8,28),0x3E7D6B,"generator",[-6.0,0.45,0],[0,0,Math.PI/2]);
-    mk(new T.BoxGeometry(1.6,2.6,1.2),0x8A6A3C,"converter",[-8.9,0.2,1.3]);
-    mk(new T.BoxGeometry(1.4,1.2,1.0),0x5A6475,"converter",[-8.9,-0.4,-1.4]);
-    // rotor
-    const rotor=new T.Group(); rotor.position.set(2.7,0.45,0); tilt.add(rotor);
-    const spinPts=[]; for(let i=0;i<=16;i++){ const a=i/16; spinPts.push(new T.Vector2(Math.max(0.001,2.25*Math.cos(a*Math.PI/2)), 3.6*Math.sin(a*Math.PI/2))); }
-    const spMat=white.clone(); spMat.side=T.DoubleSide; const spinner=new T.Mesh(new T.LatheGeometry(spinPts,36),spMat); spinner.rotation.z=-Math.PI/2; spinner.position.x=-0.6; spinner.castShadow=true; spinner.userData.comp="hubPitch"; rotor.add(spinner);
-    const bg=geoCache["b"+R] ||= bladeGeo(R); const blades=[], pitchG=[]; const bMat=white.clone();
-    for(let i=0;i<3;i++){ const holder=new T.Group(); holder.rotation.x=i*2*Math.PI/3; rotor.add(holder); const pg=new T.Group(); pg.position.y=1.7; holder.add(pg); const b=new T.Mesh(bg,bMat); b.castShadow=true; b.userData.comp="blades"; pg.add(b);
-      const ph=new T.Mesh(new T.CylinderGeometry(1.35,1.35,0.5,24),new T.MeshStandardMaterial({color:0x9AA6B5,metalness:0.5,roughness:0.4})); ph.position.y=0.2; ph.userData.comp="hubPitch"; pg.add(ph); blades.push(b); pitchG.push(pg); }
-    // nacelle top: aviation light + met
-    const av=new T.Mesh(new T.SphereGeometry(0.35,12,8),new T.MeshStandardMaterial({color:0xff2a2a,emissive:0xff1a1a,emissiveIntensity:2})); av.position.set(-9.6,2.9,0); tilt.add(av);
-    const mast=new T.Mesh(new T.CylinderGeometry(0.06,0.06,1.6,6),new T.MeshStandardMaterial({color:0x8090A0})); mast.position.set(-9.0,3.4,0.8); tilt.add(mast);
-    const ring=new T.Mesh(new T.RingGeometry(9,11.5,40),new T.MeshBasicMaterial({color:COL.crit,transparent:true,opacity:0.0,side:T.DoubleSide,depthWrite:false})); ring.rotation.x=-Math.PI/2; ring.position.y=0.6; g.add(ring);
-    g.userData.refs={yawG,rotor,pitchG,blades,shell,inner,av,ring,tilt}; g.userData.rpm=0; g.userData.pitch=0;
-    return g; }
+  let TWM=null; const TW=()=>TWM||(TWM=TWIN_MODELS(T,{COL,stCol,label:(h,c)=>label(h,c),bladeGeo:R=>geoCache["b"+R] ||= bladeGeo(R)}));
   function animTurbine(g, dt, rpm, pitchDeg, yawRad, time){ const r=g.userData.refs; g.userData.rpm += (rpm-g.userData.rpm)*Math.min(1,dt*0.8); r.rotor.rotation.x -= g.userData.rpm*2*Math.PI/60*dt;
     g.userData.pitch += (pitchDeg-g.userData.pitch)*Math.min(1,dt*1.5); r.pitchG.forEach(p=>p.rotation.y=g.userData.pitch*Math.PI/180);
     if(yawRad!=null){ let d=yawRad-r.yawG.rotation.y; d=Math.atan2(Math.sin(d),Math.cos(d)); r.yawG.rotation.y+=d*Math.min(1,dt*0.4); }
-    r.av.material.emissiveIntensity = (Math.floor(time*1.0)%2===0)? 3 : 0.1; }
+    r.av.material.emissiveIntensity = (Math.floor(time*1.0)%2===0)? 3 : 0.1;
+    if(r.lowSpd) r.lowSpd.rotation.x=r.rotor.rotation.x;
+    if(r.hss){ const w=Math.min(g.userData.rpm*112, 150)*2*Math.PI/60; r.hss.rotation.x-=w*dt; }
+    if(r.fans) r.fans.forEach((f,i)=>f.rotation.y+=dt*(4+2*(i%2))*(g.userData.rpm>0.5?1:0.25)); }
   function label(html, cls="lbl3d"){ const d=document.createElement("div"); d.className=cls; d.innerHTML=html; const o=new T.CSS2DObject(d); return o; }
 
   // ---------- Wind farm ----------
@@ -129,7 +100,7 @@ const THREE3D = (()=>{
     const mm=new T.Mesh(new T.CylinderGeometry(0.4,0.6,100,6),new T.MeshStandardMaterial({color:0xC0C6CE,metalness:0.6})); const mx=-((s.feeders[0][1].length)/2)*spacing-200; mm.position.set(mx,hAt(mx,0)+50,0); scene.add(mm);
     // turbines
     const tbs={}; const R=s.rotor||156;
-    s.units.forEach((u,i)=>{ const [x,z]=pos[u.id]; const g=turbine({hub:s.hubH||110,rotor:(s.modelOf&&s.modelOf(u.id).includes("140"))?140:R}); g.position.set(x,hAt(x,z)-0.5,z); g.userData.pick=u.id; scene.add(g); tbs[u.id]=g;
+    s.units.forEach((u,i)=>{ const [x,z]=pos[u.id]; const g=TW().windTurbine({hub:s.hubH||110,rotor:(s.modelOf&&s.modelOf(u.id).includes("140"))?140:R,detail:false}); g.position.set(x,hAt(x,z)-0.5,z); g.userData.pick=u.id; scene.add(g); tbs[u.id]=g;
       if(o.labels!==false){ const lb=label(""); lb.position.set(0,(s.hubH||110)+R/2+14,0); g.add(lb); g.userData.lbl=lb; lb.element.addEventListener("click",()=>st.onPickCb&&st.onPickCb(u.id)); } });
     // wind particles
     const NP=900; const pg=new T.BufferGeometry(); const pp=new Float32Array(NP*3); for(let i=0;i<NP;i++){ pp[i*3]=(Math.random()-0.5)*3600; pp[i*3+1]=60+Math.random()*260; pp[i*3+2]=(Math.random()-0.5)*3600; } pg.setAttribute("position",new T.BufferAttribute(pp,3));
@@ -156,7 +127,7 @@ const THREE3D = (()=>{
     const gsz=[1900,1500]; const gg=new T.PlaneGeometry(gsz[0],gsz[1],90,70); gg.rotateX(-Math.PI/2); const cols=[]; const pa=gg.attributes.position; const c1=new T.Color(0xCDB98F), c2=new T.Color(0xB89E6E), c3=new T.Color(0x8C8A5A), tc=new T.Color();
     for(let i=0;i<pa.count;i++){ const x=pa.getX(i), z=pa.getZ(i); const n=fbm2(x/140,z/140,s.seed); pa.setY(i, Math.max(0,Math.hypot(x/950,z/750)-0.8)*60*(1+n)); tc.copy(c1).lerp(c2,clamp(0.5+n,0,1)); if(fbm2(x/400,z/400,s.seed+3)>0.3) tc.lerp(c3,0.35); cols.push(tc.r,tc.g,tc.b); }
     gg.setAttribute("color",new T.Float32BufferAttribute(cols,3)); gg.computeVertexNormals(); const ground=new T.Mesh(gg,new T.MeshStandardMaterial({vertexColors:true,roughness:1})); ground.receiveShadow=true; scene.add(ground);
-    const tex=panelTex(); const pm=new T.MeshStandardMaterial({color:0xffffff,map:tex,metalness:0.35,roughness:0.28});
+    const tex=TW().moduleTex(35,2,false); const pm=new T.MeshStandardMaterial({color:0xffffff,map:tex,metalness:0.15,roughness:0.16});
     const BW=290, BD=250, cols4=4, rows3=3; const blocks=[]; const nTab=6, nRow=22; const total=12*nTab*nRow;
     const inst=new T.InstancedMesh(new T.BoxGeometry(40,0.12,4.6),[new T.MeshStandardMaterial({color:0xB8BEC6,metalness:0.6,roughness:0.4}),new T.MeshStandardMaterial({color:0xB8BEC6,metalness:0.6,roughness:0.4}),pm,new T.MeshStandardMaterial({color:0x8E959E}),new T.MeshStandardMaterial({color:0xB8BEC6}),new T.MeshStandardMaterial({color:0xB8BEC6})],total);
     inst.castShadow=true; inst.receiveShadow=true; const m4=new T.Matrix4(), q=new T.Quaternion().setFromEuler(new T.Euler(12*Math.PI/180,0,0)), sc=new T.Vector3(1,1,1), pv=new T.Vector3(); let k=0;
@@ -193,7 +164,7 @@ const THREE3D = (()=>{
     const {scene}=st; let simT=Date.now(); const lt=lightsFor(scene,s.ll,simT,{shadow:true,shadowR:900,dist:1600,fogN:2000,fogF:6500});
     const ground=new T.Mesh(new T.PlaneGeometry(2200,1700),new T.MeshStandardMaterial({color:0x7E8F6A,roughness:1})); ground.rotation.x=-Math.PI/2; ground.receiveShadow=true; scene.add(ground);
     const pad=new T.Mesh(new T.PlaneGeometry(1500,1050),new T.MeshStandardMaterial({color:0xA3A7AD,roughness:0.95})); pad.rotation.x=-Math.PI/2; pad.position.y=0.05; pad.receiveShadow=true; scene.add(pad);
-    const tex=panelTex(24,1); const pm=new T.MeshStandardMaterial({map:tex,metalness:0.35,roughness:0.3});
+    const tex=TW().moduleTex(24,1,true); const pm=new T.MeshStandardMaterial({map:tex,metalness:0.15,roughness:0.18});
     const blds={}; const r=rnd(s.seed); const colsN=7, rowsN=3; const cw=200, rw=320;
     const rows=[]; let total=0; const specs=s.feeders.map(([code,ids],i)=>{ const cx=(i%colsN-(colsN-1)/2)*cw, cz=(Math.floor(i/colsN)-(rowsN-1)/2)*rw; const w=120+r()*55, d=150+r()*110, h=11+r()*8; const nrow=Math.floor((d*0.82)/3.1); total+=nrow; return {code,ids,cx,cz,w,d,h,nrow}; });
     const inst=new T.InstancedMesh(new T.BoxGeometry(1,0.1,2.2),pm,total); inst.castShadow=true; const m4=new T.Matrix4(), q=new T.Quaternion().setFromEuler(new T.Euler(6*Math.PI/180,0,0)); let k=0;
@@ -234,7 +205,7 @@ const THREE3D = (()=>{
     g.userData.refs={shell,led}; return g; }
 
   // ---------- Health colors ----------
-  function applyHealth(root, H, sel, time){ root.traverse(o=>{ const c=o.userData.comp; if(!c||!o.material||!H) return; const x=H[c]; if(c==="shell"||c==="cabinet"&&o.material.transparent) return; o.material.emissive=o.material.emissive||new T.Color();
+  function applyHealth(root, H, sel, time){ root.traverse(o=>{ const c=o.userData.comp; if(!c||!o.material||!H||o.userData.cover||!("emissiveIntensity" in o.material)) return; const x=H[c]; 
       if(!x){ o.material.emissive.setHex(0); return; } let col= x.lvl==="bad"?COL.crit : x.lvl==="watch"?COL.warn : 0x000000; let inten= x.lvl==="bad"? 0.55+0.35*Math.sin(time*5) : x.lvl==="watch"? 0.45 : 0; if(sel===c){ col= col||COL.acc; inten=Math.max(inten,0.5+0.3*Math.sin(time*6)); } o.material.emissive.setHex(col); o.material.emissiveIntensity=inten; }); }
 
   // ---------- Public: station scene ----------
@@ -251,32 +222,108 @@ const THREE3D = (()=>{
     const api={ update(){ b.update(); }, dispose(){ clearInterval(iv); st.dispose(); }, set onPick(f){ st.onPickCb=f; } };
     return api; }
 
-  // ---------- Public: single unit (drawer / twin) ----------
+  // ---------- Public: single unit (drawer / Digital Twin) ----------
+  // Detailed engineering model with three views: exterior, cutaway (enclosure cut along its
+  // centre line) and exploded (components pulled apart). Callouts show live values.
+  const CALLOUTS = {
+    wind: ["hubPitch","blades","mainBear","gearbox","brakeHyd","generator","cooling","converter","yaw"],
+    solar: ["pvArr","dcIn","igbtMod","dcLink","filter","acOut","fans","trafo"],
+    roof: ["pvArr","dcIn","dcLink","igbtMod","filter","acOut","fans"] };
+  const EXKEY = { hubPitch:"rotor", blades:"rotor", brakeHyd:"hss" };
+  const INSIDE = new Set(["mainBear","gearbox","brakeHyd","generator","cooling","converter","dcIn","igbtMod","dcLink","filter","acOut","cabinet"]);
   async function unit(el, s, uid, idx, o={}){ const ok=await lib(); if(!ok){ el.innerHTML=`<div class="twin-load">${t("fail3d")}</div>`; return null; } if(!el.isConnected) return null;
-    const st=stage(el,{shadows:true,labels:!!o.twin,far:20000,fov:o.twin?34:36,near:0.05}); const {scene}=st; const isW=s.type==="wind"; const lt=lightsFor(scene,s.ll,Date.now(),{shadow:true,shadowR:isW?140:8,dist:isW?400:30,fogN:isW?900:60,fogF:isW?5000:400});
-    const gr=new T.Mesh(new T.CircleGeometry(isW?900:40,64),new T.MeshStandardMaterial({color:isW?0x56793F:(s.id==="VHO"?0xCDB98F:0xA3A7AD),roughness:1})); gr.rotation.x=-Math.PI/2; gr.receiveShadow=true; scene.add(gr);
-    let model, H=null, sel=null, xray=false;
-    if(isW){ const r=(s.modelOf&&s.modelOf(uid).includes("140"))?140:(s.rotor||156); model=turbine({hub:s.hubH||110,rotor:r}); scene.add(model);
-      if(o.twin){ st.camera.position.set(-20,(s.hubH||110)+11,34); st.controls.target.set(-2.5,(s.hubH||110)-0.5,0); } else { st.camera.position.set(190,105,225); st.controls.target.set(0,92,0); }
-      st.controls.minDistance=12; st.controls.maxDistance=900; st.controls.maxPolarAngle=Math.PI*0.495;
-      // wind arrows
-    } else { model=inverterModel(s); scene.add(model); const c=s.id==="VHO"; if(o.twin){ st.camera.position.set(c?5.5:2.4,c?3.2:1.9,c?6.5:2.8); st.controls.target.set(0,c?1.3:1.2,c?-0.6:-0.2); } else { st.camera.position.set(c?6:2.6,c?3.5:2.0,c?7:3.2); st.controls.target.set(0,c?1.2:1.1,c?-0.8:-0.3); } st.controls.minDistance=1; st.controls.maxDistance=40; st.controls.maxPolarAngle=Math.PI*0.49; }
+    const isW=s.type==="wind", central=s.type==="solar", hubH=s.hubH||110;
+    const st=stage(el,{shadows:true,labels:!!o.twin,far:20000,fov:o.twin?34:36,near:0.03,exposure:1.0}); const {scene,renderer,camera,controls}=st; renderer.localClippingEnabled=true;
+    const close = !!o.twin || !isW;
+    const lt=lightsFor(scene,s.ll,Date.now(),{shadow:true,shadowR:isW?(close?16:140):(central?26:9),dist:isW?400:120,fogN:isW?900:central?140:90,fogF:isW?5000:central?900:700});
+    if(isW&&close){ lt.sun.target.position.set(-3,hubH,0); lt.sun.position.add(new T.Vector3(-3,hubH,0)); scene.add(lt.sun.target); lt.sun.shadow.bias=-0.0002; lt.sun.shadow.normalBias=0.02; lt.sun.shadow.mapSize.set(2048,2048); }
+    else if(!isW){ lt.sun.shadow.bias=-0.0002; lt.sun.shadow.normalBias=0.02; }
+    // image-based lighting for believable metal, paint and glass
+    try{ const pm=new T.PMREMGenerator(renderer); const env=pm.fromScene(new T.RoomEnvironment(renderer),0.04).texture; scene.environment=env; pm.dispose(); }catch(e){}
+    const M=TW(); let model;
+    if(isW){ const r=(s.modelOf&&s.modelOf(uid).includes("140"))?140:(s.rotor||156); model=M.windTurbine({hub:hubH,rotor:r,detail:true});
+      const gc=document.createElement("canvas"); gc.width=gc.height=256; const gx=gc.getContext("2d"); gx.fillStyle="#557A3E"; gx.fillRect(0,0,256,256); for(let i=0;i<9000;i++){ gx.fillStyle=Math.random()<0.5?"rgba(40,70,30,.5)":"rgba(140,170,90,.35)"; gx.fillRect(Math.random()*256,Math.random()*256,1.5,1.5); }
+      const gt=new T.CanvasTexture(gc); gt.wrapS=gt.wrapT=T.RepeatWrapping; gt.repeat.set(120,120); gt.colorSpace=T.SRGBColorSpace;
+      const gr=new T.Mesh(new T.CircleGeometry(900,64),new T.MeshStandardMaterial({map:gt,roughness:1})); gr.rotation.x=-Math.PI/2; gr.receiveShadow=true; scene.add(gr);
+      const pad=new T.Mesh(new T.CircleGeometry(16,40),new T.MeshStandardMaterial({color:0xB9AE97,roughness:1})); pad.rotation.x=-Math.PI/2; pad.position.y=0.03; pad.receiveShadow=true; scene.add(pad); }
+    else model= central? M.solarCentral(s) : M.solarString(s);
+    scene.add(model); model.updateMatrixWorld(true); const R=model.userData.refs;
+    // camera presets
+    const PRE = isW ? { close:[[-8,hubH+7,25],[-3.2,hubH+0.3,0]], exp:[[-3,hubH+12.5,38],[-1.8,hubH+3.6,0]], full:[[190,105,225],[0,92,0]] }
+      : central ? { close:[[3.0,2.9,8.6],[-0.7,1.35,0]], exp:[[4.2,4.4,11.2],[-0.5,1.9,0.6]], full:[[18,11,24],[0,1,-6]] }
+      : { close:[[1.25,1.55,2.35],[0.05,1.15,0]], exp:[[1.7,1.9,3.0],[0.1,1.25,0.25]], full:[[5.5,3.6,7.5],[0,1,-2.5]] };
+    const setCam=(k)=>{ camera.position.set(...PRE[k][0]); controls.target.set(...PRE[k][1]); };
+    setCam(o.twin? "close" : isW? "full" : "close");
+    if(isW){ controls.minDistance=3; controls.maxDistance=900; controls.maxPolarAngle=Math.PI*0.495; } else { controls.minDistance=0.6; controls.maxDistance=central?80:30; controls.maxPolarAngle=Math.PI*0.49; }
+    let tween=null; const goCam=(pos,tgt,dur=0.9)=>{ tween={p0:camera.position.clone(),t0:controls.target.clone(),p1:new T.Vector3(...pos),t1:new T.Vector3(...tgt),s:performance.now(),dur}; };
+    // enclosure clipping plane (cutaway) – kept on the equipment's own centre line as it yaws
+    const plane=new T.Plane(); const coverMats=new Set(); model.traverse(x=>{ if(x.isMesh&&x.userData.cover){ (Array.isArray(x.material)?x.material:[x.material]).forEach(m=>coverMats.add(m)); } });
+    coverMats.forEach(m=>{ m.clipShadows=true; m.userData.op=m.opacity; });
+    const qv=new T.Quaternion(), pv=new T.Vector3(), nv=new T.Vector3();
+    const updPlane=()=>{ const f=R.clip.frame; f.updateMatrixWorld(); nv.set(...R.clip.normal).applyQuaternion(f.getWorldQuaternion(qv)); pv.set(...R.clip.point).applyMatrix4(f.matrixWorld); plane.setFromNormalAndCoplanarPoint(nv,pv); };
+    // exploded view bookkeeping
+    const exBase={}; Object.entries(R.explodeObj||{}).forEach(([k,ob])=>exBase[k]=ob.position.clone());
+    let mode="ext", kE=0, lastF=0;
+    const setMode=(m,cam=true)=>{ mode=m; coverMats.forEach(mt=>{ mt.clippingPlanes = m==="cut"? [plane] : []; mt.needsUpdate=true; });
+      if(cam&&o.twin) goCam(...(m==="exp"? PRE.exp : PRE.close)); if(ctl) ctl.querySelectorAll("[data-m]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.m===m)); };
+    // ---- HUD, controls, callouts
     const hud=document.createElement("div"); hud.className="twin-hud"; el.appendChild(hud);
-    if(o.twin){ const ctl=document.createElement("div"); ctl.className="twin-ctl"; ctl.innerHTML=`<div class="seg"><button data-k="x" aria-pressed="false">${t(isW?"explode":"explode")}</button></div>`; el.appendChild(ctl);
-      ctl.onclick=e=>{ const bt=e.target.closest("button"); if(!bt) return; xray=!xray; bt.setAttribute("aria-pressed",xray); const sh=isW?model.userData.refs.shell:model.userData.refs.shell; sh.material.opacity=xray?0.18:1; sh.material.depthWrite=!xray; };
-      // component labels
-      if(isW){ [["generator",[-6,4.2,0]],["gearbox",[-2.6,3.6,0]],["converter",[-9,3.6,1.3]],["hubPitch",[3.6,3.4,0]],["yaw",[0,-3.6,0]]].forEach(([c,p])=>{ const lb=label(`<b>${t(c)}</b>`,"lbl3d"); lb.position.set(...p); model.userData.refs.tilt.add(lb); lb.element.addEventListener("click",()=>api.onComp&&api.onComp(c)); }); }
-      else { const c=s.id==="VHO"; [["igbtMod",[0,c?1.9:1.4,0.4]],["dcIn",[0,c?0.6:1.0,0.4]],["fans",[0,c?2.8:1.8,0]],["pvArr",[0,c?3.6:2.4,c?-2.6:-1.4]]].forEach(([k,p])=>{ const lb=label(`<b>${t(k)}</b>`,"lbl3d"); lb.position.set(...p); model.add(lb); lb.element.addEventListener("click",()=>api.onComp&&api.onComp(k)); }); }
-      }
-    // component picking via raycast on meshes having comp
-    if(o.twin){ const ray=new T.Raycaster(), mv=new T.Vector2(); let dn=null; st.renderer.domElement.addEventListener("pointerdown",e=>dn=[e.clientX,e.clientY]); st.renderer.domElement.addEventListener("pointerup",e=>{ if(!dn||Math.hypot(e.clientX-dn[0],e.clientY-dn[1])>5) return; const r=st.renderer.domElement.getBoundingClientRect(); mv.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1); ray.setFromCamera(mv,st.camera); const hits=ray.intersectObject(model,true); const h=hits.find(x=>x.object.userData.comp&&(!(xray)||x.object.userData.comp!=="shell")); if(h){ let c=h.object.userData.comp; if(c==="shell") c="converter"; api.onComp&&api.onComp(c); } }); }
-    const renderHud=()=>{ const u=LIVE.st[s.id].units[idx]; const d=unitDerived(s,u,idx); hud.innerHTML=`<span class="chip"><i class="dot" style="background:#${stCol(u.st).toString(16).padStart(6,"0")}"></i>${uid} · ${t("st_"+u.st)}</span>`+(isW?`<span class="chip">${ic("rot","sm")}${d.rpm==null?"—":nf(d.rpm,1)} rpm</span><span class="chip">${ic("sliders","sm")}${nf(d.pitch,1)}°</span>`:`<span class="chip">${ic("thermo","sm")}IGBT ${nf(d.igbt,1)} °C</span>`); };
-    renderHud(); const iv=setInterval(renderHud,1500);
-    st.onFrame((dt,time)=>{ const L1=LIVE.st[s.id]; const u=L1.units[idx]; if(isW){ const d=unitDerived(s,u,idx); const dir=(L1.dir??250)*Math.PI/180; animTurbine(model,dt,RM()?0:(d.rpm||0),d.pitch||0,(d.yaw||0)*Math.PI/180,time); }
-      else { const led=model.userData.refs.led; const c=stCol(u.st); led.material.color.setHex(c); led.material.emissive.setHex(c); led.material.emissiveIntensity= u.st==="fault"? (Math.sin(time*6)>0?2.5:0.2) : 2; }
+    let ctl=null, showL=true, full=false; const callouts={};
+    if(o.twin){ ctl=document.createElement("div"); ctl.className="twin-ctl";
+      ctl.innerHTML=`<div class="seg">${[["ext","vExt"],["cut","vCut"],["exp","vExp"]].map(([k,l])=>`<button data-m="${k}" aria-pressed="${k==="ext"}">${t(l)}</button>`).join("")}</div><div class="seg"><button data-k="full" aria-pressed="false">${t("vFull")}</button><button data-k="lbl" aria-pressed="true">${t("labels")}</button></div>`;
+      el.appendChild(ctl);
+      ctl.onclick=e=>{ const b=e.target.closest("button"); if(!b) return; if(b.dataset.m){ setMode(b.dataset.m); full=false; ctl.querySelector('[data-k="full"]').setAttribute("aria-pressed","false"); return; }
+        if(b.dataset.k==="lbl"){ showL=!showL; b.setAttribute("aria-pressed",showL); st.labelR.domElement.style.display=showL?"":"none"; }
+        if(b.dataset.k==="full"){ full=!full; b.setAttribute("aria-pressed",full); goCam(...(full? PRE.full : mode==="exp"? PRE.exp : PRE.close), 1.2); } };
+      if(!isW){ const lg=document.createElement("div"); lg.className="twin-leg"; lg.innerHTML=`<span><i style="background:#FFB020"></i>DC</span><span><i style="background:#36C5F0"></i>AC 0,4 kV</span>${central?`<span><i style="background:#B48CFF"></i>MV 22 kV</span>`:""}<span class="faint">${t("powerFlow")}</span>`; el.appendChild(lg); }
+      const list=CALLOUTS[isW?"wind":central?"solar":"roof"];
+      list.forEach(c=>{ const grp=R.parts[c]; if(!grp) return; const exk=EXKEY[c]||c; const ob=(R.explodeObj||{})[exk];
+        const frame = ob? ob.parent : (R.clip.frame); const v=new T.Vector3(...(R.anchors[c]||[0,1,0])); grp.localToWorld(v); frame.worldToLocal(v);
+        const lb=label("","lbl3d call"); lb.position.copy(v); frame.add(lb); lb.userData.base=v.clone(); lb.userData.ex=exk;
+        lb.element.addEventListener("click",()=>{ api.focus(c); api.onComp&&api.onComp(c); }); callouts[c]=lb; });
+    }
+    const hx=c=>"#"+c.toString(16).padStart(6,"0");
+    const val=(c,u,d)=>{ const na=u.st==="comm"; if(na) return "—"; const load=u.r? Math.max(0,(u.p||0)/u.r):0;
+      if(isW){ switch(c){ case "hubPitch": return nf(d.pitch,1)+"°"; case "blades": return d.rpm==null?"—":nf(d.rpm,1)+" rpm"; case "mainBear": return nf(d.amb+9+11*load,1)+" °C";
+        case "gearbox": return nf(d.gbT,1)+" °C"; case "brakeHyd": return (d.rpm||0)>0.5? t("brakeRel") : t("brakeOn"); case "generator": return nf(d.genT,1)+" °C · "+nf((d.rpm||0)*112,0)+" rpm";
+        case "cooling": return nf(d.nacT,1)+" °C"; case "converter": return nf((u.p||0)*1000,0)+" kW"; case "yaw": return nf(d.yaw||0,1)+"°"; } }
+      const kv=central?0.315:0.4; switch(c){ case "pvArr": return nf(d.g,0)+" W/m²"; case "dcIn": case "dcLink": return nf(d.dcV,0)+" V"; case "igbtMod": return nf(d.igbt,1)+" °C";
+        case "filter": return nf((u.p||0)*1000/(Math.sqrt(3)*kv),0)+" A"; case "acOut": return nf((u.p||0)*1000,1)+" kW"; case "fans": return nf(load>0.02? 35+60*load : 0,0)+" %"; case "trafo": return nf(d.amb+12+28*load,1)+" °C"; }
+      return ""; };
+    let H=null, sel=null;
+    const renderHud=()=>{ const u=LIVE.st[s.id].units[idx]; const d=unitDerived(s,u,idx);
+      hud.innerHTML=`<span class="chip"><i class="dot" style="background:${hx(stCol(u.st))}"></i>${uid} · ${t("st_"+u.st)}</span>`+(isW?`<span class="chip">${ic("rot","sm")}${d.rpm==null?"—":nf(d.rpm,1)} rpm</span><span class="chip">${ic("sliders","sm")}${nf(d.pitch,1)}°</span><span class="chip">${ic("zap","sm")}${u.st==="comm"?"—":nf((u.p||0)*1000,0)} kW</span>`:`<span class="chip">${ic("zap","sm")}${u.st==="comm"?"—":nf((u.p||0)*1000,1)} kW</span><span class="chip">${ic("thermo","sm")}IGBT ${nf(d.igbt,1)} °C</span>`);
+      Object.entries(callouts).forEach(([c,lb])=>{ const x=H&&H[c]; const col= x? (x.lvl==="bad"?COL.crit:x.lvl==="watch"?COL.warn:COL.ok) : COL.ok;
+        lb.element.className="lbl3d call"+(sel===c?" on":"")+(x&&x.lvl!=="good"?" "+x.lvl:""); lb.element.innerHTML=`<i style="background:${hx(col)}"></i><b>${t(c)}</b><span>${val(c,u,d)}</span>`; }); };
+    renderHud(); const iv=setInterval(renderHud,1000);
+    // ---- picking (ignores enclosures while they are cut away or lifted off)
+    if(o.twin){ const ray=new T.Raycaster(), mv=new T.Vector2(); let dn=null; const cvs=renderer.domElement;
+      cvs.addEventListener("pointerdown",e=>dn=[e.clientX,e.clientY]);
+      cvs.addEventListener("pointerup",e=>{ if(!dn||Math.hypot(e.clientX-dn[0],e.clientY-dn[1])>5) return; const r=cvs.getBoundingClientRect(); mv.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1); ray.setFromCamera(mv,camera);
+        const hits=ray.intersectObject(model,true).filter(h=>h.object.visible&&(h.object.userData.comp||h.object.userData.cover)&&!(mode!=="ext"&&h.object.userData.cover));
+        const h=hits[0]; if(!h) return; if(h.object.userData.cover){ if(!isW){ api.focus("cabinet"); api.onComp&&api.onComp("cabinet"); } return; }
+        const c=h.object.userData.comp; api.focus(c); api.onComp&&api.onComp(c); }); }
+    // ---- per-frame animation
+    const ease=x=>x<0.5?2*x*x:1-Math.pow(-2*x+2,2)/2; const tmp=new T.Vector3();
+    st.onFrame((dt,time)=>{ const L1=LIVE.st[s.id]; const u=L1.units[idx]; const load=u.r? Math.max(0,(u.p||0)/u.r):0; const run=u.st!=="comm"&&(u.p||0)>0;
+      if(isW){ const d=unitDerived(s,u,idx); animTurbine(model,dt,RM()?0:(d.rpm||0),d.pitch||0,(d.yaw||0)*Math.PI/180,time); if(R.vane) R.vane.rotation.y=Math.sin(time*0.7)*0.08; }
+      else { R.fans.forEach((f,i)=>f.rotation.y+=dt*(run? 6+16*load : 0.4)*(RM()?0:1)); const c=stCol(u.st); (R.leds||[]).forEach(l=>{ l.material.color.setHex(c); l.material.emissive.setHex(c); l.material.emissiveIntensity= u.st==="fault"? (Math.sin(time*6)>0?2.5:0.2) : 2; });
+        R.flows.forEach(f=>{ const on=run&&(f.kind!=="dc"||(LIVE.st[s.id].g||0)>15); f.tex.offset.x-= dt*(on? (0.5+1.8*load) : 0)*(RM()?0:1); f.mesh.material.opacity= on? 0.95 : 0.12; f.mesh.visible=!!o.twin||on; }); }
+      // exploded / assembled
+      const tgtE= mode==="exp"?1:0; const now=performance.now(); kE+= (tgtE-kE)*Math.min(1,(now-(lastF||now))/1000*3.2); lastF=now; const e=ease(clamp(kE,0,1));
+      Object.entries(R.explodeObj||{}).forEach(([k,ob])=>{ const off=R.explodable[k]; if(!off) return; ob.position.set(exBase[k].x+off[0]*e, exBase[k].y+off[1]*e, exBase[k].z+off[2]*e); });
+      coverMats.forEach(m=>{ const op= 1-0.86*e; m.transparent= op<0.999; m.opacity=op*(m.userData.op??1); m.depthWrite= op>0.98; });
+      Object.values(callouts).forEach(lb=>{ const off=(R.explodable||{})[lb.userData.ex]; lb.position.copy(lb.userData.base); if(off) lb.position.add(tmp.set(off[0]*e,off[1]*e,off[2]*e)); });
+      if(mode==="cut") updPlane();
+      if(tween){ tween.k=Math.min(1,(performance.now()-tween.s)/1000/tween.dur); const k=ease(tween.k); camera.position.lerpVectors(tween.p0,tween.p1,k); controls.target.lerpVectors(tween.t0,tween.t1,k); if(tween.k>=1) tween=null; }
       if(H) applyHealth(model,H,sel,time); });
-    const api={ dispose(){ clearInterval(iv); st.dispose(); }, setHealth(h){ H=h; }, focus(c){ sel=c; if(c&&isW&&!xray){ xray=true; model.userData.refs.shell.material.opacity=0.18; model.userData.refs.shell.material.depthWrite=false; const b=el.querySelector('.twin-ctl button'); b&&b.setAttribute("aria-pressed","true"); } }, onComp:null };
-    if(o.twin) setTimeout(()=>{ if(H) return; },0);
+    const api={ dispose(){ clearInterval(iv); st.dispose(); }, setHealth(h){ H=h; renderHud(); },
+      focus(c){ sel=c; renderHud(); if(!c||!o.twin) return; if(INSIDE.has(c)&&mode==="ext") setMode("cut",false);
+        const bb=new T.Box3(); model.updateMatrixWorld(true); model.traverse(x=>{ if(x.isMesh&&x.userData.comp===c&&!x.userData.cover) bb.expandByObject(x); }); if(bb.isEmpty()) return;
+        const ctr=bb.getCenter(new T.Vector3()), sz=bb.getSize(new T.Vector3()).length(); const dir=camera.position.clone().sub(controls.target).normalize();
+        if(isW&&(c==="blades"||c==="tower")){ goCam(PRE.full[0],PRE.full[1],1.2); return; }
+        const dist=clamp(sz*1.5, isW?7:central?2.4:0.7, isW?60:central?30:6); goCam([ctr.x+dir.x*dist, ctr.y+dir.y*dist, ctr.z+dir.z*dist],[ctr.x,ctr.y,ctr.z]); },
+      onComp:null };
     return api; }
 
   // ---------- Public: 3D map ----------

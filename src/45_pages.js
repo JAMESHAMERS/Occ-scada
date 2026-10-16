@@ -211,10 +211,13 @@ PAGES.alarms=(el)=>{
 };
 
 // ---------- Digital twin page ----------
-const COMP_W=[["blades","blades"],["hubPitch","hubPitch"],["mainBear","mainBear"],["gearbox","gearbox"],["generator","generator"],["converter","converter"],["yaw","yaw"],["tower","tower"]];
-const COMP_S=[["pvArr","pvArr"],["dcIn","dcIn"],["igbtMod","igbtMod"],["fans","fans"],["acOut","acOut"],["cabinet","cabinet"]];
+// Digital-twin component lists (ids match the 3D model parts in 82_twin.js)
+const COMP_W=["blades","hubPitch","mainBear","gearbox","brakeHyd","generator","cooling","converter","yaw","tower"].map(c=>[c,c]);
+const COMP_S=["pvArr","dcIn","dcLink","igbtMod","filter","acOut","fans","cabinet","trafo"].map(c=>[c,c]);   // central inverter skid
+const COMP_R=["pvArr","dcIn","dcLink","igbtMod","filter","acOut","fans","cabinet"].map(c=>[c,c]);           // rooftop string inverter
+const compList=s=> s.type==="wind"? COMP_W : s.type==="solar"? COMP_S : COMP_R;
 const ALARM_COMP={pitchBat:"hubPitch",convF:"converter",genBear:"generator",yawErr:"yaw",gbOil:"gearbox",vibHi:"tower",underPerf:"blades",igbtHi:"igbtMod",strLow:"dcIn",ovGrid:"acOut",invFault:"dcIn",ambDer:"fans",stale:"converter"};
-function compHealth(s, uid){ const isW=s.type==="wind"; const list=isW?COMP_W:COMP_S; const k=s.units.findIndex(u=>u.id===uid)+1; const out={};
+function compHealth(s, uid){ const isW=s.type==="wind"; const list=compList(s); const k=s.units.findIndex(u=>u.id===uid)+1; const out={};
   list.forEach(([c],i)=>{ const h=clamp(93+6*hsh(k*31+i*7+s.seed),70,99.5); out[c]={h, lvl:"good"}; });
   ALARMS.filter(a=>a.st===s.id&&a.dev===uid&&!a.cleared).forEach(a=>{ const c=ALARM_COMP[a.key]; if(c&&out[c]){ out[c].lvl=a.sev<=2?"bad":"watch"; out[c].h=a.sev<=2? 48+10*Math.abs(hsh(k)) : 74+6*Math.abs(hsh(k+1)); out[c].al=a; } });
   if(unitState(s,uid)==="maint"){ const c=isW?"gearbox":"fans"; out[c].lvl="watch"; out[c].h=78; }
@@ -235,12 +238,12 @@ PAGES.twin=(el,param)=>{
     const m=(l,v,un)=>`<div class="m"><span>${l}</span><b>${v}<small>${un}</small></b></div>`;
     $("#twM").innerHTML= isW? [m(t("power"),na?"—":nf(u.p*1000,0),"kW"),m(t("windSpd"),na?"—":nf(u.v,1),"m/s"),m(t("rotor"),na||d.rpm==null?"—":nf(d.rpm,1),"rpm"),m(t("pitch"),na?"—":nf(d.pitch,1),"°"),m(t("genT"),na?"—":nf(d.genT,1),"°C"),m(t("gbT"),na?"—":nf(d.gbT,1),"°C")].join("")
       : [m(t("acP"),na?"—":nf(u.p*1000,1),"kW"),m(t("dcV"),na?"—":nf(d.dcV,0),"V"),m(t("eff"),na||d.eff==null?"—":nf(d.eff,2),"%"),m(t("igbt"),na?"—":nf(d.igbt,1),"°C"),m(t("irr"),nf(d.g,0),"W/m²"),m(t("strI"),na?"—":nf(d.strI,2),"A")].join("");
-    const H=compHealth(s,uid); const lst=s.type==="wind"?COMP_W:COMP_S;
+    const H=compHealth(s,uid); const lst=compList(s);
     $("#twC").innerHTML=lst.map(([c,l])=>{ const x=H[c]; const cls=x.lvl==="bad"?"crit":x.lvl==="watch"?"warn":"ok"; return `<button class="comp ${sel===c?"on":""}" data-c="${c}"><span class="dot ${cls}"></span><span>${t(l)}${x.al?`<div class="faint" style="font-size:11px;white-space:normal">${esc(alarmText(x.al))}</div>`:""}</span><span class="num c-${cls}" style="font-size:15px;font-weight:600">${nf(x.h,0)}</span><span class="chip bg-${cls}">${t(x.lvl)}</span></button>`; }).join("");
     scene&&scene.setHealth&&scene.setHealth(H);
   }
   async function load3d(){ if(scene){ scene.dispose(); S.scenes=S.scenes.filter(x=>x!==scene); scene=null; } $("#tw3d").innerHTML=`<div class="twin-load">${t("loading3d")}</div>`; const idx=s.units.findIndex(u=>u.id===uid);
-    const sc=await THREE3D.unit($("#tw3d"), s, uid, idx, {twin:true}); if(!sc) return; if(S.page!=="twin"){ sc.dispose(); return; } scene=sc; S.scenes.push(sc); sc.onComp=c=>{ sel=c; info(); }; info(); }
+    const sc=await THREE3D.unit($("#tw3d"), s, uid, idx, {twin:true}); if(!sc) return; if(S.page!=="twin"){ sc.dispose(); return; } scene=sc; S.scenes.push(sc); sc.onComp=c=>{ sel=c; info(); const b=$(`#twC [data-c="${c}"]`); b&&b.scrollIntoView({block:"nearest"}); }; info(); }
   $("#twSt").onchange=e=>{ sid=e.target.value; s=ST[sid]; uid=s.units[0].id; sel=null; list(); info(); load3d(); };
   $("#twL").onclick=e=>{ const b=e.target.closest("[data-u]"); if(!b) return; uid=b.dataset.u; sel=null; list(); info(); load3d(); };
   $("#twC").onclick=e=>{ const b=e.target.closest("[data-c]"); if(!b) return; sel=sel===b.dataset.c?null:b.dataset.c; info(); scene&&scene.focus&&scene.focus(sel); };
