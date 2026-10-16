@@ -264,7 +264,7 @@ const ROLES={
 const SALT="occ-iapech-2026";
 // Email one-time code for two-step sign-in. Paste the Web-app URL of tools/mail-otp/Code.gs here
 // (it ends with /exec). The script holds the recipient addresses; only account names are sent from the page.
-const MAIL_OTP = { url: "", users: ["admin", "manager", "zhang.wei"] };
+const MAIL_OTP = { url: "https://script.google.com/macros/s/AKfycbzGsSPS05zqRKEAdiqvKtHB0fWR_XpGXZvXqFT70Jj6VGgEsw_cqImw-IA_6cDzHO9h/exec", users: ["admin", "manager", "zhang.wei"] };
 let USERS=[
   {u:"admin",   name:"Nguyễn Văn An",   role:"admin",  scope:"all", mfa:true,  enabled:true, h:"__H_admin__", last:"14/10/2026 17:42"},
   {u:"manager", name:"Trần Minh Đức",   role:"manager",scope:"all", mfa:true,  enabled:true, h:"__H_manager__", last:"14/10/2026 08:15"},

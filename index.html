@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- GENERATED FILE – do not edit. Source: src/ + data/ in this repository; rebuild with build.py.
-     HINO OCC SCADA 1.0 · build 261016.64bc15a · HINO Systech Vietnam Co., Ltd. -->
+     HINO OCC SCADA 1.0 · build 261016.8b75ae9 · HINO Systech Vietnam Co., Ltd. -->
 <title>OCC SCADA Ia Pech</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="HINO OCC SCADA – Trung tâm giám sát tập trung các nhà máy điện gió, điện mặt trời · HINO Systech Vietnam Co., Ltd.">
@@ -812,7 +812,7 @@ DICT.brandSub2=["{NP} nhà máy · {MW} MW","{NP} plants · {MW} MW","{NP} 座 �
 
 // ---- 20_data.js
 // Build stamp is injected by build.py (date + git commit), so every published copy can be compared at a glance.
-const BUILD = {"version": "1.0", "id": "261016.64bc15a", "date": "2026-10-16"};
+const BUILD = {"version": "1.0", "id": "261016.8b75ae9", "date": "2026-10-16"};
 // ===================== Plant registry =====================
 // Coordinates: WGS84, public reference sources (gem.wiki / thewindpower / news), tolerance a few km.
 const OCC_LL = [107.902, 13.975];
@@ -1077,7 +1077,7 @@ const ROLES={
 const SALT="occ-iapech-2026";
 // Email one-time code for two-step sign-in. Paste the Web-app URL of tools/mail-otp/Code.gs here
 // (it ends with /exec). The script holds the recipient addresses; only account names are sent from the page.
-const MAIL_OTP = { url: "", users: ["admin", "manager", "zhang.wei"] };
+const MAIL_OTP = { url: "https://script.google.com/macros/s/AKfycbzGsSPS05zqRKEAdiqvKtHB0fWR_XpGXZvXqFT70Jj6VGgEsw_cqImw-IA_6cDzHO9h/exec", users: ["admin", "manager", "zhang.wei"] };
 let USERS=[
   {u:"admin",   name:"Nguyễn Văn An",   role:"admin",  scope:"all", mfa:true,  enabled:true, h:"f44a9eac3f33f29d8f5acd566a0f5ab35ae2c0d2c2bd1925de20de4f6c6b79fc", last:"14/10/2026 17:42"},
   {u:"manager", name:"Trần Minh Đức",   role:"manager",scope:"all", mfa:true,  enabled:true, h:"dc210277fb50abfcdd76aaa529180995f50c60f2cbe21bacde34ba7233a459ce", last:"14/10/2026 08:15"},
