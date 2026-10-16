@@ -14,7 +14,7 @@ const THREE3D = (()=>{
   function stage(el, o={}){
     const w=el.clientWidth||600, h=el.clientHeight||400;
     const renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:"high-performance"});
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2)); renderer.setSize(w,h); renderer.outputColorSpace=T.SRGBColorSpace; renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=o.exposure||1.0;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,o.maxDpr||2)); renderer.setSize(w,h); renderer.outputColorSpace=T.SRGBColorSpace; renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=o.exposure||1.0;
     if(o.shadows){ renderer.shadowMap.enabled=true; renderer.shadowMap.type=T.PCFSoftShadowMap; }
     el.innerHTML=""; el.appendChild(renderer.domElement); renderer.domElement.style.display="block";
     const scene=new T.Scene(); const camera=new T.PerspectiveCamera(o.fov||40,w/h,o.near||1,o.far||20000);
@@ -25,12 +25,13 @@ const THREE3D = (()=>{
     const ro=new ResizeObserver(()=>{ const W=el.clientWidth, H=el.clientHeight; if(!W||!H) return; renderer.setSize(W,H); labelR&&labelR.setSize(W,H); camera.aspect=W/H; camera.updateProjectionMatrix(); }); ro.observe(el);
     function loop(now){ raf=requestAnimationFrame(loop); const dt=Math.min(0.05,(now-last)/1000); last=now; if(!visible||document.hidden) return; fns.forEach(f=>f(dt,now/1000)); controls.update(); renderer.render(scene,camera); labelR&&labelR.render(scene,camera); }
     raf=requestAnimationFrame(loop);
+    if(/dbg3d/.test(location.hash)) (window.__st3d=window.__st3d||[]).push({camera,controls});   // test hook: camera access for automated visual checks
     // picking
     const ray=new T.Raycaster(), mv=new T.Vector2(); let down=null;
     renderer.domElement.addEventListener("pointerdown",e=>{ down=[e.clientX,e.clientY]; });
     const st={renderer,scene,camera,controls,labelR,el,
       onFrame(f){ fns.push(f); },
-      pick(objs, cb){ renderer.domElement.addEventListener("pointerup",e=>{ if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>5) return; const r=renderer.domElement.getBoundingClientRect(); mv.set(((e.clientX-r.left)/r.width)*2-1, -((e.clientY-r.top)/r.height)*2+1); ray.setFromCamera(mv,camera); const hit=ray.intersectObjects(objs(),true)[0]; if(hit){ let o=hit.object; while(o&&!o.userData.pick) o=o.parent; if(o) cb(o.userData.pick, o); } });
+      pick(objs, cb){ renderer.domElement.addEventListener("pointerup",e=>{ if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>5) return; const r=renderer.domElement.getBoundingClientRect(); mv.set(((e.clientX-r.left)/r.width)*2-1, -((e.clientY-r.top)/r.height)*2+1); ray.setFromCamera(mv,camera); const hit=ray.intersectObjects(objs(),true)[0]; if(hit){ let o=hit.object; if(o.userData.pickFn){ const id=o.userData.pickFn(hit.instanceId); if(id!=null) cb(id,o); return; } while(o&&!o.userData.pick) o=o.parent; if(o) cb(o.userData.pick, o); } });
         renderer.domElement.addEventListener("pointermove",e=>{ const r=renderer.domElement.getBoundingClientRect(); mv.set(((e.clientX-r.left)/r.width)*2-1, -((e.clientY-r.top)/r.height)*2+1); ray.setFromCamera(mv,camera); const hit=ray.intersectObjects(objs(),true)[0]; renderer.domElement.style.cursor=hit?"pointer":"grab"; }); },
       dispose(){ if(disposed) return; disposed=true; cancelAnimationFrame(raf); io.disconnect(); ro.disconnect(); controls.dispose();
         scene.traverse(o=>{ if(o.geometry) o.geometry.dispose(); if(o.material){ (Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{ m.map&&m.map.dispose(); m.dispose(); }); } if(o.isCSS2DObject&&o.element) o.element.remove(); });
@@ -118,106 +119,28 @@ const THREE3D = (()=>{
     return {update, tbs, lt, hAt};
   }
 
-  // ---------- Solar (utility) ----------
-  function panelTex(cols=36, rows=2){ const c=document.createElement("canvas"); c.width=1024; c.height=128; const x=c.getContext("2d"); x.fillStyle="#17294d"; x.fillRect(0,0,1024,128); const pw=1024/cols, ph=128/rows;
-    for(let i=0;i<cols;i++) for(let j=0;j<rows;j++){ x.fillStyle=`hsl(222,${45+((i*7+j)%5)}%,${17+((i+j)%3)}%)`; x.fillRect(i*pw+1.5,j*ph+1.5,pw-3,ph-3); x.strokeStyle="rgba(170,190,230,.18)"; x.lineWidth=1; for(let k=1;k<6;k++){ x.beginPath(); x.moveTo(i*pw+k*pw/6,j*ph+2); x.lineTo(i*pw+k*pw/6,j*ph+ph-2); x.stroke(); } }
-    const t=new T.CanvasTexture(c); t.colorSpace=T.SRGBColorSpace; t.anisotropy=4; return t; }
-  function buildSolarFarm(st, s, o={}){
-    const {scene}=st; let simT=o.time||Date.now(); const lt=lightsFor(scene,s.ll,simT,{shadow:true,shadowR:900,dist:1600,fogN:2200,fogF:7000});
-    const gsz=[1900,1500]; const gg=new T.PlaneGeometry(gsz[0],gsz[1],90,70); gg.rotateX(-Math.PI/2); const cols=[]; const pa=gg.attributes.position; const c1=new T.Color(0xCDB98F), c2=new T.Color(0xB89E6E), c3=new T.Color(0x8C8A5A), tc=new T.Color();
-    for(let i=0;i<pa.count;i++){ const x=pa.getX(i), z=pa.getZ(i); const n=fbm2(x/140,z/140,s.seed); pa.setY(i, Math.max(0,Math.hypot(x/950,z/750)-0.8)*60*(1+n)); tc.copy(c1).lerp(c2,clamp(0.5+n,0,1)); if(fbm2(x/400,z/400,s.seed+3)>0.3) tc.lerp(c3,0.35); cols.push(tc.r,tc.g,tc.b); }
-    gg.setAttribute("color",new T.Float32BufferAttribute(cols,3)); gg.computeVertexNormals(); const ground=new T.Mesh(gg,new T.MeshStandardMaterial({vertexColors:true,roughness:1})); ground.receiveShadow=true; scene.add(ground);
-    const tex=TW().moduleTex(35,2,false); const pm=new T.MeshStandardMaterial({color:0xffffff,map:tex,metalness:0.15,roughness:0.16});
-    const BW=290, BD=250, cols4=4, rows3=3; const blocks=[]; const nTab=6, nRow=22; const total=12*nTab*nRow;
-    const inst=new T.InstancedMesh(new T.BoxGeometry(40,0.12,4.6),[new T.MeshStandardMaterial({color:0xB8BEC6,metalness:0.6,roughness:0.4}),new T.MeshStandardMaterial({color:0xB8BEC6,metalness:0.6,roughness:0.4}),pm,new T.MeshStandardMaterial({color:0x8E959E}),new T.MeshStandardMaterial({color:0xB8BEC6}),new T.MeshStandardMaterial({color:0xB8BEC6})],total);
-    inst.castShadow=true; inst.receiveShadow=true; const m4=new T.Matrix4(), q=new T.Quaternion().setFromEuler(new T.Euler(12*Math.PI/180,0,0)), sc=new T.Vector3(1,1,1), pv=new T.Vector3(); let k=0;
-    const legs=new T.InstancedMesh(new T.BoxGeometry(0.15,1.6,0.15),new T.MeshStandardMaterial({color:0x9AA3AE,metalness:0.6}),total*2); let kl=0;
-    for(let b=0;b<12;b++){ const bx=(b%cols4-(cols4-1)/2)*(BW+40), bz=(Math.floor(b/cols4)-(rows3-1)/2)*(BD+40); blocks.push([bx,bz]);
-      for(let r=0;r<nRow;r++) for(let tb=0;tb<nTab;tb++){ const x=bx-BW/2+22+tb*44.5, z=bz-BD/2+8+r*10.6; pv.set(x,1.9,z); m4.compose(pv,q,sc); inst.setMatrixAt(k++,m4); [x-15,x+15].forEach(lx=>{ m4.compose(new T.Vector3(lx,0.8,z),new T.Quaternion(),sc); legs.setMatrixAt(kl++,m4); }); } }
-    scene.add(inst); scene.add(legs);
-    // roads
-    const road=new T.MeshStandardMaterial({color:0xD9CFB8,roughness:1}); for(let i=0;i<5;i++){ const r=new T.Mesh(new T.PlaneGeometry(8,rows3*(BD+40)),road); r.rotation.x=-Math.PI/2; r.position.set((i-2)*(BW+40),0.08,0); r.receiveShadow=true; scene.add(r); } for(let i=0;i<4;i++){ const r=new T.Mesh(new T.PlaneGeometry(cols4*(BW+40),8),road); r.rotation.x=-Math.PI/2; r.position.set(0,0.09,(i-1.5)*(BD+40)); scene.add(r); }
-    // inverter stations
-    const stations={}; s.feeders.forEach(([f,ids],b)=>{ const [bx,bz]=blocks[b]; const g=new T.Group(); g.position.set(bx+BW/2+20,0,bz); const box=new T.Mesh(new T.BoxGeometry(6,2.9,12.2),new T.MeshStandardMaterial({color:0xEEF1F4,roughness:0.6})); box.position.y=1.6; box.castShadow=true; g.add(box);
-      const trf=new T.Mesh(new T.BoxGeometry(3.4,3.2,3.4),new T.MeshStandardMaterial({color:0x6C7480,metalness:0.4,roughness:0.5})); trf.position.set(0,1.7,9); trf.castShadow=true; g.add(trf);
-      const lamp=new T.Mesh(new T.SphereGeometry(1.1,14,10),new T.MeshStandardMaterial({color:COL.ok,emissive:COL.ok,emissiveIntensity:1.6})); lamp.position.y=4; g.add(lamp); g.userData.lamp=lamp; g.userData.pick=ids[0]; g.userData.ids=ids;
-      const lb=label(""); lb.position.set(0,12,0); g.add(lb); g.userData.lbl=lb; lb.element.addEventListener("click",()=>st.onPickCb&&st.onPickCb(worst(ids))); scene.add(g); stations[f]=g; });
-    // substation & weather station
-    const sub=new T.Group(); sub.position.set(-cols4*(BW+40)/2-70,0,0); const sb=new T.Mesh(new T.BoxGeometry(40,8,16),new T.MeshStandardMaterial({color:0xE9ECEF})); sb.position.y=4; sb.castShadow=true; sub.add(sb); const st1=new T.Mesh(new T.BoxGeometry(9,7,7),new T.MeshStandardMaterial({color:0x6C7480,metalness:0.4})); st1.position.set(0,3.5,24); sub.add(st1); scene.add(sub);
-    const sl=label(`<b>TBA ${s.kv}</b>`); sl.position.set(sub.position.x,30,0); scene.add(sl);
-    const wx=new T.Mesh(new T.CylinderGeometry(0.15,0.15,10,6),new T.MeshStandardMaterial({color:0xC0C6CE})); wx.position.set(sub.position.x,5,-60); scene.add(wx); const wl=label(`<b>${s.wx}</b>`); wl.position.set(sub.position.x,16,-60); scene.add(wl);
-    // sun disc
-    const sunD=new T.Mesh(new T.SphereGeometry(60,24,16),new T.MeshBasicMaterial({color:0xFFE9B0})); scene.add(sunD);
-    function worst(ids){ const L1=LIVE.st[s.id]; const rank={fault:0,comm:1,limit:2,stop:3,maint:4,run:5}; return ids.slice().sort((a,b)=>rank[unitState(s,a)]-rank[unitState(s,b)])[0]; }
-    st.camera.position.set(820,520,980); st.controls.target.set(0,0,0); st.controls.maxPolarAngle=Math.PI*0.47; st.controls.minDistance=120; st.controls.maxDistance=3200;
-    let lapse=false; const placeSun=(ms)=>{ const sp=solarPos(s.ll,ms); const el=sp.el*Math.PI/180, az=sp.az*Math.PI/180; const dir=new T.Vector3(Math.sin(az)*Math.cos(el),Math.sin(el),-Math.cos(az)*Math.cos(el)); lt.sun.position.copy(dir.clone().multiplyScalar(1600)); sunD.position.copy(dir.clone().multiplyScalar(5200)); sunD.visible=sp.el>-2; lt.sun.intensity= sp.el>0? 0.6+2.2*Math.sin(Math.max(el,0.05)) : 0.15; lt.hemi.intensity= sp.el>0? 0.5+0.5*Math.sin(Math.max(el,0)) : 0.25; st.sunInfo=sp; };
-    placeSun(simT);
-    st.onFrame((dt)=>{ if(lapse){ simT += dt*3600*1000*1.6; const d0=dayStart(Date.now()); if(simT>d0+19*HOUR) simT=d0+5*HOUR; placeSun(simT); } });
-    function update(){ const L1=LIVE.st[s.id]; s.feeders.forEach(([f,ids])=>{ const g=stations[f]; const us=ids.map(id=>L1.units[s.units.findIndex(u=>u.id===id)]); const wst=worst(ids); const st0=unitState(s,wst); const c=stCol(st0); g.userData.lamp.material.color.setHex(c); g.userData.lamp.material.emissive.setHex(c); g.userData.pick=wst;
-      const p=us.reduce((a,u)=>a+(u.p||0),0); g.userData.lbl.element.innerHTML=`<i style="background:#${c.toString(16).padStart(6,"0")}"></i><b>${t("block",{n:f})}</b><span>${nf(p*1000,0)} kW</span>`; }); }
-    update(); st.pick(()=>Object.values(stations), id=>st.onPickCb&&st.onPickCb(id));
-    return {update, setLapse(v){ lapse=v; if(!v){ simT=Date.now(); placeSun(simT); } }, lt};
-  }
-
-  // ---------- Rooftop (industrial park) ----------
-  function buildRoof(st, s, o={}){
-    const {scene}=st; let simT=Date.now(); const lt=lightsFor(scene,s.ll,simT,{shadow:true,shadowR:900,dist:1600,fogN:2000,fogF:6500});
-    const ground=new T.Mesh(new T.PlaneGeometry(2200,1700),new T.MeshStandardMaterial({color:0x7E8F6A,roughness:1})); ground.rotation.x=-Math.PI/2; ground.receiveShadow=true; scene.add(ground);
-    const pad=new T.Mesh(new T.PlaneGeometry(1500,1050),new T.MeshStandardMaterial({color:0xA3A7AD,roughness:0.95})); pad.rotation.x=-Math.PI/2; pad.position.y=0.05; pad.receiveShadow=true; scene.add(pad);
-    const tex=TW().moduleTex(24,1,true); const pm=new T.MeshStandardMaterial({map:tex,metalness:0.15,roughness:0.18});
-    const blds={}; const r=rnd(s.seed); const colsN=7, rowsN=3; const cw=200, rw=320;
-    const rows=[]; let total=0; const specs=s.feeders.map(([code,ids],i)=>{ const cx=(i%colsN-(colsN-1)/2)*cw, cz=(Math.floor(i/colsN)-(rowsN-1)/2)*rw; const w=120+r()*55, d=150+r()*110, h=11+r()*8; const nrow=Math.floor((d*0.82)/3.1); total+=nrow; return {code,ids,cx,cz,w,d,h,nrow}; });
-    const inst=new T.InstancedMesh(new T.BoxGeometry(1,0.1,2.2),pm,total); inst.castShadow=true; const m4=new T.Matrix4(), q=new T.Quaternion().setFromEuler(new T.Euler(6*Math.PI/180,0,0)); let k=0;
-    specs.forEach(sp=>{ const g=new T.Group(); g.position.set(sp.cx,0,sp.cz); const body=new T.Mesh(new T.BoxGeometry(sp.w,sp.h,sp.d),new T.MeshStandardMaterial({color:0xE8EBEF,roughness:0.7})); body.position.y=sp.h/2; body.castShadow=true; body.receiveShadow=true; g.add(body);
-      const roof=new T.Mesh(new T.BoxGeometry(sp.w+1,0.6,sp.d+1),new T.MeshStandardMaterial({color:0x7D8C9F,roughness:0.6,metalness:0.3})); roof.position.y=sp.h+0.3; roof.receiveShadow=true; g.add(roof);
-      const band=new T.Mesh(new T.BoxGeometry(sp.w+0.4,1.4,sp.d+0.4),new T.MeshStandardMaterial({color:0x2D5DA8})); band.position.y=sp.h-1.2; g.add(band);
-      for(let j=0;j<sp.nrow;j++){ m4.compose(new T.Vector3(sp.cx,sp.h+1.0,sp.cz-sp.d*0.41+j*3.1),q,new T.Vector3(sp.w*0.86,1,1)); inst.setMatrixAt(k++,m4); }
-      const lamp=new T.Mesh(new T.SphereGeometry(2.2,12,8),new T.MeshStandardMaterial({color:COL.ok,emissive:COL.ok,emissiveIntensity:1.5})); lamp.position.set(sp.w/2-6,sp.h+4,sp.d/2-6); g.add(lamp); g.userData.lamp=lamp; g.userData.ids=sp.ids; g.userData.pick=sp.ids[0];
-      const lb=label(""); lb.position.set(0,sp.h+22,0); g.add(lb); g.userData.lbl=lb; lb.element.addEventListener("click",()=>st.onPickCb&&st.onPickCb(g.userData.pick)); scene.add(g); blds[sp.code]=g; });
-    scene.add(inst);
-    // trees
-    const tn=180; const tree=new T.InstancedMesh(new T.SphereGeometry(5,8,6),new T.MeshStandardMaterial({color:0x3E6B35,roughness:1}),tn); for(let i=0;i<tn;i++){ const side=i%4; const x= side<2? (r()-0.5)*1500 : (side===2?-780:780); const z= side<2? (side===0?-560:560) : (r()-0.5)*1050; m4.compose(new T.Vector3(x,5+r()*2,z),new T.Quaternion(),new T.Vector3(1,1.2+r()*0.6,1)); tree.setMatrixAt(i,m4); } tree.castShadow=true; scene.add(tree);
-    st.camera.position.set(780,560,900); st.controls.target.set(0,0,0); st.controls.maxPolarAngle=Math.PI*0.47; st.controls.minDistance=120; st.controls.maxDistance=3000;
-    const worst=ids=>{ const rank={fault:0,comm:1,limit:2,stop:3,maint:4,run:5}; return ids.slice().sort((a,b)=>rank[unitState(s,a)]-rank[unitState(s,b)])[0]; };
-    function update(){ const L1=LIVE.st[s.id]; Object.values(blds).forEach(g=>{ const ids=g.userData.ids; const w=worst(ids); const c=stCol(unitState(s,w)); g.userData.lamp.material.color.setHex(c); g.userData.lamp.material.emissive.setHex(c); g.userData.pick=w; const p=ids.reduce((a,id)=>a+(L1.units[s.units.findIndex(u=>u.id===id)].p||0),0); const code=s.feeders.find(([c,i])=>i===ids)[0];
-      g.userData.lbl.element.innerHTML=`<i style="background:#${c.toString(16).padStart(6,"0")}"></i><b>${code}</b><span>${nf(p*1000,0)} kW</span>`; }); }
-    update(); st.pick(()=>Object.values(blds), id=>st.onPickCb&&st.onPickCb(id));
-    return {update, lt};
-  }
-
-  // ---------- Inverter model ----------
-  function inverterModel(s){ const g=new T.Group(); const central=s.id==="VHO"; const W=central?2.8:1.0, H=central?2.3:0.75, D=central?1.0:0.36;
-    const shell=new T.Mesh(new T.RoundedBoxGeometry(W,H,D,3,central?0.06:0.04),new T.MeshStandardMaterial({color:central?0xE6EAEE:0xF3F5F7,roughness:0.5,metalness:0.1,transparent:true,opacity:1})); shell.position.y=H/2+(central?0.15:0.9); shell.castShadow=true; shell.userData.comp="cabinet"; g.add(shell);
-    const y0=shell.position.y; const comp=(geo,col,c,p)=>{ const m=new T.Mesh(geo,new T.MeshStandardMaterial({color:col,metalness:0.4,roughness:0.45})); m.position.set(...p); m.userData.comp=c; g.add(m); return m; };
-    comp(new T.BoxGeometry(W*0.42,H*0.28,D*0.5),0x3C5F84,"igbtMod",[0,y0+H*0.08,0]);
-    comp(new T.BoxGeometry(W*0.8,H*0.1,D*0.6),0x2F3B4C,"dcIn",[0,y0-H*0.4,0.0]);
-    comp(new T.BoxGeometry(W*0.3,H*0.12,D*0.5),0x8A6A3C,"acOut",[W*0.28,y0-H*0.22,0]);
-    for(let i=0;i<(central?3:2);i++){ comp(new T.CylinderGeometry(central?0.22:0.08,central?0.22:0.08,0.04,24),0x222A35,"fans",[-W*0.3+i*(central?0.3:0.18),y0+H*0.5+0.02,0]); }
-    // front: display + LED + fins
-    const disp=new T.Mesh(new T.PlaneGeometry(W*0.22,H*0.12),new T.MeshBasicMaterial({color:0x1D3557})); disp.position.set(-W*0.18,y0+H*0.18,D/2+0.003); g.add(disp);
-    const led=new T.Mesh(new T.CircleGeometry(central?0.04:0.018,16),new T.MeshStandardMaterial({color:COL.ok,emissive:COL.ok,emissiveIntensity:2})); led.position.set(W*0.25,y0+H*0.3,D/2+0.004); g.add(led);
-    if(!central){ for(let i=0;i<9;i++){ const fin=new T.Mesh(new T.BoxGeometry(W*0.9,0.012,0.06),new T.MeshStandardMaterial({color:0xB8BEC6,metalness:0.7,roughness:0.35})); fin.position.set(0,y0-H*0.35+i*H*0.085,-D/2-0.03); g.add(fin); } }
-    else { for(let i=0;i<3;i++){ const door=new T.Mesh(new T.PlaneGeometry(W/3-0.04,H-0.1),new T.MeshStandardMaterial({color:0xDDE2E8,roughness:0.6})); door.position.set(-W/3+i*W/3,y0,D/2+0.002); g.add(door); const h=new T.Mesh(new T.BoxGeometry(0.03,0.2,0.03),new T.MeshStandardMaterial({color:0x5A6475})); h.position.set(-W/3+i*W/3+W/6-0.08,y0,D/2+0.02); g.add(h); } }
-    if(!central){ const post=new T.Mesh(new T.BoxGeometry(0.08,1.9,0.08),new T.MeshStandardMaterial({color:0x9AA3AE,metalness:0.6})); post.position.set(0,0.95,-0.3); g.add(post); }
-    // pv array behind
-    const pv=new T.Group(); const tex=panelTex(12,2); const pm=new T.MeshStandardMaterial({map:tex,metalness:0.35,roughness:0.3}); const arr=new T.Mesh(new T.BoxGeometry(central?7:3.2,0.06,central?2.3:1.6),[pm,pm,pm,pm,pm,pm].map((m,i)=>i===2?m:new T.MeshStandardMaterial({color:0xB8BEC6}))); arr.rotation.x=0.25; arr.position.set(0,central?2.4:1.9,central?-2.6:-1.4); arr.castShadow=true; arr.userData.comp="pvArr"; pv.add(arr);
-    [-1,1].forEach(sx=>{ const l=new T.Mesh(new T.BoxGeometry(0.06,central?2.2:1.8,0.06),new T.MeshStandardMaterial({color:0x9AA3AE})); l.position.set(sx*(central?3:1.4),central?1.1:0.9,central?-2.6:-1.4); pv.add(l); }); g.add(pv);
-    g.userData.refs={shell,led}; return g; }
-
   // ---------- Health colors ----------
   function applyHealth(root, H, sel, time){ root.traverse(o=>{ const c=o.userData.comp; if(!c||!o.material||!H||o.userData.cover||!("emissiveIntensity" in o.material)) return; const x=H[c]; 
       if(!x){ o.material.emissive.setHex(0); return; } let col= x.lvl==="bad"?COL.crit : x.lvl==="watch"?COL.warn : 0x000000; let inten= x.lvl==="bad"? 0.55+0.35*Math.sin(time*5) : x.lvl==="watch"? 0.45 : 0; if(sel===c){ col= col||COL.acc; inten=Math.max(inten,0.5+0.3*Math.sin(time*6)); } o.material.emissive.setHex(col); o.material.emissiveIntensity=inten; }); }
 
   // ---------- Public: station scene ----------
   async function station(el, s){ const ok=await lib(); if(!ok){ el.innerHTML=`<div class="twin-load">${t("fail3d")}</div>`; return null; } if(!el.isConnected) return null;
-    const st=stage(el,{shadows:true,labels:true,far:16000,fov:38}); let b;
-    if(s.type==="wind") b=buildWindFarm(st,s); else if(s.type==="solar") b=buildSolarFarm(st,s); else b=buildRoof(st,s);
+    const st=stage(el,{shadows:true,labels:true,far:16000,fov:38,maxDpr:1.5}); let b;
+    if(s.type==="wind") b=buildWindFarm(st,s);
+    else { try{ const pm=new T.PMREMGenerator(st.renderer); st.scene.environment=pm.fromScene(new T.RoomEnvironment(st.renderer),0.04).texture; pm.dispose(); }catch(e){}
+      const SS=SOLAR_SITES(T,{lightsFor,label,COL,stCol,fbm2,TW,RM}); b= s.type==="solar"? SS.farm(st,s) : SS.rooftop(st,s); }
     // HUD
     const hud=document.createElement("div"); hud.className="twin-hud"; el.appendChild(hud);
     const ctl=document.createElement("div"); ctl.className="twin-ctl"; el.appendChild(ctl);
     let showL=true; const renderHud=()=>{ const L1=LIVE.st[s.id]; const sp=b.lt.sp; hud.innerHTML= s.type==="wind"? `<span class="chip">${ic("wind","sm")}${s.notOper?"—":t("windDir",{d:Math.round(L1.dir)})+" · "+nf(L1.v,1)+" m/s"}</span><span class="chip">${ic("pin","sm")}${s.ll[1].toFixed(3)}°N ${s.ll[0].toFixed(3)}°E</span>` : `<span class="chip">${ic("sun","sm")}${(st.sunInfo||sp).el>0? t("sunPos",{e:nf((st.sunInfo||sp).el,1),a:nf((st.sunInfo||sp).az,0)}) : t("night")}</span><span class="chip">${ic("pin","sm")}${s.ll[1].toFixed(3)}°N ${s.ll[0].toFixed(3)}°E</span>`; };
-    ctl.innerHTML=`<div class="seg">${s.type!=="wind"?`<button data-k="lapse" aria-pressed="false">${t("timelapse")}</button>`:""}<button data-k="lbl" aria-pressed="true">${t("labels")}</button></div>`;
-    ctl.onclick=e=>{ const bt=e.target.closest("button"); if(!bt) return; const on=bt.getAttribute("aria-pressed")!=="true"; bt.setAttribute("aria-pressed",on); if(bt.dataset.k==="lbl"){ showL=on; st.labelR.domElement.style.display=on?"":"none"; } else b.setLapse&&b.setLapse(on); };
+    const solar=s.type!=="wind";
+    ctl.innerHTML=(solar?`<div class="seg"><button data-k="heat" aria-pressed="false">${t("heatMap")}</button><button data-k="flow" aria-pressed="false">${t("powerFlow")}</button></div>`:"")+`<div class="seg">${solar?`<button data-k="lapse" aria-pressed="false">${t("timelapse")}</button>`:""}<button data-k="lbl" aria-pressed="true">${t("labels")}</button></div>`;
+    const leg=document.createElement("div"); leg.className="twin-leg"; leg.hidden=true; el.appendChild(leg);
+    const setLeg=()=>{ const hOn=ctl.querySelector('[data-k="heat"]')?.getAttribute("aria-pressed")==="true", fOn=ctl.querySelector('[data-k="flow"]')?.getAttribute("aria-pressed")==="true";
+      leg.hidden=!(hOn||fOn); leg.innerHTML=(hOn?`<span class="faint">${t("heatMap")}</span><span>${t("hmLow")}</span><i style="width:90px;height:8px;background:linear-gradient(90deg,hsl(7,85%,55%),hsl(60,85%,55%),hsl(126,85%,55%))"></i><span>${t("hmHigh")}</span><span><i style="width:8px;height:8px;background:#F4475E"></i>${t("st_fault")}</span><span><i style="width:8px;height:8px;background:#8892A0"></i>${t("st_comm")}</span>`:"")
+        +(fOn?`<span class="faint">${t("powerFlow")}</span>${s.type==="roof"?`<span><i style="background:#36C5F0"></i>AC 0,4 kV</span>`:""}<span><i style="background:#B48CFF"></i>MV ${s.type==="roof"?"22":"22–35"} kV</span>`:""); };
+    ctl.onclick=e=>{ const bt=e.target.closest("button"); if(!bt) return; const on=bt.getAttribute("aria-pressed")!=="true"; bt.setAttribute("aria-pressed",on); const k=bt.dataset.k;
+      if(k==="lbl"){ showL=on; st.labelR.domElement.style.display=on?"":"none"; } else if(k==="heat"){ b.setHeat&&b.setHeat(on); } else if(k==="flow"){ b.setFlow&&b.setFlow(on); } else b.setLapse&&b.setLapse(on); setLeg(); };
     renderHud(); const iv=setInterval(renderHud,1000);
     const api={ update(){ b.update(); }, dispose(){ clearInterval(iv); st.dispose(); }, set onPick(f){ st.onPickCb=f; } };
     return api; }

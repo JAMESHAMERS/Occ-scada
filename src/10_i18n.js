@@ -89,7 +89,7 @@ const DICT = {
   explode:["Tách lớp vỏ","X-ray nacelle","透视机舱"], cabinet:["Tủ inverter","Inverter cabinet","逆变器柜"], brakeHyd:["Phanh & thủy lực","Brake & hydraulics","制动与液压"], cooling:["Hệ làm mát","Cooling system","冷却系统"],
   dcLink:["Tụ DC-link","DC-link capacitors","直流母线电容"], filter:["Cuộn lọc LCL","LCL filter","LCL 滤波器"], trafo:["Máy biến áp trung thế","MV transformer","中压变压器"],
   vExt:["Bên ngoài","Exterior","外观"], vCut:["Cắt lớp","Cutaway","剖视"], vExp:["Tách rời","Exploded","爆炸图"], vFull:["Toàn cảnh","Full view","全景"],
-  brakeRel:["nhả phanh","released","已释放"], brakeOn:["đang phanh","applied","制动中"], powerFlow:["Dòng công suất","Power flow","功率流"], dcIn:["Đầu vào DC / MPPT","DC input / MPPT","直流输入 / MPPT"], igbtMod:["Module IGBT","IGBT module","IGBT 模块"], fans:["Quạt làm mát","Cooling fans","散热风扇"], acOut:["Đầu ra AC","AC output","交流输出"], pvArr:["Dàn pin","PV array","光伏阵列"],
+  brakeRel:["nhả phanh","released","已释放"], brakeOn:["đang phanh","applied","制动中"], powerFlow:["Dòng công suất","Power flow","功率流"], heatMap:["Bản đồ hiệu suất","Performance map","性能热图"], hmLow:["Thấp","Low","低"], hmHigh:["Cao","High","高"], roofsN:["mái","roofs","屋面"], dcIn:["Đầu vào DC / MPPT","DC input / MPPT","直流输入 / MPPT"], igbtMod:["Module IGBT","IGBT module","IGBT 模块"], fans:["Quạt làm mát","Cooling fans","散热风扇"], acOut:["Đầu ra AC","AC output","交流输出"], pvArr:["Dàn pin","PV array","光伏阵列"],
   // GIS
   presetAll:["Toàn quốc","Nationwide","全国"], presetHigh:["Tây Nguyên – Nam Trung Bộ","Central Highlands – South Central","西原–南中部"], presetNorth:["Bắc Ninh","Bac Ninh","北宁"],
   view2d:["2D chuẩn xác","2D precise","2D 精确"], view3d:["3D trực quan","3D visual","3D 立体"],
