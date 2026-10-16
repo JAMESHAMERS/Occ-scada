@@ -6,7 +6,7 @@ const NAV = [
 ];
 const PAGE_PERM = {custom:"analytics",overview:"overview",gis:"overview",station:"station",twin:"station",alarms:"alarm",kpis:"analytics",pcurve:"analytics",loss:"analytics",downtime:"analytics",curtail:"analytics",bench:"analytics",reports:"reports",sources:"sources",users:"users",audit:"audit"};
 let navOpenStations = true;
-function renderShell(){
+function renderShell(){ const hl=$("#homeLink"); if(hl&&!hl._b){ hl._b=1; hl.onclick=e=>{ if(e.ctrlKey||e.metaKey||e.shiftKey||e.button) return; e.preventDefault(); homeReload(); }; } if(hl){ hl.title=t("homeRefresh"); hl.setAttribute("aria-label",t("homeRefresh")); }
   const u=S.user; const nAl=activeAlarms().length;
   $("#nav").innerHTML = NAV.map(g=>{ const its=g.items.filter(([,, p])=>can(p)); if(!its.length) return "";
     return `<div class="sb-g">${t(g.g)}</div>` + its.map(([k,icn])=>{

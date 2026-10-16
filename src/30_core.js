@@ -176,7 +176,7 @@ async function doLogin(u, pw, rem){
 const SESSION_KEY="occ.sess", SESSION_MAX=12*3600e3, IDLE_LIM=15*60;
 const sess={ get(){ try{ return JSON.parse(sessionStorage.getItem(SESSION_KEY)); }catch(e){ return null; } },
   set(v){ try{ v? sessionStorage.setItem(SESSION_KEY,JSON.stringify(v)) : sessionStorage.removeItem(SESSION_KEY); }catch(e){} } };
-function saveSession(){ if(!S.user) return; S._saved=Date.now(); sess.set({u:S.user.u, loginAt:S.loginAt, lastAct:S.lastAct, page:S.page, param:S.param}); }
+function saveSession(){ if(!S.user||S._homeReload) return; S._saved=Date.now(); sess.set({u:S.user.u, loginAt:S.loginAt, lastAct:S.lastAct, page:S.page, param:S.param}); }
 function resumeSession(){ const x=sess.get(); if(!x||!x.u) return false; const acc=USERS.find(u=>u.u===x.u), now=Date.now();
   const idle=(now-(x.lastAct||0))/1000;
   if(!acc||!acc.enabled||now-(x.loginAt||0)>SESSION_MAX||idle>IDLE_LIM){ sess.set(null); if(acc&&idle>IDLE_LIM) LOGIN.err=t("expired"); return false; }
@@ -184,6 +184,10 @@ function resumeSession(){ const x=sess.get(); if(!x||!x.u) return false; const a
   $("#login").hidden=true; $("#shell").hidden=false; renderShell();
   const pg = x.page && PAGES[x.page] ? x.page : (can("overview")? "overview" : "alarms"); go(pg, x.param??null); return true; }
 window.addEventListener("pagehide", saveSession);
+// Logo = "home + refresh" (like F5, but always lands on the main screen and keeps the sign-in)
+function homeReload(){ if(S.user){ const home=can("overview")? "overview" : "alarms"; S.lastAct=Date.now();
+    sess.set({u:S.user.u, loginAt:S.loginAt, lastAct:S.lastAct, page:home, param:null}); S._homeReload=true; }
+  location.reload(); }
 function finishLogin(acc){
   S.user=acc; LOGIN.step="cred"; LOGIN.err=null; LOGIN.pending=null; S.lastAct=Date.now(); S.loginAt=Date.now(); audit("a_login","","ok",acc.u);
   stopHero(); $("#login").hidden=true; $("#shell").hidden=false; renderShell();
