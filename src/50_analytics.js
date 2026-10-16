@@ -128,11 +128,6 @@ PAGES.bench=(el)=>{
   $("#bM").onchange=e=>{metric=e.target.value;render();}; $("#bV").onclick=e=>{ const b=e.target.closest("button"); if(!b) return; view=b.dataset.k; $$("#bV button").forEach(x=>x.setAttribute("aria-pressed",x===b)); render(); }; render();
 };
 
-PAGES.reports=(el)=>{
-  setTitle(t("reports"),t("sub_reports")); const R=[["rDaily","cal"],["rWeekly","cal"],["rMonthly","cal"],["rEnergy","zap"],["rAlarm","bell"],["rCO2","sun"]];
-  el.innerHTML=`<div class="rep-list">${R.map(([k,i])=>`<button class="rep" data-r="${k}">${ic(i,"c-acc")}<b>${t(k)}</b><span>${t(k+"S")}</span><span class="faint" style="font-size:11px">${t("autoSched")}</span></button>`).join("")}</div><div class="faint" style="font-size:11.5px">${ic("info","sm")} ${t("printNote")}</div>`;
-  el.onclick=e=>{ const b=e.target.closest("[data-r]"); if(!b) return; openReport(b.dataset.r); };
-};
 function openReport(k){
   const ids=scopeIds(); const now=new Date(); const tri=(key)=>DICT[key]? `${DICT[key][0]} / ${DICT[key][2]}`:key;
   const rows=ids.map(id=>{ const s=ST[id], L0=LIVE.st[id]; return [stName(s), s.notOper?"—":nf(L0.e,1), s.notOper?"—":nf(L0.pmax,2), L0.avail==null?"—":nf(L0.avail,2), s.notOper?"—":nf(L0.e/(s.capDC||s.cap),2), ALARMS.filter(a=>a.st===id&&!a.cleared).length, s.notOper?"—":nf(L0.e*0.6592,1)]; });

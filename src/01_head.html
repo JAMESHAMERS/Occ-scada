@@ -447,6 +447,37 @@ table.t td.num,table.t .r{font-family:var(--f-num);font-variant-numeric:tabular-
 .paper th,.paper td{border:1px solid #C8D3E3;padding:5px 7px;text-align:right;white-space:nowrap}
 .paper th{background:#E8EEF8;color:#14223A}
 .paper td:first-child,.paper th:first-child{text-align:left}
+/* plant operations report (A4) */
+.rep-paper{max-width:1000px;margin:12px auto 0;padding:26px 30px 22px;font-size:11.5px;line-height:1.4}
+.rep-paper .rhead{display:grid;grid-template-columns:160px 1fr auto;gap:16px;align-items:center;border-bottom:3px solid #0044B8;padding-bottom:10px}
+.rep-paper .rtitle h2{font-size:18px;text-transform:uppercase;letter-spacing:.03em} .rep-paper .rsub{color:#5B6B85;font-size:11px} .rep-paper .rname{font-size:14px;font-weight:700;margin-top:3px;color:#14223A}
+.rep-paper .rmeta{display:grid;gap:3px;text-align:right;font-size:11px} .rep-paper .rmeta span{color:#5B6B85;margin-right:6px} .rep-paper .rmeta b{font-weight:600}
+.rep-paper table.rinfo{margin-top:10px} .rep-paper .rinfo td{text-align:left;white-space:normal} .rep-paper .rinfo td:nth-child(odd){background:#F3F6FB;color:#5B6B85;width:13%}
+.rep-paper .rsec{margin-top:16px;break-inside:auto} .rep-paper .rsec h3{margin:0 0 6px;font-size:13px;color:#0044B8;border-left:4px solid #00B07A;padding-left:8px;text-transform:uppercase;letter-spacing:.03em}
+.rep-paper h4{margin:10px 0 0;font-size:12px;color:#14223A}
+.rep-paper .kgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid #C8D3E3}
+.rep-paper .kc{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-right:1px solid #C8D3E3;border-bottom:1px solid #C8D3E3}
+.rep-paper .kc span{color:#5B6B85;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em} .rep-paper .kc b{font-size:18px;color:#0E2A55;font-weight:700} .rep-paper .kc small{font-size:11px;color:#5B6B85;font-weight:500} .rep-paper .kc em{font-style:normal;color:#5B6B85;font-size:10.5px}
+.rep-paper tr.tot td{font-weight:700;background:#F3F6FB} .rep-paper tr.bad td{background:#FDECEE;color:#9B1C2E} .rep-paper tr.na td{color:#8A94A3}
+.rep-paper table.units{font-size:10.5px} .rep-paper table.units td,.rep-paper table.units th{padding:3px 5px}
+.rep-paper .rnote{margin-top:10px;padding:8px 10px;background:#FFF6E5;border:1px solid #F2C46D;color:#7A4E00}
+.rep-paper .rnotes div{height:22px;border-bottom:1px dotted #9AA8BD}
+.rep-paper .sig{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:16px;text-align:center} .rep-paper .sig span{display:block;font-weight:700;color:#14223A} .rep-paper .sig b{display:block;height:46px;line-height:70px;font-weight:500} .rep-paper .sig em{font-style:normal;color:#5B6B85;border-top:1px solid #9AA8BD;display:block;padding-top:3px}
+.rep-paper .rfoot{display:flex;justify-content:space-between;gap:12px;margin-top:16px;padding-top:6px;border-top:1px solid #C8D3E3;color:#8A94A3;font-size:10px}
+.rep-plants{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px} .rep.sm{border:1px solid var(--line);box-shadow:none;padding:10px 12px}
+.rep.sm:hover{border-color:var(--accent)}
+@media screen and (max-width:900px){ .rep-paper{padding:16px} .rep-paper .rhead{grid-template-columns:1fr} .rep-paper .rmeta{text-align:left} .rep-paper .kgrid{grid-template-columns:repeat(2,minmax(0,1fr))} .rep-paper .sig{grid-template-columns:1fr} }
+#printHost{display:none}
+@media print{
+  @page{size:A4 portrait;margin:10mm}
+  body.printing{background:#fff!important;overflow:visible!important}
+  body.printing>*:not(#printHost){display:none!important}
+  body.printing #printHost{display:block}
+  #printHost .paper{box-shadow:none;max-width:none;margin:0;padding:0;overflow:visible;font-size:10.5px}
+  #printHost .rsec h3,#printHost h4{break-after:avoid} #printHost .kgrid,#printHost svg{break-inside:avoid} #printHost table{break-inside:auto} #printHost tr{break-inside:avoid}
+  #printHost .kgrid{grid-template-columns:repeat(5,minmax(0,1fr))!important} #printHost .sig{grid-template-columns:repeat(3,1fr)!important}
+  #printHost *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 .rep-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0;border:1px solid var(--line);background:var(--surface)}
 .rep{display:flex;flex-direction:column;gap:5px;padding:14px;border:0;box-shadow:1px 0 0 var(--line),0 1px 0 var(--line);background:transparent;text-align:left;color:var(--text)}
 .rep:hover{background:var(--surface-2)}

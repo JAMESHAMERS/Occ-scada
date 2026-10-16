@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- GENERATED FILE – do not edit. Source: src/ + data/ in this repository; rebuild with build.py.
-     HINO OCC SCADA 1.0 · build 261016.1aad6da · HINO Systech Vietnam Co., Ltd. -->
+     HINO OCC SCADA 1.0 · build 261016.07ebf00 · HINO Systech Vietnam Co., Ltd. -->
 <title>OCC SCADA Ia Pech</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="HINO OCC SCADA – Trung tâm giám sát tập trung các nhà máy điện gió, điện mặt trời · HINO Systech Vietnam Co., Ltd.">
@@ -454,6 +454,37 @@ table.t td.num,table.t .r{font-family:var(--f-num);font-variant-numeric:tabular-
 .paper th,.paper td{border:1px solid #C8D3E3;padding:5px 7px;text-align:right;white-space:nowrap}
 .paper th{background:#E8EEF8;color:#14223A}
 .paper td:first-child,.paper th:first-child{text-align:left}
+/* plant operations report (A4) */
+.rep-paper{max-width:1000px;margin:12px auto 0;padding:26px 30px 22px;font-size:11.5px;line-height:1.4}
+.rep-paper .rhead{display:grid;grid-template-columns:160px 1fr auto;gap:16px;align-items:center;border-bottom:3px solid #0044B8;padding-bottom:10px}
+.rep-paper .rtitle h2{font-size:18px;text-transform:uppercase;letter-spacing:.03em} .rep-paper .rsub{color:#5B6B85;font-size:11px} .rep-paper .rname{font-size:14px;font-weight:700;margin-top:3px;color:#14223A}
+.rep-paper .rmeta{display:grid;gap:3px;text-align:right;font-size:11px} .rep-paper .rmeta span{color:#5B6B85;margin-right:6px} .rep-paper .rmeta b{font-weight:600}
+.rep-paper table.rinfo{margin-top:10px} .rep-paper .rinfo td{text-align:left;white-space:normal} .rep-paper .rinfo td:nth-child(odd){background:#F3F6FB;color:#5B6B85;width:13%}
+.rep-paper .rsec{margin-top:16px;break-inside:auto} .rep-paper .rsec h3{margin:0 0 6px;font-size:13px;color:#0044B8;border-left:4px solid #00B07A;padding-left:8px;text-transform:uppercase;letter-spacing:.03em}
+.rep-paper h4{margin:10px 0 0;font-size:12px;color:#14223A}
+.rep-paper .kgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid #C8D3E3}
+.rep-paper .kc{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-right:1px solid #C8D3E3;border-bottom:1px solid #C8D3E3}
+.rep-paper .kc span{color:#5B6B85;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em} .rep-paper .kc b{font-size:18px;color:#0E2A55;font-weight:700} .rep-paper .kc small{font-size:11px;color:#5B6B85;font-weight:500} .rep-paper .kc em{font-style:normal;color:#5B6B85;font-size:10.5px}
+.rep-paper tr.tot td{font-weight:700;background:#F3F6FB} .rep-paper tr.bad td{background:#FDECEE;color:#9B1C2E} .rep-paper tr.na td{color:#8A94A3}
+.rep-paper table.units{font-size:10.5px} .rep-paper table.units td,.rep-paper table.units th{padding:3px 5px}
+.rep-paper .rnote{margin-top:10px;padding:8px 10px;background:#FFF6E5;border:1px solid #F2C46D;color:#7A4E00}
+.rep-paper .rnotes div{height:22px;border-bottom:1px dotted #9AA8BD}
+.rep-paper .sig{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:16px;text-align:center} .rep-paper .sig span{display:block;font-weight:700;color:#14223A} .rep-paper .sig b{display:block;height:46px;line-height:70px;font-weight:500} .rep-paper .sig em{font-style:normal;color:#5B6B85;border-top:1px solid #9AA8BD;display:block;padding-top:3px}
+.rep-paper .rfoot{display:flex;justify-content:space-between;gap:12px;margin-top:16px;padding-top:6px;border-top:1px solid #C8D3E3;color:#8A94A3;font-size:10px}
+.rep-plants{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px} .rep.sm{border:1px solid var(--line);box-shadow:none;padding:10px 12px}
+.rep.sm:hover{border-color:var(--accent)}
+@media screen and (max-width:900px){ .rep-paper{padding:16px} .rep-paper .rhead{grid-template-columns:1fr} .rep-paper .rmeta{text-align:left} .rep-paper .kgrid{grid-template-columns:repeat(2,minmax(0,1fr))} .rep-paper .sig{grid-template-columns:1fr} }
+#printHost{display:none}
+@media print{
+  @page{size:A4 portrait;margin:10mm}
+  body.printing{background:#fff!important;overflow:visible!important}
+  body.printing>*:not(#printHost){display:none!important}
+  body.printing #printHost{display:block}
+  #printHost .paper{box-shadow:none;max-width:none;margin:0;padding:0;overflow:visible;font-size:10.5px}
+  #printHost .rsec h3,#printHost h4{break-after:avoid} #printHost .kgrid,#printHost svg{break-inside:avoid} #printHost table{break-inside:auto} #printHost tr{break-inside:avoid}
+  #printHost .kgrid{grid-template-columns:repeat(5,minmax(0,1fr))!important} #printHost .sig{grid-template-columns:repeat(3,1fr)!important}
+  #printHost *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 .rep-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0;border:1px solid var(--line);background:var(--surface)}
 .rep{display:flex;flex-direction:column;gap:5px;padding:14px;border:0;box-shadow:1px 0 0 var(--line),0 1px 0 var(--line);background:transparent;text-align:left;color:var(--text)}
 .rep:hover{background:var(--surface-2)}
@@ -736,7 +767,21 @@ const DICT = {
   explode:["Tách lớp vỏ","X-ray nacelle","透视机舱"], cabinet:["Tủ inverter","Inverter cabinet","逆变器柜"], brakeHyd:["Phanh & thủy lực","Brake & hydraulics","制动与液压"], cooling:["Hệ làm mát","Cooling system","冷却系统"],
   dcLink:["Tụ DC-link","DC-link capacitors","直流母线电容"], filter:["Cuộn lọc LCL","LCL filter","LCL 滤波器"], trafo:["Máy biến áp trung thế","MV transformer","中压变压器"],
   vExt:["Bên ngoài","Exterior","外观"], vCut:["Cắt lớp","Cutaway","剖视"], vExp:["Tách rời","Exploded","爆炸图"], vFull:["Toàn cảnh","Full view","全景"],
-  brakeRel:["nhả phanh","released","已释放"], brakeOn:["đang phanh","applied","制动中"], powerFlow:["Dòng công suất","Power flow","功率流"], heatMap:["Bản đồ hiệu suất","Performance map","性能热图"], hmLow:["Thấp","Low","低"], hmHigh:["Cao","High","高"], roofsN:["mái","roofs","屋面"], language:["Ngôn ngữ","Language","语言"], themeT:["Giao diện sáng / tối","Light / dark theme","浅色 / 深色主题"], homeRefresh:["Về màn hình chính và làm mới (F5)","Home screen and refresh (F5)","返回主屏幕并刷新 (F5)"], dcIn:["Đầu vào DC / MPPT","DC input / MPPT","直流输入 / MPPT"], igbtMod:["Module IGBT","IGBT module","IGBT 模块"], fans:["Quạt làm mát","Cooling fans","散热风扇"], acOut:["Đầu ra AC","AC output","交流输出"], pvArr:["Dàn pin","PV array","光伏阵列"],
+  brakeRel:["nhả phanh","released","已释放"], brakeOn:["đang phanh","applied","制动中"], powerFlow:["Dòng công suất","Power flow","功率流"], heatMap:["Bản đồ hiệu suất","Performance map","性能热图"], hmLow:["Thấp","Low","低"], hmHigh:["Cao","High","高"], roofsN:["mái","roofs","屋面"], language:["Ngôn ngữ","Language","语言"], themeT:["Giao diện sáng / tối","Light / dark theme","浅色 / 深色主题"], homeRefresh:["Về màn hình chính và làm mới (F5)","Home screen and refresh (F5)","返回主屏幕并刷新 (F5)"],
+  repPortfolio:["Toàn danh mục","Portfolio","全部电站"], repPlant:["Chi tiết nhà máy","Plant detail","单站详细"], repPlantS:["Báo cáo vận hành chi tiết cho từng nhà máy","Detailed operations report for each plant","各电站详细运行报告"],
+  repPlantT:["Báo cáo vận hành nhà máy","Plant operations report","电站运行报告"], planE:["Kế hoạch","Plan","计划"], planPct:["Hoàn thành KH","Plan achieved","计划完成率"], bestDay:["Ngày cao nhất","Best day","最高日发电量"],
+  wsAvg:["Tốc độ gió TB","Average wind speed","平均风速"], pr:["Hiệu suất PR","Performance ratio PR","系统效率 PR"], insol:["Bức xạ tích lũy","Insolation","累计辐照量"], events:["sự kiện","events","次"],
+  eDayK:["SL ngày (kWh)","Energy today (kWh)","今日电量(kWh)"], availPer:["Khả dụng kỳ (%)","Period availability (%)","期间可利用率(%)"], downH:["Giờ dừng (h)","Down (h)","停机(h)"],
+  feederCol:["Lộ","Feeder","集电线"], blockCol:["Trạm inverter","Inverter block","逆变器箱变"], roofCol:["Dự án mái","Roof project","屋顶项目"], otherSt:["Khác (dừng/bảo trì/mất TT)","Other (stop/maint./comm.)","其他（停机/维护/通讯）"],
+  lossCat:["Loại tổn thất","Loss category","损失类别"], sec1:["1. Chỉ tiêu vận hành chính","1. Key operating indicators","1. 主要运行指标"], sec2:["2. Biểu đồ sản lượng","2. Energy profile","2. 发电量曲线"],
+  sec3:["3. Phân tích tổn thất điện năng","3. Energy loss analysis","3. 电量损失分析"], sec4:["4. Tình trạng thiết bị theo lộ / trạm / mái","4. Equipment status by feeder / block / roof","4. 按集电线 / 方阵 / 屋顶的设备状态"],
+  sec5:["5. Chi tiết từng thiết bị","5. Unit-level details","5. 单台设备明细"], sec6:["6. Dừng máy và hạn chế công suất","6. Downtime and curtailment","6. 停机与限电"], sec7:["7. Cảnh báo trong kỳ","7. Alarms in the period","7. 期间告警"],
+  sec8:["8. Ghi chú vận hành và ký duyệt","8. Operator notes and sign-off","8. 运行备注与签字"], noEvents:["Không có sự kiện trong kỳ.","No events in this period.","本期无事件。"],
+  genAt:["Lập lúc","Generated","生成时间"], docNo:["Số báo cáo","Report no.","报告编号"], plantCode:["Mã nhà máy","Plant code","电站编码"], capInst:["Công suất lắp đặt","Installed capacity","装机容量"],
+  unitsN:["Số thiết bị","Units","设备数量"], turbinesU:["tuabin","turbines","台风机"], invU:["inverter","inverters","台逆变器"], gridConn:["Đấu nối","Grid connection","并网电压"], dataPts:["Điểm dữ liệu","Data points","数据点"],
+  notOperNote:["Nhà máy chưa vận hành thương mại: không có số liệu sản lượng trong kỳ.","Plant not yet in commercial operation: no energy data for this period.","电站尚未商业运行：本期无发电数据。"],
+  checkedBy:["Kiểm tra","Checked by","审核"], shiftLead:["Trưởng ca vận hành","Shift leader","值长"], plantDir:["Giám đốc nhà máy","Plant director","场长"],
+  printPdf:["In / Lưu PDF","Print / Save PDF","打印 / 保存 PDF"], printBlocked:["Trình duyệt chặn lệnh in tại trang này.","Printing is blocked in this view.","此页面不允许打印。"], dcIn:["Đầu vào DC / MPPT","DC input / MPPT","直流输入 / MPPT"], igbtMod:["Module IGBT","IGBT module","IGBT 模块"], fans:["Quạt làm mát","Cooling fans","散热风扇"], acOut:["Đầu ra AC","AC output","交流输出"], pvArr:["Dàn pin","PV array","光伏阵列"],
   // GIS
   presetAll:["Toàn quốc","Nationwide","全国"], presetHigh:["Tây Nguyên – Nam Trung Bộ","Central Highlands – South Central","西原–南中部"], presetNorth:["Bắc Ninh","Bac Ninh","北宁"],
   view2d:["2D chuẩn xác","2D precise","2D 精确"], view3d:["3D trực quan","3D visual","3D 立体"],
@@ -815,7 +860,7 @@ DICT.brandSub2=["{NP} nhà máy · {MW} MW","{NP} plants · {MW} MW","{NP} 座 �
 
 // ---- 20_data.js
 // Build stamp is injected by build.py (date + git commit), so every published copy can be compared at a glance.
-const BUILD = {"version": "1.0", "id": "261016.1aad6da", "date": "2026-10-16"};
+const BUILD = {"version": "1.0", "id": "261016.07ebf00", "date": "2026-10-16"};
 // ===================== Plant registry =====================
 // Coordinates: WGS84, public reference sources (gem.wiki / thewindpower / news), tolerance a few km.
 const OCC_LL = [107.902, 13.975];
@@ -1788,11 +1833,6 @@ PAGES.bench=(el)=>{
   $("#bM").onchange=e=>{metric=e.target.value;render();}; $("#bV").onclick=e=>{ const b=e.target.closest("button"); if(!b) return; view=b.dataset.k; $$("#bV button").forEach(x=>x.setAttribute("aria-pressed",x===b)); render(); }; render();
 };
 
-PAGES.reports=(el)=>{
-  setTitle(t("reports"),t("sub_reports")); const R=[["rDaily","cal"],["rWeekly","cal"],["rMonthly","cal"],["rEnergy","zap"],["rAlarm","bell"],["rCO2","sun"]];
-  el.innerHTML=`<div class="rep-list">${R.map(([k,i])=>`<button class="rep" data-r="${k}">${ic(i,"c-acc")}<b>${t(k)}</b><span>${t(k+"S")}</span><span class="faint" style="font-size:11px">${t("autoSched")}</span></button>`).join("")}</div><div class="faint" style="font-size:11.5px">${ic("info","sm")} ${t("printNote")}</div>`;
-  el.onclick=e=>{ const b=e.target.closest("[data-r]"); if(!b) return; openReport(b.dataset.r); };
-};
 function openReport(k){
   const ids=scopeIds(); const now=new Date(); const tri=(key)=>DICT[key]? `${DICT[key][0]} / ${DICT[key][2]}`:key;
   const rows=ids.map(id=>{ const s=ST[id], L0=LIVE.st[id]; return [stName(s), s.notOper?"—":nf(L0.e,1), s.notOper?"—":nf(L0.pmax,2), L0.avail==null?"—":nf(L0.avail,2), s.notOper?"—":nf(L0.e/(s.capDC||s.cap),2), ALARMS.filter(a=>a.st===id&&!a.cleared).length, s.notOper?"—":nf(L0.e*0.6592,1)]; });
@@ -1895,6 +1935,169 @@ PAGES.custom=(el)=>{
     if(e.target.dataset.xy!=null){ xy[+e.target.dataset.xy]=e.target.value; render(); } if(e.target.id==="cHk"){ hk=e.target.value; render(); } if(e.target.id==="cB"){ bins=+e.target.value; render(); } };
   $("#cSide").onclick=e=>{ const b=e.target.closest("[data-ax]"); if(!b) return; const [k,a]=b.dataset.ax.split(":"); sel[k]=a; render(); };
   fillSel(); render();
+};
+
+// ---- 52_reports.js
+// ===================== Reports: portfolio + detailed plant report =====================
+// Portfolio tab: the existing report catalogue (summary of all plants in scope).
+// Plant tab: an A4 operations report for one plant and one period – key indicators, energy
+// profile, loss breakdown, feeders/blocks/roofs, every unit, downtime, curtailment, alarms
+// and sign-off. Printable (only the report is printed) and exportable to Excel (CSV).
+const REP_PERIODS = [["day", "today"], ["month", "thisMonth"], ["d30", "d30"], ["year", "thisYear"]];
+const EF_CO2 = 0.6592;   // t CO2 / MWh – Vietnam grid emission factor used across the app
+
+function repRange(per) { const now = Date.now(), d0 = dayStart(now), dm = new Date(now + TZ);
+  const from = per === "day" ? d0 : per === "month" ? Date.UTC(dm.getUTCFullYear(), dm.getUTCMonth(), 1) - TZ : per === "year" ? Date.UTC(dm.getUTCFullYear(), 0, 1) - TZ : d0 - 29 * DAY;
+  return { from, to: now, hours: Math.max(1 / 60, (now - from) / HOUR), days: Math.max(1, Math.ceil((now - from) / DAY)) }; }
+function daysInMonth() { const dm = new Date(Date.now() + TZ); return new Date(Date.UTC(dm.getUTCFullYear(), dm.getUTCMonth() + 1, 0)).getUTCDate(); }
+const feederLabel = (s, f) => s.type === "wind" ? t("feeder", { n: f }) : s.type === "solar" ? t("block", { n: f }) : t("roof", { n: f });
+const capFull = s => capLabel(s) + (s.capUnit && s.capUnit !== "MW" ? "" : " MW");
+const repTri = k => DICT[k] ? (S.lang === "zh" ? DICT[k][0] : DICT[k][2]) : "";
+
+// ---- all figures of one plant for one period (shared by the page, the print and the Excel export)
+function plantReportData(id, per) {
+  buildHist(); buildEvents(); const s = ST[id], L0 = LIVE.st[id], R = repRange(per), isW = s.type === "wind";
+  const capRef = isW ? s.cap : s.capDC; let K, series;
+  if (per === "day") {
+    const H = HIST.st[id][HIST.st[id].length - 1]; const lt = Math.max(0, L0.eth - L0.e), hsum = H.loss.reduce((a, b) => a + b, 0) || 1;
+    const hrsDone = (Date.now() - dayStart(Date.now())) / HOUR; const used = L0.hrs.filter(h => h.n);
+    const res = isW ? (used.length ? used.reduce((a, h) => a + h.w, 0) / used.length : 0) : L0.hrs.reduce((a, h) => a + (h.n ? h.w / 1000 : 0), 0);
+    K = { e: L0.e, th: L0.eth, loss: H.loss.map(x => lt * x / hsum), res, avail: L0.avail, cf: cfToday(s), eqh: L0.e / capRef, pmax: L0.pmax, plan: s.plan / daysInMonth() * Math.min(1, hrsDone / 24) };
+    series = L0.hrs.map((h, i) => ({ k: String(i).padStart(2, "0"), e: h.e, th: h.th, r: h.n ? (isW ? h.w : h.w) : null, plan: null }));
+  } else {
+    const idx = histRange(per === "d30" ? "d30" : per); const ag = aggSt(id, idx); const rows = idx.map(i => HIST.st[id][i]);
+    const best = rows.reduce((a, r) => r.e > a.e ? r : a, rows[0] || { e: 0, d: Date.now() });
+    K = { e: ag.e, th: ag.th, loss: ag.loss, res: ag.res, avail: ag.avail, cf: ag.cf, eqh: ag.eqh, bestDay: best, plan: s.plan * idx.length / 30.4, stopH: ag.stopH };
+    if (per === "year") { const m = {}; rows.forEach(r => { const d = new Date(r.d + TZ); const key = d.getUTCMonth(); (m[key] ||= { k: String(key + 1).padStart(2, "0"), e: 0, th: 0, r: 0, n: 0, plan: 0 }); m[key].e += r.e; m[key].th += r.th; m[key].r += r.res; m[key].n++; m[key].plan += s.plan / 30.4; });
+      series = Object.values(m).map(x => ({ ...x, r: isW ? x.r / x.n : x.r })); }
+    else series = rows.map(r => { const d = new Date(r.d + TZ); return { k: `${String(d.getUTCDate()).padStart(2, "0")}/${String(d.getUTCMonth() + 1).padStart(2, "0")}`, e: r.e, th: r.th, r: r.res, plan: s.plan / 30.4 }; });
+  }
+  K.lsum = K.loss.reduce((a, b) => a + b, 0); K.pr = !isW && K.res > 0 ? 100 * K.e / (K.res * s.capDC) : null; K.co2 = K.e * EF_CO2;
+  const inPer = x => (x.t1 == null || x.t1 >= R.from) && x.t0 <= R.to;
+  const stops = s.notOper ? [] : STOPS.filter(x => x.st === id && inPer(x));
+  const curts = s.notOper ? [] : CURTS.filter(x => x.st === id && inPer(x));
+  const ovl = x => Math.max(0, (Math.min(x.t1 ?? R.to, R.to) - Math.max(x.t0, R.from)) / HOUR);
+  K.stopH = stops.reduce((a, x) => a + ovl(x), 0); K.curtE = Math.max(curts.reduce((a, x) => a + x.e * ovl(x) / Math.max(x.dur, 0.01), 0), K.loss[2]);
+  const alarms = ALARMS.filter(a => a.st === id && (a.t >= R.from || !a.cleared)).sort((a, b) => a.sev - b.sev || b.t - a.t);
+  // units and feeders
+  const units = s.units.map((u, i) => { const lu = L0.units[i]; const d = unitDerived(s, lu, i); const st = lu.st;
+    const down = stops.filter(x => x.dev === u.id).reduce((a, x) => a + ovl(x), 0) + (st === "fault" || st === "comm" || st === "maint" ? Math.min(R.hours, 0.6) : 0);
+    const f = s.feeders.find(([, ids]) => ids.includes(u.id))?.[0] ?? "";
+    return { id: u.id, f, st, p: lu.p, v: lu.v, d, down, avail: s.notOper ? null : clamp(100 * (1 - down / R.hours), 0, 100), al: ALARMS.filter(a => a.st === id && a.dev === u.id && !a.cleared).length, rated: unitRated(s, u.id) }; });
+  const feeders = s.feeders.map(([f, ids]) => { const us = units.filter(u => ids.includes(u.id)); const cnt = k => us.filter(u => u.st === k).length;
+    return { f, n: us.length, run: cnt("run"), limit: cnt("limit"), fault: cnt("fault"), other: us.length - cnt("run") - cnt("limit") - cnt("fault"), p: us.reduce((a, u) => a + (u.p || 0), 0), eDay: us.reduce((a, u) => a + (u.st === "comm" ? 0 : u.d.eDay || 0), 0) / 1000 }; });
+  return { s, L0, R, per, K, series, stops, curts, alarms, units, feeders, isW };
+}
+
+// ---- inline SVG energy chart (prints crisply, no chart library needed)
+function repChart(D) { const W = 760, Hh = 210, pl = 46, pr = 46, pt = 16, pb = 30, s = D.series, n = s.length || 1;
+  const maxE = Math.max(1e-6, ...s.map(x => Math.max(x.e, x.th, x.plan || 0))), maxR = Math.max(1e-6, ...s.map(x => x.r || 0));
+  const bw = (W - pl - pr) / n, y = v => pt + (Hh - pt - pb) * (1 - v / maxE), yr = v => pt + (Hh - pt - pb) * (1 - v / maxR);
+  const unit = D.per === "day" ? "MWh" : "MWh"; const rU = D.isW ? "m/s" : (D.per === "day" ? "kWh/m²" : "kWh/m²");
+  let g = `<svg viewBox="0 0 ${W} ${Hh}" width="100%" style="display:block;font-family:Arial,sans-serif;font-size:10px" role="img" aria-label="${esc(t("sec2"))}">`;
+  for (let i = 0; i <= 4; i++) { const v = maxE * i / 4, yy = y(v); g += `<line x1="${pl}" x2="${W - pr}" y1="${yy}" y2="${yy}" stroke="#E3E9F2"/><text x="${pl - 6}" y="${yy + 3}" text-anchor="end" fill="#5B6B85">${nf(v, v < 10 ? 1 : 0)}</text><text x="${W - pr + 6}" y="${yy + 3}" fill="#0E8A5F">${nf(maxR * i / 4, 1)}</text>`; }
+  g += `<text x="${pl - 6}" y="10" text-anchor="end" fill="#5B6B85">${unit}</text><text x="${W - pr + 6}" y="10" fill="#0E8A5F">${D.isW ? "m/s" : rU}</text>`;
+  s.forEach((x, i) => { const x0 = pl + i * bw + bw * 0.15, w = bw * 0.7; g += `<rect x="${x0}" y="${y(x.th)}" width="${w}" height="${Math.max(0, y(0) - y(x.th))}" fill="none" stroke="#9FB3D1" stroke-dasharray="2 2"/><rect x="${x0}" y="${y(x.e)}" width="${w}" height="${Math.max(0, y(0) - y(x.e))}" fill="#0044B8"/>`;
+    if (n <= 31 || i % Math.ceil(n / 24) === 0) g += `<text x="${x0 + w / 2}" y="${Hh - pb + 13}" text-anchor="middle" fill="#5B6B85">${x.k}</text>`; });
+  const rp = s.map((x, i) => x.r == null ? null : `${pl + i * bw + bw / 2},${yr(x.r)}`).filter(Boolean); if (rp.length > 1) g += `<polyline points="${rp.join(" ")}" fill="none" stroke="#00B07A" stroke-width="1.6"/>`;
+  if (s.some(x => x.plan)) g += `<polyline points="${s.map((x, i) => `${pl + i * bw + bw / 2},${y(x.plan || 0)}`).join(" ")}" fill="none" stroke="#E8795B" stroke-width="1.4" stroke-dasharray="5 4"/>`;
+  g += `<line x1="${pl}" x2="${W - pr}" y1="${y(0)}" y2="${y(0)}" stroke="#8A9BB5"/></svg>`;
+  const lg = (c, l, dash) => `<span style="display:inline-flex;align-items:center;gap:5px;margin-right:14px"><i style="display:inline-block;width:14px;height:${dash ? 0 : 9}px;${dash ? `border-top:2px ${dash} ${c}` : `background:${c}`}"></i>${l}</span>`;
+  return g + `<div style="margin-top:4px;color:#3A4A66">${lg("#0044B8", t("actE2"))}${lg("#9FB3D1", t("thE2"), "dashed")}${s.some(x => x.plan) ? lg("#E8795B", t("planE"), "dashed") : ""}${lg("#00B07A", D.isW ? t("windSpd") : t("irr"))}</div>`; }
+
+function plantReportHTML(D) {
+  const { s, K, R, per, isW } = D, now = new Date(); const fmtH = h => h >= 24 ? `${nf(h / 24, 1)} ${S.lang === "zh" ? "天" : S.lang === "en" ? "d" : "ngày"}` : `${nf(h, 1)} h`;
+  const perLbl = per === "day" ? `${t("today")} ${fmtDate(new Date(R.from))}` : `${fmtDate(new Date(R.from))} – ${fmtDate(now)}`;
+  const cell = (l, v, u = "", sub = "") => `<div class="kc"><span>${l}</span><b>${v}<small>${u}</small></b>${sub ? `<em>${sub}</em>` : ""}</div>`;
+  const pct = (a, b) => b ? nf(100 * a / b, 1) : "—";
+  const kpis = [
+    cell(t("actE2"), nf(K.e, 1), " MWh", `${t("thE2")}: ${nf(K.th, 1)} MWh`),
+    cell(t("planE"), nf(K.plan, 1), " MWh", `${t("planPct")}: ${pct(K.e, K.plan)} %`),
+    per === "day" ? cell(t("peak"), nf(K.pmax, 2), " MW", `${t("capInst")}: ${capFull(s)}`) : cell(t("bestDay"), nf(K.bestDay.e, 1), " MWh", fmtDate(new Date(K.bestDay.d))),
+    cell(t("cf"), nf(K.cf, 1), " %", `${t("eqHh")}: ${nf(K.eqh, 2)}`),
+    cell(t("availPct"), K.avail == null ? "—" : nf(K.avail, 2), " %", isW ? "IEC 61400-26 (T)" : "IEC 61724"),
+    isW ? cell(t("wsAvg"), nf(K.res, 2), " m/s", s.model) : cell(t("pr"), K.pr == null ? "—" : nf(K.pr, 1), " %", `${t("insol")}: ${nf(K.res, 2)} kWh/m²`),
+    cell(t("lossTot"), nf(K.lsum, 1), " MWh", `${pct(K.lsum, K.th)} % ${t("thE2").toLowerCase()}`),
+    cell(t("curtE"), nf(K.curtE, 1), " MWh", `${D.curts.length} ${t("events")}`),
+    cell(t("stopH"), fmtH(K.stopH), "", `${D.stops.length} ${t("events")}`),
+    cell(t("co2"), nf(K.co2, 1), "", `${EF_CO2} t/MWh`)];
+  const LN = ["l_fault", "l_maint", "l_curt", "l_grid", "l_conv"], LC = ["#D8344A", "#8F6BE0", "#2F7FD8", "#D99A1E", "#7A8699"];
+  const lossRows = LN.map((k, j) => `<tr><td><i style="display:inline-block;width:9px;height:9px;background:${LC[j]};margin-right:6px"></i>${t(k)}</td><td>${nf(K.loss[j], 2)}</td><td>${pct(K.loss[j], K.lsum)}</td><td>${pct(K.loss[j], K.th)}</td><td style="text-align:left;width:34%"><div style="height:8px;background:#EEF2F8"><div style="height:8px;width:${K.lsum ? 100 * K.loss[j] / K.lsum : 0}%;background:${LC[j]}"></div></div></td></tr>`).join("");
+  const stTxt = st => t("st_" + st);
+  const feederRows = D.feeders.map(f => `<tr><td>${esc(feederLabel(s, f.f))}</td><td>${f.n}</td><td>${f.run}</td><td>${f.limit}</td><td${f.fault ? ' style="color:#C0283E;font-weight:700"' : ""}>${f.fault}</td><td>${f.other}</td><td>${nf(f.p, 2)}</td><td>${nf(f.eDay, 2)}</td></tr>`).join("");
+  const uHead = isW ? [t("device"), t("feederCol"), t("state"), "P (kW)", `${t("windSpd")} (m/s)`, t("eDayK"), t("availPer"), t("downH"), `${t("genT")} (°C)`, `${t("gbT")} (°C)`, t("alarms")]
+    : [t("device"), t("feederCol"), t("state"), "P AC (kW)", "V DC (V)", `${t("eff")} (%)`, `${t("igbt")} (°C)`, t("eDayK"), t("availPer"), t("downH"), t("alarms")];
+  const uRows = D.units.map(u => { const na = u.st === "comm"; const bad = u.st === "fault"; const c = v => na ? "—" : v;
+    const cells = isW ? [u.id, u.f, stTxt(u.st), c(nf((u.p || 0) * 1000, 0)), c(u.v == null ? "—" : nf(u.v, 1)), c(nf(u.d.eDay || 0, 0)), u.avail == null ? "—" : nf(u.avail, 1), nf(u.down, 1), c(nf(u.d.genT, 1)), c(nf(u.d.gbT, 1)), u.al || ""]
+      : [u.id, u.f, stTxt(u.st), c(nf((u.p || 0) * 1000, 1)), c(nf(u.d.dcV, 0)), c(u.d.eff == null ? "—" : nf(u.d.eff, 2)), c(nf(u.d.igbt, 1)), c(nf(u.d.eDay || 0, 0)), u.avail == null ? "—" : nf(u.avail, 1), nf(u.down, 1), u.al || ""];
+    return `<tr${bad ? ' class="bad"' : na ? ' class="na"' : ""}>${cells.map(x => `<td>${esc(String(x))}</td>`).join("")}</tr>`; }).join("");
+  const stopRows = D.stops.map(x => `<tr><td>${esc(x.dev)}</td><td>${fmtDT(new Date(x.t0))}</td><td>${x.t1 ? fmtDT(new Date(x.t1)) : `<b>${t("ongoing")}</b>`}</td><td>${nf(x.dur, 1)} h</td><td style="text-align:left;white-space:normal">${esc(L(x.cause))}</td><td>${x.planned ? t("plannedS") : t("unplanned")}</td><td>${esc(x.iec)}</td><td>${nf(x.loss, 2)}</td></tr>`).join("");
+  const curtRows = D.curts.map(x => `<tr><td>${fmtDT(new Date(x.t0))}</td><td>${x.t1 ? nf(x.dur, 1) + " h" : `<b>${t("ongoing")}</b>`}</td><td>${nf(x.set, 1)}</td><td>${nf(x.av, 1)}</td><td>${esc(x.src)}</td><td style="text-align:left;white-space:normal">${esc(L(x.reason))}</td><td>${nf(x.e, 2)}</td></tr>`).join("");
+  const alRows = D.alarms.map(a => `<tr><td><b style="color:${["", "#C0283E", "#C2660A", "#9A7B00", "#2563EB"][a.sev]}">${t("p" + a.sev)}</b></td><td>${esc(a.dev)}</td><td style="text-align:left;white-space:normal">${esc(alarmText(a))}</td><td>${fmtDT(new Date(a.t))}</td><td>${a.cleared ? fmtDT(new Date(a.clrT)) : `<b>${t("active")}</b>`}</td><td>${a.acked ? esc(a.ackBy) : "—"}</td></tr>`).join("");
+  const empty = c => `<tr><td colspan="${c}" style="text-align:center;color:#5B6B85">${t("noEvents")}</td></tr>`;
+  const sec = (k, body) => `<section class="rsec"><h3>${t(k)}</h3>${body}</section>`;
+  return `<div class="rhead"><div><span data-logo="full" style="width:150px;display:block"></span></div>
+      <div class="rtitle"><h2>${t("repPlantT")}</h2><div class="rsub">${esc(repTri("repPlantT"))}</div><div class="rname">${esc(L(s.full))}</div></div>
+      <div class="rmeta"><div><span>${t("period")}</span><b>${esc(perLbl)}</b></div><div><span>${t("genAt")}</span><b>${fmtDate(now)} ${fmtTime(now, false)}</b></div><div><span>${t("docNo")}</span><b>OCC-${s.code}-${per.toUpperCase()}-${fmtDate(now).split("/").reverse().join("")}</b></div></div></div>
+    <table class="rinfo"><tr><td>${t("plantCode")}</td><td>${s.code}</td><td>${t("province")}</td><td>${esc(L(s.prov))}</td><td>${t("capInst")}</td><td>${esc(capFull(s))}${s.capDC && s.capAC && s.capUnit === "MWp" ? ` · ${nf(s.capAC, 2)} MWac` : s.capDC && s.capUnit === "MWac" ? ` · ${nf(s.capDC, 2)} MWp` : ""}</td></tr>
+      <tr><td>${t("model")}</td><td>${esc(s.model)}</td><td>${t("unitsN")}</td><td>${s.n} ${isW ? t("turbinesU") : t("invU")}</td><td>COD</td><td>${esc(s.cod || "—")}</td></tr>
+      <tr><td>SCADA</td><td>${esc(s.scada || "—")}</td><td>${t("gridConn")}</td><td>${esc(s.kv || "—")}</td><td>${t("dataPts")}</td><td>${nf(s.pts, 0)}</td></tr></table>
+    ${s.notOper ? `<div class="rnote">${t("notOperNote")}</div>` : ""}
+    ${sec("sec1", `<div class="kgrid">${kpis.join("")}</div>`)}
+    ${sec("sec2", repChart(D))}
+    ${sec("sec3", `<table><thead><tr><th>${t("lossCat")}</th><th>MWh</th><th>% ${t("lossTot").toLowerCase()}</th><th>% ${t("thE2").toLowerCase()}</th><th></th></tr></thead><tbody>${lossRows}<tr class="tot"><td>${t("total")}</td><td>${nf(K.lsum, 2)}</td><td>100</td><td>${pct(K.lsum, K.th)}</td><td></td></tr></tbody></table>`)}
+    ${sec("sec4", `<table><thead><tr><th>${isW ? t("feederCol") : s.type === "solar" ? t("blockCol") : t("roofCol")}</th><th>${t("unitsN")}</th><th>${t("st_run")}</th><th>${t("st_limit")}</th><th>${t("st_fault")}</th><th>${t("otherSt")}</th><th>P (MW)</th><th>${t("eToday")} (MWh)</th></tr></thead><tbody>${feederRows}<tr class="tot"><td>${t("total")}</td><td>${s.n}</td><td>${D.feeders.reduce((a, f) => a + f.run, 0)}</td><td>${D.feeders.reduce((a, f) => a + f.limit, 0)}</td><td>${D.feeders.reduce((a, f) => a + f.fault, 0)}</td><td>${D.feeders.reduce((a, f) => a + f.other, 0)}</td><td>${nf(D.feeders.reduce((a, f) => a + f.p, 0), 2)}</td><td>${nf(D.feeders.reduce((a, f) => a + f.eDay, 0), 2)}</td></tr></tbody></table>`)}
+    ${sec("sec5", `<table class="units"><thead><tr>${uHead.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>${uRows}</tbody></table>`)}
+    ${sec("sec6", `<h4>${t("stopRec")} · ${D.stops.length}</h4><table><thead><tr><th>${t("device")}</th><th>${t("start")}</th><th>${t("end")}</th><th>${t("dur")}</th><th>${t("cause")}</th><th>${t("type")}</th><th>IEC 61400-26</th><th>${t("lossMWh")}</th></tr></thead><tbody>${stopRows || empty(8)}</tbody></table>
+      <h4>${t("curtRec")} · ${D.curts.length}</h4><table><thead><tr><th>${t("start")}</th><th>${t("dur")}</th><th>${t("setMW")}</th><th>${t("availMW")}</th><th>${t("src")}</th><th>${t("reason")}</th><th>${t("curtE")} (MWh)</th></tr></thead><tbody>${curtRows || empty(7)}</tbody></table>`)}
+    ${sec("sec7", `<table><thead><tr><th>${t("level")}</th><th>${t("device")}</th><th>${t("desc")}</th><th>${t("start")}</th><th>${t("end")}</th><th>${t("ackBy")}</th></tr></thead><tbody>${alRows || empty(6)}</tbody></table>`)}
+    ${sec("sec8", `<div class="rnotes"><div></div><div></div><div></div></div>
+      <div class="sig"><div><span>${t("preparedBy")}</span><b>${esc(S.user.name)}</b><em>${esc(t("r_" + S.user.role))}</em></div><div><span>${t("checkedBy")}</span><b>&nbsp;</b><em>${t("shiftLead")}</em></div><div><span>${t("approvedBy")}</span><b>&nbsp;</b><em>${t("plantDir")}</em></div></div>`)}
+    <div class="rfoot"><span>HINO Systech Vietnam Co., Ltd. · OCC SCADA ${BUILD.version} · build ${BUILD.id}</span><span>${t("simNote")}</span></div>`;
+}
+
+function plantReportCSV(D) { const { s, K } = D; const rows = [];
+  rows.push([t("repPlantT"), L(s.full)], [t("period"), D.per, fmtDate(new Date(D.R.from)), fmtDate(new Date())], [t("capInst"), capFull(s)], []);
+  rows.push([t("sec1")], [t("actE2") + " (MWh)", nf(K.e, 2)], [t("thE2") + " (MWh)", nf(K.th, 2)], [t("planE") + " (MWh)", nf(K.plan, 2)], [t("cf") + " (%)", nf(K.cf, 2)], [t("eqHh"), nf(K.eqh, 2)], [t("availPct"), K.avail == null ? "" : nf(K.avail, 2)],
+    [D.isW ? t("wsAvg") + " (m/s)" : t("insol") + " (kWh/m²)", nf(K.res, 2)], ...(D.isW ? [] : [[t("pr") + " (%)", K.pr == null ? "" : nf(K.pr, 2)]]), [t("lossTot") + " (MWh)", nf(K.lsum, 2)], [t("curtE") + " (MWh)", nf(K.curtE, 2)], [t("stopH") + " (h)", nf(K.stopH, 1)], [t("co2"), nf(K.co2, 1)], []);
+  rows.push([t("sec2")], ["", t("actE2") + " (MWh)", t("thE2") + " (MWh)", D.isW ? t("windSpd") : t("irr")], ...D.series.map(x => [x.k, nf(x.e, 3), nf(x.th, 3), x.r == null ? "" : nf(x.r, 2)]), []);
+  rows.push([t("sec3")], ...["l_fault", "l_maint", "l_curt", "l_grid", "l_conv"].map((k, j) => [t(k), nf(K.loss[j], 3)]), []);
+  rows.push([t("sec4")], ["", t("unitsN"), t("st_run"), t("st_limit"), t("st_fault"), t("otherSt"), "P (MW)", t("eToday")], ...D.feeders.map(f => [feederLabel(s, f.f), f.n, f.run, f.limit, f.fault, f.other, nf(f.p, 3), nf(f.eDay, 3)]), []);
+  rows.push([t("sec5")], [t("device"), t("feederCol"), t("state"), "P (kW)", t("eDayK"), t("availPer"), t("downH"), D.isW ? t("genT") : t("igbt"), D.isW ? t("gbT") : t("dcV"), t("alarms")],
+    ...D.units.map(u => [u.id, u.f, t("st_" + u.st), nf((u.p || 0) * 1000, 1), nf(u.d.eDay || 0, 0), u.avail == null ? "" : nf(u.avail, 1), nf(u.down, 1), nf(D.isW ? u.d.genT : u.d.igbt, 1), nf(D.isW ? u.d.gbT : u.d.dcV, 1), u.al]), []);
+  rows.push([t("stopRec")], ...D.stops.map(x => [x.dev, fmtDT(new Date(x.t0)), x.t1 ? fmtDT(new Date(x.t1)) : t("ongoing"), nf(x.dur, 1), L(x.cause), x.iec, nf(x.loss, 2)]), []);
+  rows.push([t("curtRec")], ...D.curts.map(x => [fmtDT(new Date(x.t0)), nf(x.dur, 1), nf(x.set, 1), nf(x.av, 1), x.src, L(x.reason), nf(x.e, 2)]), []);
+  rows.push([t("sec7")], ...D.alarms.map(a => [t("p" + a.sev), a.dev, alarmText(a), fmtDT(new Date(a.t)), a.cleared ? fmtDT(new Date(a.clrT)) : t("active"), a.ackBy || ""]));
+  return rows; }
+
+// print only the report: copy it to a top-level host, print, then remove it
+function printPaper(paper) { const host = document.createElement("div"); host.id = "printHost"; host.innerHTML = paper.outerHTML; document.body.appendChild(host); document.body.classList.add("printing");
+  const done = () => { document.body.classList.remove("printing"); host.remove(); window.removeEventListener("afterprint", done); }; window.addEventListener("afterprint", done);
+  try { window.print(); } catch (e) { toast(t("printBlocked"), "", "warn"); } setTimeout(() => { if (!matchMedia("print").matches) done(); }, 1500); }
+
+PAGES.reports = (el, param) => {
+  setTitle(t("reports"), t("sub_reports")); const ids = scopeIds(); let [tab, sid, per] = (param || "").split(":");
+  tab = tab === "plant" || (!tab && ids.length <= 2) ? "plant" : "all"; sid = ids.includes(sid) ? sid : ids.find(i => !ST[i].notOper) || ids[0]; per = REP_PERIODS.some(([k]) => k === per) ? per : "day";
+  el.innerHTML = `<div class="fbar"><div class="seg" id="rTab"><button data-tab="all" aria-pressed="${tab === "all"}">${ic("grid", "sm")} ${t("repPortfolio")}</button><button data-tab="plant" aria-pressed="${tab === "plant"}">${ic("station", "sm")} ${t("repPlant")}</button></div>
+      <span id="rCtl" class="row" style="gap:8px;flex-wrap:wrap"></span></div><div id="rBody"></div>`;
+  function render() { $$("#rTab button").forEach(b => b.setAttribute("aria-pressed", b.dataset.tab === tab));
+    if (tab === "all") { $("#rCtl").innerHTML = "";
+      const R = [["rDaily", "cal"], ["rWeekly", "cal"], ["rMonthly", "cal"], ["rEnergy", "zap"], ["rAlarm", "bell"], ["rCO2", "sun"]];
+      $("#rBody").innerHTML = `<div class="rep-list">${R.map(([k, i]) => `<button class="rep" data-r="${k}">${ic(i, "c-acc")}<b>${t(k)}</b><span>${t(k + "S")}</span><span class="faint" style="font-size:11px">${t("autoSched")}</span></button>`).join("")}</div>
+        <div class="panel" style="margin-top:12px"><div class="ph"><h3>${t("repPlant")}</h3><span class="sub">${t("repPlantS")}</span></div><div class="pb"><div class="rep-plants">${ids.map(i => { const s = ST[i]; return `<button class="rep sm" data-plant="${i}">${ic(s.type === "wind" ? "turbine" : "panel", "c-acc")}<b>${esc(stName(s))}</b><span>${esc(capFull(s))} · ${s.n} ${s.type === "wind" ? t("turbinesU") : t("invU")}</span></button>`; }).join("")}</div></div></div>
+        <div class="faint" style="font-size:11.5px">${ic("info", "sm")} ${t("printNote")}</div>`; return; }
+    $("#rCtl").innerHTML = `<label>${t("station")}</label><select class="sel" id="rSt">${ids.map(i => `<option value="${i}" ${i === sid ? "selected" : ""}>${esc(stName(ST[i]))}</option>`).join("")}</select>
+      <label>${t("period")}</label><div class="seg" id="rPer">${REP_PERIODS.map(([k, l]) => `<button data-per="${k}" aria-pressed="${k === per}">${t(l)}</button>`).join("")}</div>
+      <span style="margin-left:auto" class="row"><button class="btn sm" id="rPrint">${ic("file", "sm")} ${t("printPdf")}</button><button class="btn sm" id="rXls">${ic("dl", "sm")} ${t("excel")}</button></span>`;
+    const D = plantReportData(sid, per); $("#rBody").innerHTML = `<div class="paper rep-paper" id="rPaper">${plantReportHTML(D)}</div>`; applyLogos();
+    $("#rSt").onchange = e => { sid = e.target.value; audit("a_view", "report · " + sid + " · " + per, "ok"); render(); };
+    $("#rPer").onclick = e => { const b = e.target.closest("[data-per]"); if (!b) return; per = b.dataset.per; render(); };
+    $("#rPrint").onclick = () => { audit("a_export", `PDF · ${sid} · ${per}`, "ok"); printPaper($("#rPaper")); };
+    $("#rXls").onclick = () => exportCSV(`report_${ST[sid].code}_${per}`, plantReportCSV(D));
+    S.param = `plant:${sid}:${per}`; saveSession(); }
+  $("#rTab").onclick = e => { const b = e.target.closest("[data-tab]"); if (!b) return; tab = b.dataset.tab; render(); };
+  el.onclick = e => { const r = e.target.closest("[data-r]"); if (r) { openReport(r.dataset.r); return; } const p = e.target.closest("[data-plant]"); if (p) { tab = "plant"; sid = p.dataset.plant; render(); } };
+  render();
 };
 
 // ---- 70_map.js
