@@ -68,7 +68,7 @@ const THREE3D = (()=>{
     if(r.lowSpd) r.lowSpd.rotation.x=r.rotor.rotation.x;
     if(r.hss){ const w=Math.min(g.userData.rpm*112, 150)*2*Math.PI/60; r.hss.rotation.x-=w*dt; }
     if(r.fans) r.fans.forEach((f,i)=>f.rotation.y+=dt*(4+2*(i%2))*(g.userData.rpm>0.5?1:0.25)); }
-  function label(html, cls="lbl3d"){ const d=document.createElement("div"); d.className=cls; d.innerHTML=html; const o=new T.CSS2DObject(d); return o; }
+  function label(html, cls="lbl3d"){ const d=document.createElement("div"); d.className=cls; d.innerHTML=html; liveEl(d); const o=new T.CSS2DObject(d); return o; }
 
   // ---------- Wind farm ----------
   function buildWindFarm(st, s, o={}){
@@ -130,7 +130,7 @@ const THREE3D = (()=>{
     else { try{ const pm=new T.PMREMGenerator(st.renderer); st.scene.environment=pm.fromScene(new T.RoomEnvironment(st.renderer),0.04).texture; pm.dispose(); }catch(e){}
       const SS=SOLAR_SITES(T,{lightsFor,label,COL,stCol,fbm2,TW,RM}); b= s.type==="solar"? SS.farm(st,s) : SS.rooftop(st,s); }
     // HUD
-    const hud=document.createElement("div"); hud.className="twin-hud"; el.appendChild(hud);
+    const hud=liveEl(document.createElement("div")); hud.className="twin-hud"; el.appendChild(hud);
     const ctl=document.createElement("div"); ctl.className="twin-ctl"; el.appendChild(ctl);
     let showL=true; const renderHud=()=>{ const L1=LIVE.st[s.id]; const sp=b.lt.sp; hud.innerHTML= s.type==="wind"? `<span class="chip">${ic("wind","sm")}${s.notOper?"—":t("windDir",{d:Math.round(L1.dir)})+" · "+nf(L1.v,1)+" m/s"}</span><span class="chip">${ic("pin","sm")}${s.ll[1].toFixed(3)}°N ${s.ll[0].toFixed(3)}°E</span>` : `<span class="chip">${ic("sun","sm")}${(st.sunInfo||sp).el>0? t("sunPos",{e:nf((st.sunInfo||sp).el,1),a:nf((st.sunInfo||sp).az,0)}) : t("night")}</span><span class="chip">${ic("pin","sm")}${s.ll[1].toFixed(3)}°N ${s.ll[0].toFixed(3)}°E</span>`; };
     const solar=s.type!=="wind";
@@ -190,7 +190,7 @@ const THREE3D = (()=>{
     const setMode=(m,cam=true)=>{ mode=m; coverMats.forEach(mt=>{ mt.clippingPlanes = m==="cut"? [plane] : []; mt.needsUpdate=true; });
       if(cam&&o.twin) goCam(...(m==="exp"? PRE.exp : PRE.close)); if(ctl) ctl.querySelectorAll("[data-m]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.m===m)); };
     // ---- HUD, controls, callouts
-    const hud=document.createElement("div"); hud.className="twin-hud"; el.appendChild(hud);
+    const hud=liveEl(document.createElement("div")); hud.className="twin-hud"; el.appendChild(hud);
     let ctl=null, showL=true, full=false; const callouts={};
     if(o.twin){ ctl=document.createElement("div"); ctl.className="twin-ctl";
       ctl.innerHTML=`<div class="seg">${[["ext","vExt"],["cut","vCut"],["exp","vExp"]].map(([k,l])=>`<button data-m="${k}" aria-pressed="${k==="ext"}">${t(l)}</button>`).join("")}</div><div class="seg"><button data-k="full" aria-pressed="false">${t("vFull")}</button><button data-k="lbl" aria-pressed="true">${t("labels")}</button></div>`;

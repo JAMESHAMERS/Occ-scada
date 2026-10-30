@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- GENERATED FILE – do not edit. Source: src/ + data/ in this repository; rebuild with build.py.
-     HINO OCC SCADA 1.0 · build 261016.07ebf00 · HINO Systech Vietnam Co., Ltd. -->
+     HINO OCC SCADA 1.0 · build 261030.eb6da62 · HINO Systech Vietnam Co., Ltd. -->
 <title>OCC SCADA Ia Pech</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="HINO OCC SCADA – Trung tâm giám sát tập trung các nhà máy điện gió, điện mặt trời · HINO Systech Vietnam Co., Ltd.">
@@ -610,6 +610,63 @@ table.t td.num,table.t .r{font-family:var(--f-num);font-variant-numeric:tabular-
   #themeBtn,#userBtn>.i{display:none} .show-xs{display:flex}
   .top{gap:4px} .alsum button{min-width:27px}
 }
+/* ---------- live motion: sparklines, value flash, heartbeat, power flow, transitions, toasts ---------- */
+.kpi{position:relative}
+.kpi-s{flex:1 0 auto}
+.spark{position:relative;height:24px;margin-top:6px}
+.spark svg{display:block;width:100%;height:100%;overflow:visible;animation:spIn 1s cubic-bezier(.3,.7,.2,1)}
+.spark .sl{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.spark .sa{fill:currentColor;opacity:.13;stroke:none}
+.spark i{position:absolute;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:currentColor;box-shadow:0 0 0 2px var(--surface);transition:top .6s}
+.spark i::after{content:"";position:absolute;inset:0;border-radius:50%;background:currentColor;animation:hpulse 2s ease-out infinite}
+.spark+.bar{margin-top:5px}
+@keyframes spIn{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.kpi-v.lv-up,.kpi-v.lv-dn{animation:lvGlow 1.2s ease-out}
+.kpi-v.lv-up::after,.kpi-v.lv-dn::after{display:inline-block;font-size:9px;margin-left:5px;vertical-align:4px;animation:lvArr 1.3s ease-out forwards}
+.kpi-v.lv-up::after{content:"\25B2";color:var(--ok)} .kpi-v.lv-dn::after{content:"\25BC";color:var(--muted)}
+@keyframes lvGlow{0%,20%{text-shadow:0 0 16px color-mix(in srgb,var(--accent) 60%,transparent)}}
+@keyframes lvArr{0%{opacity:0;transform:translateY(3px)}15%,70%{opacity:1;transform:none}100%{opacity:0}}
+#alSum b{display:inline-block} #alSum b.lv-up{animation:bump .6s cubic-bezier(.3,1.6,.5,1)}
+@keyframes bump{30%{transform:scale(1.4)}}
+.live i.beat,.stbar i.beat{animation:beat 1.1s ease-out}
+@keyframes beat{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 75%,transparent)}100%{box-shadow:0 0 0 7px color-mix(in srgb,var(--ok) 0%,transparent)}}
+.ph .sub.live{margin-left:8px}
+#ovH circle{transition:stroke-dasharray .8s ease,stroke-dashoffset .8s ease}
+.tile{transition:border-color .5s,background-color .5s}
+.al-new td{animation:alNew 2.6s ease-out}
+@keyframes alNew{0%,35%{background:color-mix(in srgb,var(--warn) 22%,transparent)}}
+.flow-w{min-height:0}
+.flow{display:block;width:100%;height:auto;max-height:170px;overflow:visible}
+.flow .fl-base{fill:none;stroke:var(--surface-3);stroke-linecap:round;transition:stroke-width .8s}
+.flow .fl-run{fill:none;stroke-linecap:round;stroke-dasharray:2 10.5;animation:flRun linear infinite;transition:stroke-width .8s}
+@keyframes flRun{to{stroke-dashoffset:-25}}
+.flow .fl-node{fill:var(--bg-2);stroke-width:1;stroke-opacity:.55}
+.flow .fl-bus{fill:var(--surface-3);stroke:var(--line-2)}
+.flow .fl-l{font:500 9.5px var(--f-cond);letter-spacing:.08em;text-transform:uppercase;fill:var(--muted)}
+.flow .fl-v{font:500 17px var(--f-num);fill:var(--text);font-variant-numeric:tabular-nums}
+.flow .fl-s{font:10.5px var(--f-mono);fill:var(--muted)}
+.view-in>*{animation:vIn .42s cubic-bezier(.2,.7,.2,1) backwards}
+.view-in>*:nth-child(2){animation-delay:.05s} .view-in>*:nth-child(3){animation-delay:.1s} .view-in>*:nth-child(4){animation-delay:.15s} .view-in>*:nth-child(n+5){animation-delay:.2s}
+.view-in.keep>*{animation:none}
+@keyframes vIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.twin-load{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:linear-gradient(100deg,rgba(255,255,255,0) 35%,rgba(255,255,255,.05) 50%,rgba(255,255,255,0) 65%) 0 0/300% 100% no-repeat;animation:shim 1.6s linear infinite}
+.twin-load::before{content:"";width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.14);border-top-color:var(--accent);animation:spin .9s linear infinite}
+@keyframes shim{from{background-position:100% 0}to{background-position:0 0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:relative;overflow:hidden;padding-right:36px}
+.toast.click{cursor:pointer} .toast.click:hover{border-color:var(--line-3,var(--line-2));background:var(--surface-2,var(--surface))}
+.toast .tb{flex:1;min-width:0}
+.toast .tx{position:absolute;top:5px;right:5px;width:24px;height:24px}
+.toast .tact{margin-top:8px;display:flex;gap:6px}
+.toast .tsev{flex:none;font:600 11px var(--f-num);padding:2px 6px;border-radius:2px;margin-top:1px}
+.tsev.s1{background:var(--crit);color:#fff} .tsev.s2{background:var(--warn);color:#1A1205} .tsev.s3{background:var(--p3);color:#1A1605} .tsev.s4{background:var(--p4);color:#06121F}
+.toast .tprog{position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--accent);opacity:.55;transform-origin:left;animation:tprog linear forwards}
+.toast.k-crit .tprog{background:var(--crit)} .toast.k-warn .tprog{background:var(--warn)} .toast.k-ok .tprog{background:var(--ok)}
+.toast:hover .tprog{animation-play-state:paused}
+.toast.k-crit{box-shadow:var(--shadow),0 0 0 1px color-mix(in srgb,var(--crit) 45%,transparent)}
+.toast.out{animation:tout .25s ease-in forwards}
+@keyframes tprog{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+@keyframes tout{to{opacity:0;transform:translateX(28px)}}
 @media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }
 </style>
 
@@ -672,6 +729,7 @@ table.t td.num,table.t .r{font-family:var(--f-num);font-variant-numeric:tabular-
 // ---- 10_i18n.js
 // ===================== i18n (VI · EN · 中文) =====================
 const DICT = {
+  lvTr3h:["Xu hướng 3 giờ qua","Last 3 hours","近3小时趋势"], lvTrD:["Xu hướng từ 00:00","Trend since 00:00","今日趋势"], lvTr12h:["Số cảnh báo 12 giờ qua","Active alarms, last 12 hours","近12小时告警数"], lvGrid:["Lưới điện quốc gia","National grid","国家电网"], lvTot:["Tổng phát","Total","总出力"],
   brandSub:["Trung tâm giám sát tập trung","Operations Control Centre","集中监控中心"],
   brandSub2:["{NP} nhà máy · {MW} MW","{NP} plants · {MW} MW","{NP} 座电站 · {MW} MW"],
   heroH:["Một nền tảng giám sát cho {NP} nhà máy điện gió và điện mặt trời","One monitoring platform for {NP} wind and solar plants","{NP} 座风电、光伏电站统一监控平台"],
@@ -860,7 +918,7 @@ DICT.brandSub2=["{NP} nhà máy · {MW} MW","{NP} plants · {MW} MW","{NP} 座 �
 
 // ---- 20_data.js
 // Build stamp is injected by build.py (date + git commit), so every published copy can be compared at a glance.
-const BUILD = {"version": "1.0", "id": "261016.07ebf00", "date": "2026-10-16"};
+const BUILD = {"version": "1.0", "id": "261030.eb6da62", "date": "2026-10-30"};
 // ===================== Plant registry =====================
 // Coordinates: WGS84, public reference sources (gem.wiki / thewindpower / news), tolerance a few km.
 const OCC_LL = [107.902, 13.975];
@@ -1214,11 +1272,14 @@ function hinoLogo(kind="full", fixed){ const b=fixed?' style="fill:#5C8FF2"':'',
   const mark=`<rect class="b"${b} x="93" y="59" width="14" height="154"/><rect class="b"${b} x="189" y="59" width="14" height="154"/><rect class="b"${b} x="93" y="129" width="110" height="14"/><polygon class="g"${g} points="310,59 326,59 227,213 211,213"/><rect class="b"${b} x="333" y="59" width="14" height="154"/><rect class="b"${b} x="433" y="59" width="14" height="154"/><polygon class="b"${b} points="333,59 349,59 447,213 431,213"/><ellipse class="o"${o} cx="541.5" cy="136" rx="69" ry="70.5" stroke-width="13"/>`;
   return kind==="mark"? `<svg class="hino" viewBox="86 52 538 168" role="img" aria-label="HINO">${mark}</svg>` : `<svg class="hino" viewBox="78 50 566 218" role="img" aria-label="HINO Systech Vietnam Co., Ltd.">${mark}<text class="t"${tx} x="80" y="259" font-family="Arial,Helvetica,sans-serif" font-size="25" textLength="556" lengthAdjust="spacingAndGlyphs">HINO SYSTECH VIETNAM CO.,LTD.</text></svg>`; }
 function applyLogos(){ $$("[data-logo]").forEach(el=>el.innerHTML=hinoLogo(el.dataset.logo, el.hasAttribute("data-fixed"))); }
-function toast(title, body, kind="info"){
-  const el=document.createElement("div"); el.className="toast k-"+kind;
-  const k={info:["info","c-acc"],ok:["okc","c-ok"],warn:["alert","c-warn"],crit:["alert","c-crit"]}[kind];
-  el.innerHTML=`${ic(k[0],k[1])}<div><b>${esc(title)}</b>${body?`<div class="muted">${esc(body)}</div>`:""}</div>`;
-  $("#toasts").appendChild(el); setTimeout(()=>{ el.style.opacity="0"; el.style.transition="opacity .3s"; setTimeout(()=>el.remove(),320); }, 4200);
+function toast(title, body, kind="info", o={}){
+  const host=$("#toasts"); const el=document.createElement("div"); el.className="toast k-"+kind+(o.onClick?" click":""); el.setAttribute("role",kind==="crit"||kind==="warn"?"alert":"status");
+  const k={info:["info","c-acc"],ok:["okc","c-ok"],warn:["alert","c-warn"],crit:["alert","c-crit"]}[kind]; const ttl=o.ttl||4200;
+  el.innerHTML=`${o.sev?`<span class="tsev s${o.sev}">P${o.sev}</span>`:ic(k[0],k[1])}<div class="tb"><b>${esc(title)}</b>${body?`<div class="muted">${esc(body)}</div>`:""}${o.action?`<div class="tact"><button class="btn sm" data-ta>${esc(o.action.label)}</button></div>`:""}</div><button class="ibtn tx" data-tx aria-label="${t("close")}">${ic("x","sm")}</button><i class="tprog" style="animation-duration:${ttl}ms"></i>`;
+  let gone=false; const close=()=>{ if(gone) return; gone=true; el.classList.add("out"); setTimeout(()=>el.remove(),260); };
+  el.addEventListener("click",e=>{ if(e.target.closest("[data-tx]")){ close(); return; } if(e.target.closest("[data-ta]")){ o.action.fn(); close(); return; } if(o.onClick){ o.onClick(); close(); } });
+  if(RM()){ setTimeout(close,ttl); } else el.querySelector(".tprog").addEventListener("animationend",close);
+  host.appendChild(el); const all=[...host.children].filter(x=>!x.classList.contains("out")); if(all.length>4) all.slice(0,all.length-4).forEach(x=>x.querySelector("[data-tx]").click());
 }
 function modal(html, wide){ const h=$("#modalHost"); h.innerHTML=`<div class="scrim" data-close></div><div class="modal" data-close><div class="modal-c ${wide?"wide":""}" role="dialog" aria-modal="true">${html}</div></div>`; h.onclick=e=>{ if(e.target.hasAttribute("data-close")) closeModal(); }; return $(".modal-c",h); }
 function closeModal(){ $("#modalHost").innerHTML=""; }
@@ -1422,7 +1483,7 @@ function go(page, param=null, keep){
   if(page==="station" && !param){ param=scopeIds()[0]; S.param=param; }
   if(page!==prevPage||param!==prevParam) audit("a_view",page+(param?" · "+param:""),"ok");
   renderShell();
-  const fn=PAGES[page]; v.innerHTML=`<div class="view-in" id="vin"></div>`; fn($("#vin"), param);
+  const fn=PAGES[page]; v.innerHTML=`<div class="view-in${keep?" keep":""}" id="vin"></div>`; fn($("#vin"), param); liveify($("#vin")); if(!keep) lvIntro($("#vin"));
   saveSession();
 }
 const PAGE_LVL={custom:3,overview:1,gis:1,station:2,alarms:2,kpis:2,pcurve:3,loss:2,downtime:3,curtail:2,bench:1,reports:2,twin:4,sources:3,users:2,audit:2};
@@ -1467,16 +1528,16 @@ function portfolio(){
 PAGES.overview=(el)=>{
   setTitle(t("overview"), subClock("sub_overview"));
   let tab="pow";
-  el.innerHTML=`<div class="grid g-kpi" id="ovK"></div>
+  el.innerHTML=`<div class="grid g-kpi" id="ovK" data-live></div>
   <div class="grid g-ov">
-    <div class="panel"><div class="ph"><h3>${t("health")}</h3></div><div class="pb" id="ovH"></div></div>
+    <div class="panel"><div class="ph"><h3>${t("health")}</h3></div><div class="pb" id="ovH" data-live></div></div>
     <div class="panel ov-map"><div class="ph"><h3>${t("stMap")}</h3><span class="sub">WGS84</span><span class="act"><button class="btn sm" data-go="gis">${ic("map","sm")} ${t("gis")}</button></span></div><div class="pb flush" style="display:flex;flex-direction:column;padding-top:10px;min-height:340px"><div class="map-w" id="ovMap"></div></div></div>
-    <div class="panel"><div class="ph"><h3>${t("stStatus")}</h3><span class="act">${can("analytics")?`<button class="link" data-go="bench">${t("viewAll")}</button>`:""}</span></div><div class="pb flush tw" id="ovT"></div></div>
+    <div class="panel"><div class="ph"><h3>${t("stStatus")}</h3><span class="act">${can("analytics")?`<button class="link" data-go="bench">${t("viewAll")}</button>`:""}</span></div><div class="pb flush tw" id="ovT" data-live></div></div>
   </div>
   <div class="grid g-ov2">
-    <div class="panel"><div class="ph"><h3>${t("assets")}</h3></div><div class="pb"><div class="asset" id="ovA"></div></div></div>
+    <div class="panel"><div class="ph"><h3>${t("assets")}</h3><span class="sub live"><i></i>${t("powerFlow")}</span></div><div class="pb" style="gap:12px;display:flex;flex-direction:column"><div class="flow-w" id="ovF" data-live></div><div class="asset" id="ovA" data-live></div></div></div>
     <div class="panel"><div class="ph"><h3>${t("trend")}</h3><span class="sub">${fmtDate(new Date())}</span><span class="act"><div class="seg" id="ovTab">${[["pow","activePow"],["en","energy"],["wind","windSpd"],["irr","irr"]].map(([k,l])=>`<button data-k="${k}" aria-pressed="${k===tab}">${t(l)}</button>`).join("")}</div></span></div>
-      <div class="pb" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,170px);gap:14px"><div class="chart" id="ovC"></div><div id="ovS" class="ov-side"></div></div></div>
+      <div class="pb" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,170px);gap:14px"><div class="chart" id="ovC"></div><div id="ovS" data-live class="ov-side"></div></div></div>
   </div>
   <div class="faint" style="font-size:11.5px">${ic("info","sm")} ${t("simNote")}</div>`;
   const map=MAP2D.mount($("#ovMap"),{mini:true}); S.cleanup.push(()=>map.destroy());
@@ -1501,16 +1562,16 @@ PAGES.overview=(el)=>{
     }
     ch.setOption(opt,true);
   }
-  function upd(){ const P=portfolio();
+  function upd(){ const P=portfolio(); const ids=scopeIds(), tr3=t("lvTr3h"), trD=t("lvTrD");
     const nUrgent=P.al.filter(a=>a.sev===1).length, nSt=new Set(P.al.map(a=>a.st)).size;
     $("#ovK").innerHTML=[
-      kpi("zap","", t("pNow"), nf(P.p,1),"MW", t("ofCap",{a:nf(100*P.p/P.cap,1)+" %",b:nf(P.cap,1)}), `<div class="bar"><i style="width:${100*P.p/P.cap}%"></i></div>`),
-      kpi("sun","bg-solar", t("eToday"), nf(P.e,1),"MWh", t("eqH",{h:nf(P.e/P.cap,2)})),
+      kpi("zap","", t("pNow"), nf(P.p,1),"MW", t("ofCap",{a:nf(100*P.p/P.cap,1)+" %",b:nf(P.cap,1)}), spark(trendP(ids),"var(--accent)",{title:tr3})+`<div class="bar"><i style="width:${100*P.p/P.cap}%"></i></div>`),
+      kpi("sun","bg-solar", t("eToday"), nf(P.e,1),"MWh", t("eqH",{h:nf(P.e/P.cap,2)}), spark(trendHrs(ids,"e"),"var(--solar)",{title:trD})),
       kpi("cal","bg-maint", t("planM"), nf(P.plan?100*P.mtd/P.plan:0,1),"%", `${nf(P.mtd/1000,2)} / ${nf(P.plan/1000,2)} GWh`, `<div class="bar"><i style="width:${P.plan?Math.min(100,100*P.mtd/P.plan):0}%"></i></div>`),
-      kpi("okc","bg-ok", t("avail"), P.avail==null?"—":nf(P.avail,1),"%", t("devRun",{a:P.unitsOk,b:P.units})),
-      kpi("alert","bg-crit", t("actAlarms"), `<span class="c-crit">${P.al.length}</span>`,"", `<span class="c-crit">${t("urgent",{n:nUrgent,m:nSt})}</span>`),
-      kpi("wind","bg-wind", t("avgWind"), P.wind==null?"—":nf(P.wind,1),"m/s", t("windSt",{n:P.ws.length})),
-      kpi("sun","bg-solar", t("irr"), P.irr==null?"—":nf(P.irr,0),"W/m²", t("solarSt",{n:P.sol.length})) ].join("");
+      kpi("okc","bg-ok", t("avail"), P.avail==null?"—":nf(P.avail,1),"%", t("devRun",{a:P.unitsOk,b:P.units}), `<div class="bar"><i style="width:${100*P.unitsOk/Math.max(1,P.units)}%;background:var(--ok)"></i></div>`),
+      kpi("alert","bg-crit", t("actAlarms"), `<span class="c-crit">${P.al.length}</span>`,"", `<span class="c-crit">${t("urgent",{n:nUrgent,m:nSt})}</span>`, spark(trendAl(ids),"var(--crit)",{zero:true,title:t("lvTr12h")})),
+      kpi("wind","bg-wind", t("avgWind"), P.wind==null?"—":nf(P.wind,1),"m/s", t("windSt",{n:P.ws.length}), spark(trendHrs(P.ws.map(s=>s.id),"w"),"var(--wind)",{title:trD})),
+      kpi("sun","bg-solar", t("irr"), P.irr==null?"—":nf(P.irr,0),"W/m²", t("solarSt",{n:P.sol.length}), spark(trendHrs(P.sol.map(s=>s.id),"w"),"var(--solar)",{title:trD})) ].join("");
     const cnt={ok:0,warn:0,crit:0,off:0}; P.ss.forEach(s=>cnt[stStatus(s)]++); const tot=P.ss.length;
     const segs=[["ok",cnt.ok],["warn",cnt.warn],["crit",cnt.crit],["off",cnt.off]]; let acc=0; const C=2*Math.PI*44;
     const arcs=segs.map(([k,n])=>{ const len=C*n/tot; const gap=n&&tot>1?3:0; const s=`<circle cx="60" cy="60" r="44" fill="none" stroke="var(--${k})" stroke-width="13" stroke-dasharray="${Math.max(0,len-gap)} ${C}" stroke-dashoffset="${-acc}" transform="rotate(-90 60 60)"/>`; acc+=len; return s; }).join("");
@@ -1525,7 +1586,7 @@ PAGES.overview=(el)=>{
       const res = type==="wind"? [t("avgWind"), live.length? nf(live.reduce((a,s)=>a+LIVE.st[s.id].v,0)/live.length,1)+" m/s":"—"] : [t("irr"), live.length? nf(live.reduce((a,s)=>a+LIVE.st[s.id].g,0)/live.length,0)+" W/m²":"—"];
       return `<div class="asset-c"><h4><span class="sw" style="background:var(--${type==="wind"?"wind":"solar"})"></span>${t(type==="wind"?"windP":"solarP")} <span class="muted" style="font-weight:400;font-size:12px">· ${arr.length} ${t("stCount")}</span></h4>
         <div class="kv"><span>${t("pNow")}</span><b>${nf(p,1)} / ${nf(cap,1)} MW</b></div><div class="kv"><span>${res[0]}</span><b>${res[1]}</b></div><div class="kv"><span>${t("eToday")}</span><b>${nf(e,1)} MWh</b></div><div class="kv"><span>${t("monthPlan")}</span><b>${nf(pl?100*m/pl:0,1)} %</b></div><div class="kv"><span>${t("avail")}</span><b>${av==null?"—":nf(av,1)+" %"}</b></div></div>`; };
-    $("#ovA").innerHTML=card("wind")+card("solar");
+    $("#ovA").innerHTML=card("wind")+card("solar"); $("#ovF").innerHTML=flowSVG(P);
     const vt=P.eth? 100*(P.e-P.eth)/P.eth:0;
     $("#ovS").innerHTML=`<div><div class="kpi-l">${t("vsTheory")}</div><div class="kpi-v ${vt<0?"c-crit":"c-ok"}">${vt>0?"+":""}${nf(vt,1)}<small>%</small></div></div><div><div class="kpi-l">${t("eToday")}</div><div class="kpi-v" style="font-size:22px">${nf(P.e,1)}<small>MWh</small></div></div><div><div class="kpi-l">${t("theoryE")}</div><div class="kpi-v" style="font-size:22px">${nf(P.eth,1)}<small>MWh</small></div></div><div><div class="kpi-l">${t("yestE")}</div><div class="kpi-v" style="font-size:22px">${nf(P.yday,1)}<small>MWh</small></div></div>`;
     map.update(); setTitle(t("overview"), subClock("sub_overview"));
@@ -1551,18 +1612,18 @@ PAGES.station=(el,id)=>{
   const s=ST[id]; const isW=s.type==="wind"; let filterQ="";
   const head=()=>{ setTitle(L(s.full), `${s.model} · ${L(s.prov)}${s.old?" ("+t("formerly",{p:L(s.old)})+")":""} · ${fmtTime(new Date())}`); };
   head();
-  el.innerHTML=`<div class="st-head"><div class="between" style="flex-wrap:wrap"><div class="meta"><span class="tag">${s.code}</span><span>${L(s.prov)}</span><span class="sep"></span><span>${s.model}</span><span class="sep"></span><span>SCADA ${s.scada}</span><span class="sep"></span><span>PPC ${s.ppc}</span><span class="sep"></span><span class="mono">${s.gw}</span><span class="sep"></span><span>COD ${s.cod}</span></div><span class="live" id="stLive"></span></div>
+  el.innerHTML=`<div class="st-head"><div class="between" style="flex-wrap:wrap"><div class="meta"><span class="tag">${s.code}</span><span>${L(s.prov)}</span><span class="sep"></span><span>${s.model}</span><span class="sep"></span><span>SCADA ${s.scada}</span><span class="sep"></span><span>PPC ${s.ppc}</span><span class="sep"></span><span class="mono">${s.gw}</span><span class="sep"></span><span>COD ${s.cod}</span></div><span class="live" id="stLive" data-live></span></div>
     ${s.pset?`<div class="banner">${ic("gauge","c-curt")}<b>${t("curtBanner")}</b><span>${t("curtBannerS",{p:nf(s.pset,1),t:"10:00 "+fmtDate(new Date())})}</span>${can("analytics")?`<button class="link" style="margin-left:auto" data-go="curtail">${t("curtail")} →</button>`:""}</div>`:""}
     ${s.notOper?`<div class="banner off">${ic("wifiOff")}<b>${t("notOper")}</b><span>${t("notOperS")}</span></div>`:""}</div>
-  <div class="grid g-kpi4" id="stK"></div>
+  <div class="grid g-kpi4" id="stK" data-live></div>
   <div class="grid g-st">
     <div class="grid" style="gap:14px;min-width:0">
       <div class="panel"><div class="ph"><h3>${t("twin3d")}</h3><span class="sub">${t("twin3dS")}</span></div><div class="pb flush" style="padding-top:10px"><div class="twin-w" id="st3d"><div class="twin-load">${t("loading3d")}</div></div></div></div>
-      <div class="panel"><div class="ph"><h3>${t(isW?"turbines":"inverters")}</h3><span class="sub">${t("lastValid")}</span>${s.id==="LXS"||s.id==="VHO"?`<span class="act"><div class="inp" style="height:30px;width:180px">${ic("search","sm")}<input id="uq" placeholder="INV-…" aria-label="Filter"></div></span>`:""}</div><div class="pb"><div class="st-bar" id="unitBar"></div><div class="tgrid" id="stG" style="margin-top:12px"></div></div></div>
+      <div class="panel"><div class="ph"><h3>${t(isW?"turbines":"inverters")}</h3><span class="sub">${t("lastValid")}</span>${s.id==="LXS"||s.id==="VHO"?`<span class="act"><div class="inp" style="height:30px;width:180px">${ic("search","sm")}<input id="uq" placeholder="INV-…" aria-label="Filter"></div></span>`:""}</div><div class="pb"><div class="st-bar" id="unitBar" data-live></div><div class="tgrid" id="stG" data-live style="margin-top:12px"></div></div></div>
     </div>
     <div class="grid" style="gap:14px;align-content:start;min-width:0">
       <div class="panel"><div class="ph"><h3>${t("hourly")}</h3><span class="sub">${t("blankFut")}</span></div><div class="pb"><div class="chart" id="stC" style="height:300px"></div></div></div>
-      <div class="panel"><div class="ph"><h3>${t("activeAl")}</h3><span class="sub" id="stAlN"></span><span class="act">${can("alarm")?`<button class="btn sm" data-go="alarms">${t("toAlarms")}</button>`:""}</span></div><div class="pb flush tw" id="stAl"></div></div>
+      <div class="panel"><div class="ph"><h3>${t("activeAl")}</h3><span class="sub" id="stAlN"></span><span class="act">${can("alarm")?`<button class="btn sm" data-go="alarms">${t("toAlarms")}</button>`:""}</span></div><div class="pb flush tw" id="stAl" data-live></div></div>
     </div>
   </div>`;
   const ch=mkChart($("#stC"),{});
@@ -1572,22 +1633,22 @@ PAGES.station=(el,id)=>{
       series:[{name:t("actE"),type:"bar",data:L0.hrs.map((x,h)=>h<=cur?+x.e.toFixed(2):null),itemStyle:{color:isW?css("--wind"):css("--solar"),borderRadius:[3,3,0,0]},barWidth:"55%"},
         {name:t("thE"),type:"scatter",symbol:"rect",symbolSize:[12,2],data:L0.hrs.map((x,h)=>h<=cur?+x.th.toFixed(2):null),itemStyle:{color:css("--text-2")}},
         {name:isW?t("windSpd"):t("irr"),type:"line",yAxisIndex:1,smooth:.35,showSymbol:false,data:L0.hrs.map((x,h)=>h<=cur?+x.w.toFixed(isW?2:0):null),lineStyle:{width:2,color:css("--accent")},itemStyle:{color:css("--accent")}}]},true); }
-  function upd(){ const L0=LIVE.st[s.id]; head(); const hrs=(Date.now()-dayStart(Date.now()))/HOUR; const loss=Math.max(0,L0.eth-L0.e);
+  function upd(){ const L0=LIVE.st[s.id]; head(); const sp=(f,c)=>s.notOper?"":spark(f==="p"?trendP([s.id]):trendHrs([s.id],f),c,{title:f==="p"?t("lvTr3h"):t("lvTrD"),zero:f!=="w"&&f!=="p"}); const hrs=(Date.now()-dayStart(Date.now()))/HOUR; const loss=Math.max(0,L0.eth-L0.e);
     $("#stLive").innerHTML= s.notOper? `<span class="chip bg-off">${t("st_comm")}</span>` : `<i></i>${t("updated",{t:fmtTime(new Date()),s:L0.updAgo})}`;
     const pct=s.notOper?0:100*L0.p/acCap(s);
     const tiles = isW? [
-      kpi("zap","",t("pNow"), s.notOper?"—":nf(L0.p,2),"MW", `${nf(pct,1)} % / ${nf(s.cap,2)} MW`, `<div class="bar"><i style="width:${pct}%"></i></div>`),
-      kpi("wind","bg-wind",t("windNow"), s.notOper?"—":nf(L0.v,2),"m/s", s.notOper?"—":t("windSrc")+` · ${Math.round(L0.dir)}°`),
-      kpi("sun","bg-solar",t("eDay"), s.notOper?"—":nf(L0.e,1),"MWh", s.notOper?"—":t("theoryX",{e:nf(L0.eth,1)})),
-      kpi("down","bg-crit",t("eLoss"), s.notOper?"—":nf(loss,1),"MWh", s.notOper?"—":t("lossPct",{p:nf(L0.eth?100*loss/L0.eth:0,1)})),
+      kpi("zap","",t("pNow"), s.notOper?"—":nf(L0.p,2),"MW", `${nf(pct,1)} % / ${nf(s.cap,2)} MW`, sp("p","var(--accent)")+`<div class="bar"><i style="width:${pct}%"></i></div>`),
+      kpi("wind","bg-wind",t("windNow"), s.notOper?"—":nf(L0.v,2),"m/s", s.notOper?"—":t("windSrc")+` · ${Math.round(L0.dir)}°`, sp("w","var(--wind)")),
+      kpi("sun","bg-solar",t("eDay"), s.notOper?"—":nf(L0.e,1),"MWh", s.notOper?"—":t("theoryX",{e:nf(L0.eth,1)}), sp("e","var(--solar)")),
+      kpi("down","bg-crit",t("eLoss"), s.notOper?"—":nf(loss,1),"MWh", s.notOper?"—":t("lossPct",{p:nf(L0.eth?100*loss/L0.eth:0,1)}), sp("loss","var(--crit)")),
       kpi("gauge","bg-maint",t("cf"), s.notOper?"—":nf(cfToday(s),1),"%", t("since0")),
       kpi("okc","bg-ok",t("availIEC"), L0.avail==null?"—":nf(L0.avail,2),"%", "IEC 61400-26 (T)"),
       kpi("clock","bg-wind",t("eqHours"), s.notOper?"—":nf(L0.e/s.cap,2),"h", t("today")),
       kpi("plug","bg-solar",t("aux"), s.notOper?"—":nf(L0.aux,2),"%", t("auxS")) ] : [
-      kpi("zap","",t("pNow"), nf(L0.p,2),"MW", `${nf(pct,1)} % / ${nf(acCap(s),2)} MWac · ${nf(s.capDC,3)} MWp`, `<div class="bar"><i style="width:${pct}%"></i></div>`),
-      kpi("sun","bg-solar",t("poa"), nf(L0.g,0),"W/m²", t("weatherSt",{w:s.wx})),
-      kpi("sun","bg-solar",t("eDay"), nf(L0.e,1),"MWh", t("theoryX",{e:nf(L0.eth,1)})),
-      kpi("down","bg-crit",t("eLoss"), nf(loss,1),"MWh", t("lossPct",{p:nf(L0.eth?100*loss/L0.eth:0,1)})),
+      kpi("zap","",t("pNow"), nf(L0.p,2),"MW", `${nf(pct,1)} % / ${nf(acCap(s),2)} MWac · ${nf(s.capDC,3)} MWp`, sp("p","var(--accent)")+`<div class="bar"><i style="width:${pct}%"></i></div>`),
+      kpi("sun","bg-solar",t("poa"), nf(L0.g,0),"W/m²", t("weatherSt",{w:s.wx}), sp("w","var(--solar)")),
+      kpi("sun","bg-solar",t("eDay"), nf(L0.e,1),"MWh", t("theoryX",{e:nf(L0.eth,1)}), sp("e","var(--solar)")),
+      kpi("down","bg-crit",t("eLoss"), nf(loss,1),"MWh", t("lossPct",{p:nf(L0.eth?100*loss/L0.eth:0,1)}), sp("loss","var(--crit)")),
       kpi("gauge","bg-maint",t("cf"), nf(cfToday(s),1),"%", t("since0")),
       kpi("okc","bg-ok",t("availIEC"), nf(L0.avail,2),"%", "IEC 61724 (T)"),
       kpi("clock","bg-wind",t("eqHours"), nf(L0.e/s.capDC,2),"h", t("today")),
@@ -1608,7 +1669,7 @@ PAGES.station=(el,id)=>{
   THREE3D.station($("#st3d"), s).then(sc=>{ if(sc){ if(S.page!=="station"||S.param!==id){ sc.dispose(); return; } S.scenes.push(sc); sc.onPick=uid=>openUnit(s.id,uid); } });
 };
 function alarmRow(a, compact){ const ackCell = a.acked? `<span class="muted">${esc(a.ackBy)}</span>` : (can("ack")? `<button class="btn sm" data-ack="${a.id}">${t("ack")}</button>` : `<span class="c-crit" title="${t("noPermAck")}">${t("unacked")}</span>`);
-  return `<tr><td class="c-sev">${sevChip(a.sev)}</td>${compact?"":`<td class="c-st">${esc(stName(ST[a.st]))}</td>`}<td class="mono c-dev">${esc(a.dev)}</td><td class="c-desc" style="white-space:normal;min-width:200px">${esc(alarmText(a))}</td><td class="num c-t">${fmtDT(new Date(a.t))}</td>${compact?"":`<td class="num c-clr">${a.cleared?fmtDT(new Date(a.clrT)):`<span class="chip bg-crit">${t("active")}</span>`}</td>`}<td class="c-ack">${ackCell}</td></tr>`; }
+  return `<tr data-k="${a.id}"${Date.now()-a.t<20e3?' class="al-new"':""}><td class="c-sev">${sevChip(a.sev)}</td>${compact?"":`<td class="c-st">${esc(stName(ST[a.st]))}</td>`}<td class="mono c-dev">${esc(a.dev)}</td><td class="c-desc" style="white-space:normal;min-width:200px">${esc(alarmText(a))}</td><td class="num c-t">${fmtDT(new Date(a.t))}</td>${compact?"":`<td class="num c-clr">${a.cleared?fmtDT(new Date(a.clrT)):`<span class="chip bg-crit">${t("active")}</span>`}</td>`}<td class="c-ack">${ackCell}</td></tr>`; }
 function bindAck(root, after){ root.addEventListener("click",e=>{ const b=e.target.closest("[data-ack]"); if(!b) return; const a=ALARMS.find(x=>x.id===+b.dataset.ack); if(!a) return; if(!can("ack")){ toast(t("noPermAck"),"","warn"); audit("a_ack",a.dev,"denied"); return; } a.acked=true; a.ackBy=S.user.u; a.ackT=Date.now(); audit("a_ack",`${a.st} · ${a.dev}`,"ok"); toast(t("ackDone",{d:`${a.st} · ${a.dev}`}),alarmText(a),"ok"); after&&after(); renderShell(); }); }
 
 // ---------- Unit drawer ----------
@@ -1616,10 +1677,10 @@ let DRAWER=null;
 function closeDrawer(){ if(DRAWER){ DRAWER.sc&&DRAWER.sc.dispose(); clearInterval(DRAWER.iv); DRAWER.ch&&DRAWER.ch.dispose(); } DRAWER=null; $("#drawerHost").innerHTML=""; }
 function openUnit(stId, uid){
   closeDrawer(); const s=ST[stId]; const isW=s.type==="wind"; const host=$("#drawerHost");
-  host.innerHTML=`<div class="scrim" id="drS"></div><aside class="drawer" role="dialog" aria-modal="true" aria-label="${uid}"><div class="dr-h">${ic(isW?"turbine":"panel","lg")}<div style="flex:1;min-width:0"><h3>${uid}</h3><div class="muted" style="font-size:12px">${esc(L(s.full))} · ${t(isW?"tDetail":"iDetail")}</div></div><span id="drSt"></span><button class="ibtn" id="drX" aria-label="${t("close")}">${ic("x")}</button></div>
-    <div class="dr-b"><div class="dr-3d" id="dr3d"><div class="twin-load">${t("loading3d")}</div></div><div class="mgrid" id="drM"></div><dl class="dl" id="drI"></dl><div class="panel"><div class="ph"><h3>${t("todayP")}</h3></div><div class="pb"><div class="chart sm" id="drC"></div></div></div>
+  host.innerHTML=`<div class="scrim" id="drS"></div><aside class="drawer" role="dialog" aria-modal="true" aria-label="${uid}"><div class="dr-h">${ic(isW?"turbine":"panel","lg")}<div style="flex:1;min-width:0"><h3>${uid}</h3><div class="muted" style="font-size:12px">${esc(L(s.full))} · ${t(isW?"tDetail":"iDetail")}</div></div><span id="drSt" data-live></span><button class="ibtn" id="drX" aria-label="${t("close")}">${ic("x")}</button></div>
+    <div class="dr-b"><div class="dr-3d" id="dr3d"><div class="twin-load">${t("loading3d")}</div></div><div class="mgrid" id="drM" data-live></div><dl class="dl" id="drI" data-live></dl><div class="panel"><div class="ph"><h3>${t("todayP")}</h3></div><div class="pb"><div class="chart sm" id="drC"></div></div></div>
     ${can("station")?`<button class="btn" id="drTwin">${ic("cube","sm")} ${t("openTwin")}</button>`:""}</div></aside>`;
-  $("#drS").onclick=closeDrawer; $("#drX").onclick=closeDrawer; $("#drTwin") && ($("#drTwin").onclick=()=>{ const p=stId+":"+uid; closeDrawer(); go("twin",p); });
+  liveify(host); $("#drS").onclick=closeDrawer; $("#drX").onclick=closeDrawer; $("#drTwin") && ($("#drTwin").onclick=()=>{ const p=stId+":"+uid; closeDrawer(); go("twin",p); });
   DRAWER={};
   const idx=s.units.findIndex(u=>u.id===uid); const k=idx+1;
   function upd(){ const u=LIVE.st[s.id].units[idx]; const d=unitDerived(s,u,idx); const st=u.st;
@@ -1680,8 +1741,8 @@ PAGES.twin=(el,param)=>{
   el.innerHTML=`<div class="grid g-twin">
     <div class="panel"><div class="ph"><h3>${t("selEq")}</h3></div><div class="pb" style="padding-bottom:8px;flex:none">${stSelect(sid,"twSt","none")}</div><div class="eq-list" id="twL"></div></div>
     <div class="twin-big" id="tw3d"><div class="twin-load">${t("loading3d")}</div></div>
-    <div class="grid twin-info" style="gap:14px;align-content:start"><div class="panel"><div class="ph"><h3 id="twT"></h3><span class="act" id="twSt2"></span></div><div class="pb"><div class="mgrid" id="twM" style="grid-template-columns:repeat(2,minmax(0,1fr))"></div></div></div>
-    <div class="panel"><div class="ph"><h3>${t("components")}</h3><span class="sub">${t("hIdx")}</span></div><div class="pb"><div class="comp-list" id="twC"></div></div></div>
+    <div class="grid twin-info" style="gap:14px;align-content:start"><div class="panel"><div class="ph"><h3 id="twT"></h3><span class="act" id="twSt2" data-live></span></div><div class="pb"><div class="mgrid" id="twM" data-live style="grid-template-columns:repeat(2,minmax(0,1fr))"></div></div></div>
+    <div class="panel"><div class="ph"><h3>${t("components")}</h3><span class="sub">${t("hIdx")}</span></div><div class="pb"><div class="comp-list" id="twC" data-live></div></div></div>
     <div class="faint" style="font-size:11.5px">${ic("info","sm")} ${t("twinNote")}</div></div></div>`;
   $("#twSt").innerHTML=scopeIds().map(i=>`<option value="${i}" ${i===sid?"selected":""}>${esc(stName(ST[i]))}</option>`).join("");
   function list(){ $("#twL").innerHTML=s.feeders.map(([f,ids])=>`<div class="grp">${s.type==="wind"?t("feeder",{n:f}):s.id==="VHO"?t("block",{n:f}):t("roof",{n:f})}</div>`+ids.map(id=>{ const st=unitState(s,id); return `<button data-u="${id}" class="${id===uid?"on":""}"><span class="dot ${ST_CLS[st]==="curt"?"ok":ST_CLS[st]==="maint"?"warn":ST_CLS[st]}"></span>${id}<span class="faint" style="margin-left:auto;font-size:11px">${t("st_"+st)}</span></button>`; }).join("")).join(""); }
@@ -1701,6 +1762,94 @@ PAGES.twin=(el,param)=>{
   $("#twC").onclick=e=>{ const b=e.target.closest("[data-c]"); if(!b) return; sel=sel===b.dataset.c?null:b.dataset.c; info(); scene&&scene.focus&&scene.focus(sel); };
   list(); info(); load3d(); PAGE_UPD=()=>info();
 };
+
+// ---- 46_live.js
+// ===================== Live motion: in-place DOM updates, number tweens, sparklines, power flow =====================
+// Containers marked data-live keep their DOM between 2-second refreshes: assigning innerHTML patches only what
+// changed (morph), so bars and arcs glide via CSS transitions, hover/focus survive, and numbers count to the new value.
+const RM = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const LV_T = document.createElement("template");
+const LV_KEYS = ["data-k","data-unit","data-ack","data-u","data-c","data-s","data-lang","data-p"];
+const LV_TW = ".kpi-v,.num,.m b,.tv,.mini3 b,.lbl3d span,[data-tw],#alSum b,.badge,.fl-v";
+const LV_FL = ".kpi-v,#alSum b,[data-flash]";
+const LV_HTML = Object.getOwnPropertyDescriptor(Element.prototype, "innerHTML");
+function lvKey(n){ for(const k of LV_KEYS){ const v=n.getAttribute(k); if(v!=null) return k+"="+v; } return n.id||""; }
+function morph(el, html){ LV_T.innerHTML = html; lvKids(el, LV_T.content); }
+function lvKids(a, b){ const an=[...a.childNodes], bn=[...b.childNodes];
+  bn.forEach((y,i)=>{ const x=an[i];
+    if(!x){ a.appendChild(y); return; }
+    if(x.nodeType!==y.nodeType || x.nodeName!==y.nodeName || (x.nodeType===1 && lvKey(x)!==lvKey(y))){ a.replaceChild(y,x); return; }
+    if(x.nodeType===3){ if(x.nodeValue!==y.nodeValue) lvText(x,y.nodeValue); return; }
+    if(x.nodeType===1){ lvAttrs(x,y); lvKids(x,y); return; }
+    if(x.nodeValue!==y.nodeValue) x.nodeValue=y.nodeValue; });
+  for(let i=an.length-1;i>=bn.length;i--) an[i].remove(); }
+function lvAttrs(x, y){
+  for(const {name} of [...x.attributes]) if(!y.hasAttribute(name)) x.removeAttribute(name);
+  for(const {name,value} of [...y.attributes]){
+    if(name==="class"){ const keep=[...x.classList].filter(c=>c.startsWith("lv-")); const v=keep.length? value+" "+keep.join(" ") : value; if(x.getAttribute("class")!==v) x.setAttribute("class",v); continue; }
+    if(x.getAttribute(name)!==value) x.setAttribute(name,value); } }
+// number format of the current language: "1.234,5" (vi) · "1,234.5" (en/zh)
+function lvSep(){ const d=nf(1.5,1).replace(/\d/g,""), g=nf(12345,0).replace(/\d/g,""); return {d, g}; }
+function lvParse(s){ const m=/^(\D*?)([+\-−]?\d(?:[\d.,  ]*\d)?)(\D*)$/.exec(s); if(!m) return null; const {d,g}=lvSep(); let num=m[2];
+  const dec= d && num.includes(d)? num.length-num.lastIndexOf(d)-1 : 0; if(g) num=num.split(g).join(""); num=num.replace(d,".").replace("−","-");
+  const v=parseFloat(num); return isFinite(v)? {pre:m[1], v, d:dec, suf:m[3]} : null; }
+function lvAnim(n, A, B, final, dur=650){ if(n._tw) cancelAnimationFrame(n._tw); const t0=performance.now();
+  const step=now=>{ const k=Math.max(0,Math.min(1,(now-t0)/dur)), e=1-Math.pow(1-k,3); if(k<1){ n.nodeValue=B.pre+nf(A.v+(B.v-A.v)*e,B.d)+B.suf; n._tw=requestAnimationFrame(step); } else { n.nodeValue=final; n._tw=0; } };
+  n._tw=requestAnimationFrame(step); }
+function lvText(n, v){ const host=n.parentElement; if(n._tw){ cancelAnimationFrame(n._tw); n._tw=0; }
+  if(RM()||document.hidden||!host||!host.closest(LV_TW)){ n.nodeValue=v; return; }
+  const A=lvParse(n.nodeValue), B=lvParse(v);
+  if(!A||!B||A.pre!==B.pre||A.suf!==B.suf||A.d!==B.d||A.v===B.v){ n.nodeValue=v; return; }
+  const fh=host.closest(LV_FL); if(fh){ const rel=Math.abs(B.v-A.v)/Math.max(Math.abs(A.v),1e-9); if(B.d===0&&Math.abs(B.v-A.v)>=1 || rel>0.01) lvFlash(fh, B.v>A.v?"lv-up":"lv-dn"); }
+  lvAnim(n, A, B, v); }
+function lvFlash(el, c){ el.classList.remove("lv-up","lv-dn"); void el.offsetWidth; el.classList.add(c); clearTimeout(el._ft); el._ft=setTimeout(()=>el.classList.remove(c),1300); }
+function liveEl(el){ if(!el||el._lv) return el; el._lv=1;
+  Object.defineProperty(el,"innerHTML",{configurable:true, get(){ return LV_HTML.get.call(this); }, set(v){ if(!this.firstChild) LV_HTML.set.call(this,v); else morph(this,String(v)); }});
+  return el; }
+function liveify(root){ if(!root) return; root.querySelectorAll("[data-live]").forEach(liveEl); }
+// count up from zero when a page opens
+function lvIntro(root){ if(RM()||!root) return; root.querySelectorAll(".kpi-v,.mini3 b,.fl-v").forEach(h=>{ const w=document.createTreeWalker(h,NodeFilter.SHOW_TEXT); let n;
+  while((n=w.nextNode())){ const B=lvParse(n.nodeValue); if(B&&B.v!==0) lvAnim(n,{...B,v:0},B,n.nodeValue,900); } }); }
+// heartbeat on every data refresh
+function lvBeat(){ if(RM()) return; $$(".live i, .stbar i").forEach(i=>{ i.classList.remove("beat"); void i.offsetWidth; i.classList.add("beat"); }); }
+
+// ---------- trends for sparklines ----------
+const TRC={};
+function trCache(key, ttl, fn){ const b=Math.floor(Date.now()/ttl); const c=TRC[key]; if(c&&c.b===b) return c.v; const v=fn(); TRC[key]={b,v}; return v; }
+function trendP(ids, n=36){ const live=ids.filter(id=>!ST[id].notOper); if(!live.length) return [];
+  const base=trCache("p:"+live.join(), 300e3, ()=>{ const t1=Math.floor(Date.now()/300e3)*300e3, out=[]; for(let i=n-1;i>=0;i--){ const tt=t1-i*300e3; out.push(live.reduce((a,id)=>a+stationPower(ST[id],tt).p,0)); } return out; });
+  return [...base, live.reduce((a,id)=>a+LIVE.st[id].p,0)]; }
+function trendHrs(ids, f){ const live=ids.filter(id=>!ST[id].notOper); if(!live.length) return []; const cur=Math.floor(localH(Date.now())); const out=[]; let acc=0;
+  for(let h=0;h<=cur;h++){ if(f==="w"){ out.push(live.reduce((a,id)=>a+(LIVE.st[id].hrs[h].w||0),0)/live.length); }
+    else { live.forEach(id=>{ const x=LIVE.st[id].hrs[h]; acc+= f==="e"? x.e : Math.max(0,x.th-x.e); }); out.push(acc); } }
+  return out; }
+function trendAl(ids){ return trCache("al:"+ids.join()+":"+ALARMS.length+":"+ALARMS.filter(a=>a.cleared).length, 60e3, ()=>{ const now=Date.now(), out=[];
+  for(let i=12;i>=0;i--){ const tt=now-i*HOUR; out.push(ALARMS.filter(a=>ids.includes(a.st)&&a.t<=tt&&(!a.cleared||a.clrT>tt)).length); } return out; }); }
+function spark(vals, color="var(--accent)", o={}){ const v=(vals||[]).filter(x=>x!=null&&isFinite(x)); if(v.length<2) return "";
+  let lo=Math.min(...v), hi=Math.max(...v); if(o.zero) lo=Math.min(0,lo); if(hi-lo<1e-9){ hi=lo+1; lo=lo-1; }
+  const n=vals.length, W=100, H=24; const pts=vals.map((x,i)=>x==null||!isFinite(x)?null:[i/(n-1)*W, H-2-(x-lo)/(hi-lo)*(H-5)]).filter(Boolean);
+  const d="M"+pts.map(p=>p[0].toFixed(2)+" "+p[1].toFixed(2)).join("L"); const l=pts[pts.length-1];
+  return `<div class="spark" style="color:${color}" title="${esc(o.title||"")}"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path class="sa" d="${d}L${l[0].toFixed(2)} ${H}L${pts[0][0].toFixed(2)} ${H}Z"/><path class="sl" d="${d}"/></svg><i style="left:${l[0].toFixed(2)}%;top:${(l[1]/H*100).toFixed(1)}%"></i></div>`; }
+
+// ---------- live power-flow diagram (plants → OCC → national grid) ----------
+function flowSVG(P){ const ws=P.ss.filter(s=>s.type==="wind"), so=P.ss.filter(s=>s.type!=="wind");
+  const pw=ws.reduce((a,s)=>a+LIVE.st[s.id].p,0), ps=so.reduce((a,s)=>a+LIVE.st[s.id].p,0), cw=ws.reduce((a,s)=>a+s.cap,0), cs=so.reduce((a,s)=>a+acCap(s),0);
+  const tot=pw+ps, cap=Math.max(1,cw+cs);
+  const lane=(id, d, p, c, col)=>{ const sh=c? p/c : 0; const w=(3+7*Math.min(1,p/cap*1.6)).toFixed(1); const sp=p<=0.05? 0 : [3.2,2.4,1.7,1.2,0.9][Math.min(4,Math.floor(sh*5))];
+    return `<path d="${d}" class="fl-base" style="stroke-width:${w}"/>${sp?`<path d="${d}" class="fl-run" data-k="${id}" style="stroke:${col};stroke-width:${Math.max(3,+w-0.5)};animation-duration:${sp}s"/>`:""}`; };
+  const node=(x,y,w,h,col,label,val,sub)=>`<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" class="fl-node" style="stroke:${col}"/><rect x="${x}" y="${y}" width="3" height="${h}" style="fill:${col}"/>
+    <text x="${x+12}" y="${y+16}" class="fl-l">${esc(label)}</text><text x="${x+12}" y="${y+35}" class="fl-v">${val}</text><text x="${x+w-8}" y="${y+35}" text-anchor="end" class="fl-s">${sub}</text></g>`;
+  const pct=(p,c)=>c? nf(100*p/c,0)+"%" : "—";
+  return `<svg class="flow" viewBox="0 0 460 128" role="img" aria-label="${t("powerFlow")}">
+    ${cw?lane("w","M150 30 C 190 30, 190 64, 222 64",pw,cw,"var(--wind)"):""}${cs?lane("s","M150 98 C 190 98, 190 64, 222 64",ps,cs,"var(--solar)"):""}${lane("g","M246 64 L 316 64",tot,cap,"var(--accent)")}
+    ${cw?node(4,8,146,44,"var(--wind)",t("windP"),nf(pw,1)+" MW",pct(pw,cw)):""}${cs?node(4,76,146,44,"var(--solar)",t("solarP"),nf(ps,1)+" MW",pct(ps,cs)):""}
+    <rect x="222" y="22" width="24" height="84" rx="3" class="fl-bus"/><text x="234" y="16" text-anchor="middle" class="fl-s">OCC</text><text x="234" y="122" text-anchor="middle" class="fl-s">${t("lvTot")}</text>
+    ${node(316,42,140,44,"var(--accent)",t("lvGrid"),nf(tot,1)+" MW",pct(tot,cap))}</svg>`; }
+
+// ---------- alarm toast (severity colour, click to open, quick acknowledge) ----------
+function alarmToast(a){ const k=a.sev===1?"crit":a.sev===2?"warn":"info";
+  toast(t("newAlarm",{s:`${a.st} · ${a.dev}`}), alarmText(a), k, { ttl:a.sev<=2?9000:6000, sev:a.sev, onClick:()=>go("alarms"),
+    action: can("ack")&&!a.acked? {label:t("ack"), fn:()=>{ a.acked=true; a.ackBy=S.user.u; a.ackT=Date.now(); audit("a_ack",`${a.st} · ${a.dev}`,"ok"); renderShell(); PAGE_UPD&&PAGE_UPD(); }} : null }); }
 
 // ---- 50_analytics.js
 // ===================== Analytics, reports, administration =====================
@@ -2218,7 +2367,7 @@ PAGES.gis=(el)=>{
   el.innerHTML=`<div class="gis"><div class="panel" style="position:relative;min-height:560px"><div class="map-presets"><div class="seg" id="gP"><button data-p="all" aria-pressed="true">${t("presetAll")}</button><button data-p="high" aria-pressed="false">${t("presetHigh")}</button><button data-p="north" aria-pressed="false">${t("presetNorth")}</button></div></div>
     <div style="position:absolute;left:10px;top:52px;z-index:3"><div class="seg" id="gV"><button data-v="2d" aria-pressed="true">${t("view2d")}</button><button data-v="3d" aria-pressed="false">${t("view3d")}</button></div></div>
     <div class="map-w" id="gMap" style="position:absolute;inset:0;border-radius:var(--r)"></div></div>
-    <div class="gis-side"><div class="panel"><div class="ph"><h3>${t("stations")}</h3><span class="sub">${scopeIds().length}</span></div><div class="plist" id="gL"></div></div><div class="panel" id="gD"></div><div class="faint" style="font-size:11.5px">${ic("info","sm")} ${t("coordNote")}</div></div></div>`;
+    <div class="gis-side"><div class="panel"><div class="ph"><h3>${t("stations")}</h3><span class="sub">${scopeIds().length}</span></div><div class="plist" id="gL" data-live></div></div><div class="panel" id="gD" data-live></div><div class="faint" style="font-size:11.5px">${ic("info","sm")} ${t("coordNote")}</div></div></div>`;
   function list(){ $("#gL").innerHTML=scopeIds().map(id=>{ const s=ST[id]; return `<button data-s="${id}" class="${selId===id?"on":""}"><span class="dot ${stStatus(s)}"></span><span><div class="pn">${esc(L(s.full))}</div><div class="pm">${esc(L(s.prov))} · ${capLabel(s)}${s.capUnit?"":" MW"}</div></span><span class="num muted">${s.notOper?"—":nf(LIVE.st[id].p,1)+" MW"}</span></button>`; }).join(""); }
   function detail(){ const D=$("#gD"); if(!selId){ D.innerHTML=`<div class="ph"><h3>${t("occ")}</h3><span class="act"><span class="tag">OCC</span></span></div><div class="pb"><dl class="dl"><dt>${t("coords")}</dt><dd class="mono" style="font-size:11.5px">${dms(OCC_LL[1],"N","S")}<br>${dms(OCC_LL[0],"E","W")}</dd><dt>${t("province")}</dt><dd>${esc(L(ST.IAP1.prov))}</dd><dt>${t("stations")}</dt><dd>${scopeIds().length}</dd></dl><p class="muted" style="margin:10px 0 0;font-size:12.5px">${t("occHere")} · NMĐG Ia Pếch</p></div>`; return; }
     const s=ST[selId]; const L0=LIVE.st[selId]; const d=distKm(s.ll,OCC_LL);
@@ -2310,7 +2459,7 @@ const THREE3D = (()=>{
     if(r.lowSpd) r.lowSpd.rotation.x=r.rotor.rotation.x;
     if(r.hss){ const w=Math.min(g.userData.rpm*112, 150)*2*Math.PI/60; r.hss.rotation.x-=w*dt; }
     if(r.fans) r.fans.forEach((f,i)=>f.rotation.y+=dt*(4+2*(i%2))*(g.userData.rpm>0.5?1:0.25)); }
-  function label(html, cls="lbl3d"){ const d=document.createElement("div"); d.className=cls; d.innerHTML=html; const o=new T.CSS2DObject(d); return o; }
+  function label(html, cls="lbl3d"){ const d=document.createElement("div"); d.className=cls; d.innerHTML=html; liveEl(d); const o=new T.CSS2DObject(d); return o; }
 
   // ---------- Wind farm ----------
   function buildWindFarm(st, s, o={}){
@@ -2372,7 +2521,7 @@ const THREE3D = (()=>{
     else { try{ const pm=new T.PMREMGenerator(st.renderer); st.scene.environment=pm.fromScene(new T.RoomEnvironment(st.renderer),0.04).texture; pm.dispose(); }catch(e){}
       const SS=SOLAR_SITES(T,{lightsFor,label,COL,stCol,fbm2,TW,RM}); b= s.type==="solar"? SS.farm(st,s) : SS.rooftop(st,s); }
     // HUD
-    const hud=document.createElement("div"); hud.className="twin-hud"; el.appendChild(hud);
+    const hud=liveEl(document.createElement("div")); hud.className="twin-hud"; el.appendChild(hud);
     const ctl=document.createElement("div"); ctl.className="twin-ctl"; el.appendChild(ctl);
     let showL=true; const renderHud=()=>{ const L1=LIVE.st[s.id]; const sp=b.lt.sp; hud.innerHTML= s.type==="wind"? `<span class="chip">${ic("wind","sm")}${s.notOper?"—":t("windDir",{d:Math.round(L1.dir)})+" · "+nf(L1.v,1)+" m/s"}</span><span class="chip">${ic("pin","sm")}${s.ll[1].toFixed(3)}°N ${s.ll[0].toFixed(3)}°E</span>` : `<span class="chip">${ic("sun","sm")}${(st.sunInfo||sp).el>0? t("sunPos",{e:nf((st.sunInfo||sp).el,1),a:nf((st.sunInfo||sp).az,0)}) : t("night")}</span><span class="chip">${ic("pin","sm")}${s.ll[1].toFixed(3)}°N ${s.ll[0].toFixed(3)}°E</span>`; };
     const solar=s.type!=="wind";
@@ -2432,7 +2581,7 @@ const THREE3D = (()=>{
     const setMode=(m,cam=true)=>{ mode=m; coverMats.forEach(mt=>{ mt.clippingPlanes = m==="cut"? [plane] : []; mt.needsUpdate=true; });
       if(cam&&o.twin) goCam(...(m==="exp"? PRE.exp : PRE.close)); if(ctl) ctl.querySelectorAll("[data-m]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.m===m)); };
     // ---- HUD, controls, callouts
-    const hud=document.createElement("div"); hud.className="twin-hud"; el.appendChild(hud);
+    const hud=liveEl(document.createElement("div")); hud.className="twin-hud"; el.appendChild(hud);
     let ctl=null, showL=true, full=false; const callouts={};
     if(o.twin){ ctl=document.createElement("div"); ctl.className="twin-ctl";
       ctl.innerHTML=`<div class="seg">${[["ext","vExt"],["cut","vCut"],["exp","vExp"]].map(([k,l])=>`<button data-m="${k}" aria-pressed="${k==="ext"}">${t(l)}</button>`).join("")}</div><div class="seg"><button data-k="full" aria-pressed="false">${t("vFull")}</button><button data-k="lbl" aria-pressed="true">${t("labels")}</button></div>`;
@@ -3447,10 +3596,11 @@ function stopHero(){ if(HERO&&HERO!=="pending") HERO.dispose(); HERO=null; }
 (function boot(){
   const th=store.get("theme"); applyTheme(th||"dark");
   const lg=store.get("lang"); S.lang = LANGS.includes(lg)? lg : "vi"; document.documentElement.lang = S.lang==="zh"?"zh-CN":S.lang; document.body.classList.toggle("zh",S.lang==="zh");
-  initHistory(); seedAlarms(); applyStatic(); renderLogin(); if(!resumeSession()){ renderLogin(); startHero(); }
-  setInterval(()=>{ tick(); if(!S.user) return; if(PAGE_UPD){ try{ PAGE_UPD(); }catch(e){ console.warn(e); } } }, 2000);
-  setInterval(()=>{ if(!S.user||!can("alarm")) return; if(Math.random()<0.5){ const a=randomAlarm(); if(a){ toast(t("newAlarm",{s:`${a.st} · ${a.dev}`}), alarmText(a), a.sev<=2?"warn":"info"); renderShell(); } } // clear an old non-critical one
+  ["#nav","#alSum","#sbFoot","#stbar"].forEach(q=>liveEl($(q))); initHistory(); seedAlarms(); applyStatic(); renderLogin(); if(!resumeSession()){ renderLogin(); startHero(); }
+  setInterval(()=>{ tick(); if(!S.user) return; liveify($("#view")); if(PAGE_UPD){ try{ PAGE_UPD(); }catch(e){ console.warn(e); } } lvBeat(); }, 2000);
+  setInterval(()=>{ if(!S.user||!can("alarm")) return; if(Math.random()<0.5){ const a=randomAlarm(); if(a){ alarmToast(a); renderShell(); PAGE_UPD&&PAGE_UPD(); } } // clear an old non-critical one
       const old=ALARMS.filter(a=>!a.cleared&&a.sev>=3&&a.acked&&Date.now()-a.t>40*60e3); if(old.length){ const a=old[0]; a.cleared=true; a.clrT=Date.now(); } }, 75000);
+  if(/dbg/.test(location.hash)) window.__occ={go,toast,alarmToast,randomAlarm,renderShell,get page(){ return PAGE_UPD; }}; // test hook
   window.addEventListener("resize",()=>{ if(!S.user && !HERO) startHero(); });
 })();
 

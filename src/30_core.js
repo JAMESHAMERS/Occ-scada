@@ -65,11 +65,14 @@ function hinoLogo(kind="full", fixed){ const b=fixed?' style="fill:#5C8FF2"':'',
   const mark=`<rect class="b"${b} x="93" y="59" width="14" height="154"/><rect class="b"${b} x="189" y="59" width="14" height="154"/><rect class="b"${b} x="93" y="129" width="110" height="14"/><polygon class="g"${g} points="310,59 326,59 227,213 211,213"/><rect class="b"${b} x="333" y="59" width="14" height="154"/><rect class="b"${b} x="433" y="59" width="14" height="154"/><polygon class="b"${b} points="333,59 349,59 447,213 431,213"/><ellipse class="o"${o} cx="541.5" cy="136" rx="69" ry="70.5" stroke-width="13"/>`;
   return kind==="mark"? `<svg class="hino" viewBox="86 52 538 168" role="img" aria-label="HINO">${mark}</svg>` : `<svg class="hino" viewBox="78 50 566 218" role="img" aria-label="HINO Systech Vietnam Co., Ltd.">${mark}<text class="t"${tx} x="80" y="259" font-family="Arial,Helvetica,sans-serif" font-size="25" textLength="556" lengthAdjust="spacingAndGlyphs">HINO SYSTECH VIETNAM CO.,LTD.</text></svg>`; }
 function applyLogos(){ $$("[data-logo]").forEach(el=>el.innerHTML=hinoLogo(el.dataset.logo, el.hasAttribute("data-fixed"))); }
-function toast(title, body, kind="info"){
-  const el=document.createElement("div"); el.className="toast k-"+kind;
-  const k={info:["info","c-acc"],ok:["okc","c-ok"],warn:["alert","c-warn"],crit:["alert","c-crit"]}[kind];
-  el.innerHTML=`${ic(k[0],k[1])}<div><b>${esc(title)}</b>${body?`<div class="muted">${esc(body)}</div>`:""}</div>`;
-  $("#toasts").appendChild(el); setTimeout(()=>{ el.style.opacity="0"; el.style.transition="opacity .3s"; setTimeout(()=>el.remove(),320); }, 4200);
+function toast(title, body, kind="info", o={}){
+  const host=$("#toasts"); const el=document.createElement("div"); el.className="toast k-"+kind+(o.onClick?" click":""); el.setAttribute("role",kind==="crit"||kind==="warn"?"alert":"status");
+  const k={info:["info","c-acc"],ok:["okc","c-ok"],warn:["alert","c-warn"],crit:["alert","c-crit"]}[kind]; const ttl=o.ttl||4200;
+  el.innerHTML=`${o.sev?`<span class="tsev s${o.sev}">P${o.sev}</span>`:ic(k[0],k[1])}<div class="tb"><b>${esc(title)}</b>${body?`<div class="muted">${esc(body)}</div>`:""}${o.action?`<div class="tact"><button class="btn sm" data-ta>${esc(o.action.label)}</button></div>`:""}</div><button class="ibtn tx" data-tx aria-label="${t("close")}">${ic("x","sm")}</button><i class="tprog" style="animation-duration:${ttl}ms"></i>`;
+  let gone=false; const close=()=>{ if(gone) return; gone=true; el.classList.add("out"); setTimeout(()=>el.remove(),260); };
+  el.addEventListener("click",e=>{ if(e.target.closest("[data-tx]")){ close(); return; } if(e.target.closest("[data-ta]")){ o.action.fn(); close(); return; } if(o.onClick){ o.onClick(); close(); } });
+  if(RM()){ setTimeout(close,ttl); } else el.querySelector(".tprog").addEventListener("animationend",close);
+  host.appendChild(el); const all=[...host.children].filter(x=>!x.classList.contains("out")); if(all.length>4) all.slice(0,all.length-4).forEach(x=>x.querySelector("[data-tx]").click());
 }
 function modal(html, wide){ const h=$("#modalHost"); h.innerHTML=`<div class="scrim" data-close></div><div class="modal" data-close><div class="modal-c ${wide?"wide":""}" role="dialog" aria-modal="true">${html}</div></div>`; h.onclick=e=>{ if(e.target.hasAttribute("data-close")) closeModal(); }; return $(".modal-c",h); }
 function closeModal(){ $("#modalHost").innerHTML=""; }

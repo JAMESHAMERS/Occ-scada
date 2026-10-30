@@ -1,5 +1,6 @@
 // ===================== i18n (VI · EN · 中文) =====================
 const DICT = {
+  lvTr3h:["Xu hướng 3 giờ qua","Last 3 hours","近3小时趋势"], lvTrD:["Xu hướng từ 00:00","Trend since 00:00","今日趋势"], lvTr12h:["Số cảnh báo 12 giờ qua","Active alarms, last 12 hours","近12小时告警数"], lvGrid:["Lưới điện quốc gia","National grid","国家电网"], lvTot:["Tổng phát","Total","总出力"],
   brandSub:["Trung tâm giám sát tập trung","Operations Control Centre","集中监控中心"],
   brandSub2:["{NP} nhà máy · {MW} MW","{NP} plants · {MW} MW","{NP} 座电站 · {MW} MW"],
   heroH:["Một nền tảng giám sát cho {NP} nhà máy điện gió và điện mặt trời","One monitoring platform for {NP} wind and solar plants","{NP} 座风电、光伏电站统一监控平台"],

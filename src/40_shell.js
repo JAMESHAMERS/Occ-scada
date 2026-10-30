@@ -71,7 +71,7 @@ function go(page, param=null, keep){
   if(page==="station" && !param){ param=scopeIds()[0]; S.param=param; }
   if(page!==prevPage||param!==prevParam) audit("a_view",page+(param?" · "+param:""),"ok");
   renderShell();
-  const fn=PAGES[page]; v.innerHTML=`<div class="view-in" id="vin"></div>`; fn($("#vin"), param);
+  const fn=PAGES[page]; v.innerHTML=`<div class="view-in${keep?" keep":""}" id="vin"></div>`; fn($("#vin"), param); liveify($("#vin")); if(!keep) lvIntro($("#vin"));
   saveSession();
 }
 const PAGE_LVL={custom:3,overview:1,gis:1,station:2,alarms:2,kpis:2,pcurve:3,loss:2,downtime:3,curtail:2,bench:1,reports:2,twin:4,sources:3,users:2,audit:2};

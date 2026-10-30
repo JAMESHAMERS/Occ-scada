@@ -15,16 +15,16 @@ function portfolio(){
 PAGES.overview=(el)=>{
   setTitle(t("overview"), subClock("sub_overview"));
   let tab="pow";
-  el.innerHTML=`<div class="grid g-kpi" id="ovK"></div>
+  el.innerHTML=`<div class="grid g-kpi" id="ovK" data-live></div>
   <div class="grid g-ov">
-    <div class="panel"><div class="ph"><h3>${t("health")}</h3></div><div class="pb" id="ovH"></div></div>
+    <div class="panel"><div class="ph"><h3>${t("health")}</h3></div><div class="pb" id="ovH" data-live></div></div>
     <div class="panel ov-map"><div class="ph"><h3>${t("stMap")}</h3><span class="sub">WGS84</span><span class="act"><button class="btn sm" data-go="gis">${ic("map","sm")} ${t("gis")}</button></span></div><div class="pb flush" style="display:flex;flex-direction:column;padding-top:10px;min-height:340px"><div class="map-w" id="ovMap"></div></div></div>
-    <div class="panel"><div class="ph"><h3>${t("stStatus")}</h3><span class="act">${can("analytics")?`<button class="link" data-go="bench">${t("viewAll")}</button>`:""}</span></div><div class="pb flush tw" id="ovT"></div></div>
+    <div class="panel"><div class="ph"><h3>${t("stStatus")}</h3><span class="act">${can("analytics")?`<button class="link" data-go="bench">${t("viewAll")}</button>`:""}</span></div><div class="pb flush tw" id="ovT" data-live></div></div>
   </div>
   <div class="grid g-ov2">
-    <div class="panel"><div class="ph"><h3>${t("assets")}</h3></div><div class="pb"><div class="asset" id="ovA"></div></div></div>
+    <div class="panel"><div class="ph"><h3>${t("assets")}</h3><span class="sub live"><i></i>${t("powerFlow")}</span></div><div class="pb" style="gap:12px;display:flex;flex-direction:column"><div class="flow-w" id="ovF" data-live></div><div class="asset" id="ovA" data-live></div></div></div>
     <div class="panel"><div class="ph"><h3>${t("trend")}</h3><span class="sub">${fmtDate(new Date())}</span><span class="act"><div class="seg" id="ovTab">${[["pow","activePow"],["en","energy"],["wind","windSpd"],["irr","irr"]].map(([k,l])=>`<button data-k="${k}" aria-pressed="${k===tab}">${t(l)}</button>`).join("")}</div></span></div>
-      <div class="pb" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,170px);gap:14px"><div class="chart" id="ovC"></div><div id="ovS" class="ov-side"></div></div></div>
+      <div class="pb" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,170px);gap:14px"><div class="chart" id="ovC"></div><div id="ovS" data-live class="ov-side"></div></div></div>
   </div>
   <div class="faint" style="font-size:11.5px">${ic("info","sm")} ${t("simNote")}</div>`;
   const map=MAP2D.mount($("#ovMap"),{mini:true}); S.cleanup.push(()=>map.destroy());
@@ -49,16 +49,16 @@ PAGES.overview=(el)=>{
     }
     ch.setOption(opt,true);
   }
-  function upd(){ const P=portfolio();
+  function upd(){ const P=portfolio(); const ids=scopeIds(), tr3=t("lvTr3h"), trD=t("lvTrD");
     const nUrgent=P.al.filter(a=>a.sev===1).length, nSt=new Set(P.al.map(a=>a.st)).size;
     $("#ovK").innerHTML=[
-      kpi("zap","", t("pNow"), nf(P.p,1),"MW", t("ofCap",{a:nf(100*P.p/P.cap,1)+" %",b:nf(P.cap,1)}), `<div class="bar"><i style="width:${100*P.p/P.cap}%"></i></div>`),
-      kpi("sun","bg-solar", t("eToday"), nf(P.e,1),"MWh", t("eqH",{h:nf(P.e/P.cap,2)})),
+      kpi("zap","", t("pNow"), nf(P.p,1),"MW", t("ofCap",{a:nf(100*P.p/P.cap,1)+" %",b:nf(P.cap,1)}), spark(trendP(ids),"var(--accent)",{title:tr3})+`<div class="bar"><i style="width:${100*P.p/P.cap}%"></i></div>`),
+      kpi("sun","bg-solar", t("eToday"), nf(P.e,1),"MWh", t("eqH",{h:nf(P.e/P.cap,2)}), spark(trendHrs(ids,"e"),"var(--solar)",{title:trD})),
       kpi("cal","bg-maint", t("planM"), nf(P.plan?100*P.mtd/P.plan:0,1),"%", `${nf(P.mtd/1000,2)} / ${nf(P.plan/1000,2)} GWh`, `<div class="bar"><i style="width:${P.plan?Math.min(100,100*P.mtd/P.plan):0}%"></i></div>`),
-      kpi("okc","bg-ok", t("avail"), P.avail==null?"—":nf(P.avail,1),"%", t("devRun",{a:P.unitsOk,b:P.units})),
-      kpi("alert","bg-crit", t("actAlarms"), `<span class="c-crit">${P.al.length}</span>`,"", `<span class="c-crit">${t("urgent",{n:nUrgent,m:nSt})}</span>`),
-      kpi("wind","bg-wind", t("avgWind"), P.wind==null?"—":nf(P.wind,1),"m/s", t("windSt",{n:P.ws.length})),
-      kpi("sun","bg-solar", t("irr"), P.irr==null?"—":nf(P.irr,0),"W/m²", t("solarSt",{n:P.sol.length})) ].join("");
+      kpi("okc","bg-ok", t("avail"), P.avail==null?"—":nf(P.avail,1),"%", t("devRun",{a:P.unitsOk,b:P.units}), `<div class="bar"><i style="width:${100*P.unitsOk/Math.max(1,P.units)}%;background:var(--ok)"></i></div>`),
+      kpi("alert","bg-crit", t("actAlarms"), `<span class="c-crit">${P.al.length}</span>`,"", `<span class="c-crit">${t("urgent",{n:nUrgent,m:nSt})}</span>`, spark(trendAl(ids),"var(--crit)",{zero:true,title:t("lvTr12h")})),
+      kpi("wind","bg-wind", t("avgWind"), P.wind==null?"—":nf(P.wind,1),"m/s", t("windSt",{n:P.ws.length}), spark(trendHrs(P.ws.map(s=>s.id),"w"),"var(--wind)",{title:trD})),
+      kpi("sun","bg-solar", t("irr"), P.irr==null?"—":nf(P.irr,0),"W/m²", t("solarSt",{n:P.sol.length}), spark(trendHrs(P.sol.map(s=>s.id),"w"),"var(--solar)",{title:trD})) ].join("");
     const cnt={ok:0,warn:0,crit:0,off:0}; P.ss.forEach(s=>cnt[stStatus(s)]++); const tot=P.ss.length;
     const segs=[["ok",cnt.ok],["warn",cnt.warn],["crit",cnt.crit],["off",cnt.off]]; let acc=0; const C=2*Math.PI*44;
     const arcs=segs.map(([k,n])=>{ const len=C*n/tot; const gap=n&&tot>1?3:0; const s=`<circle cx="60" cy="60" r="44" fill="none" stroke="var(--${k})" stroke-width="13" stroke-dasharray="${Math.max(0,len-gap)} ${C}" stroke-dashoffset="${-acc}" transform="rotate(-90 60 60)"/>`; acc+=len; return s; }).join("");
@@ -73,7 +73,7 @@ PAGES.overview=(el)=>{
       const res = type==="wind"? [t("avgWind"), live.length? nf(live.reduce((a,s)=>a+LIVE.st[s.id].v,0)/live.length,1)+" m/s":"—"] : [t("irr"), live.length? nf(live.reduce((a,s)=>a+LIVE.st[s.id].g,0)/live.length,0)+" W/m²":"—"];
       return `<div class="asset-c"><h4><span class="sw" style="background:var(--${type==="wind"?"wind":"solar"})"></span>${t(type==="wind"?"windP":"solarP")} <span class="muted" style="font-weight:400;font-size:12px">· ${arr.length} ${t("stCount")}</span></h4>
         <div class="kv"><span>${t("pNow")}</span><b>${nf(p,1)} / ${nf(cap,1)} MW</b></div><div class="kv"><span>${res[0]}</span><b>${res[1]}</b></div><div class="kv"><span>${t("eToday")}</span><b>${nf(e,1)} MWh</b></div><div class="kv"><span>${t("monthPlan")}</span><b>${nf(pl?100*m/pl:0,1)} %</b></div><div class="kv"><span>${t("avail")}</span><b>${av==null?"—":nf(av,1)+" %"}</b></div></div>`; };
-    $("#ovA").innerHTML=card("wind")+card("solar");
+    $("#ovA").innerHTML=card("wind")+card("solar"); $("#ovF").innerHTML=flowSVG(P);
     const vt=P.eth? 100*(P.e-P.eth)/P.eth:0;
     $("#ovS").innerHTML=`<div><div class="kpi-l">${t("vsTheory")}</div><div class="kpi-v ${vt<0?"c-crit":"c-ok"}">${vt>0?"+":""}${nf(vt,1)}<small>%</small></div></div><div><div class="kpi-l">${t("eToday")}</div><div class="kpi-v" style="font-size:22px">${nf(P.e,1)}<small>MWh</small></div></div><div><div class="kpi-l">${t("theoryE")}</div><div class="kpi-v" style="font-size:22px">${nf(P.eth,1)}<small>MWh</small></div></div><div><div class="kpi-l">${t("yestE")}</div><div class="kpi-v" style="font-size:22px">${nf(P.yday,1)}<small>MWh</small></div></div>`;
     map.update(); setTitle(t("overview"), subClock("sub_overview"));
@@ -99,18 +99,18 @@ PAGES.station=(el,id)=>{
   const s=ST[id]; const isW=s.type==="wind"; let filterQ="";
   const head=()=>{ setTitle(L(s.full), `${s.model} · ${L(s.prov)}${s.old?" ("+t("formerly",{p:L(s.old)})+")":""} · ${fmtTime(new Date())}`); };
   head();
-  el.innerHTML=`<div class="st-head"><div class="between" style="flex-wrap:wrap"><div class="meta"><span class="tag">${s.code}</span><span>${L(s.prov)}</span><span class="sep"></span><span>${s.model}</span><span class="sep"></span><span>SCADA ${s.scada}</span><span class="sep"></span><span>PPC ${s.ppc}</span><span class="sep"></span><span class="mono">${s.gw}</span><span class="sep"></span><span>COD ${s.cod}</span></div><span class="live" id="stLive"></span></div>
+  el.innerHTML=`<div class="st-head"><div class="between" style="flex-wrap:wrap"><div class="meta"><span class="tag">${s.code}</span><span>${L(s.prov)}</span><span class="sep"></span><span>${s.model}</span><span class="sep"></span><span>SCADA ${s.scada}</span><span class="sep"></span><span>PPC ${s.ppc}</span><span class="sep"></span><span class="mono">${s.gw}</span><span class="sep"></span><span>COD ${s.cod}</span></div><span class="live" id="stLive" data-live></span></div>
     ${s.pset?`<div class="banner">${ic("gauge","c-curt")}<b>${t("curtBanner")}</b><span>${t("curtBannerS",{p:nf(s.pset,1),t:"10:00 "+fmtDate(new Date())})}</span>${can("analytics")?`<button class="link" style="margin-left:auto" data-go="curtail">${t("curtail")} →</button>`:""}</div>`:""}
     ${s.notOper?`<div class="banner off">${ic("wifiOff")}<b>${t("notOper")}</b><span>${t("notOperS")}</span></div>`:""}</div>
-  <div class="grid g-kpi4" id="stK"></div>
+  <div class="grid g-kpi4" id="stK" data-live></div>
   <div class="grid g-st">
     <div class="grid" style="gap:14px;min-width:0">
       <div class="panel"><div class="ph"><h3>${t("twin3d")}</h3><span class="sub">${t("twin3dS")}</span></div><div class="pb flush" style="padding-top:10px"><div class="twin-w" id="st3d"><div class="twin-load">${t("loading3d")}</div></div></div></div>
-      <div class="panel"><div class="ph"><h3>${t(isW?"turbines":"inverters")}</h3><span class="sub">${t("lastValid")}</span>${s.id==="LXS"||s.id==="VHO"?`<span class="act"><div class="inp" style="height:30px;width:180px">${ic("search","sm")}<input id="uq" placeholder="INV-…" aria-label="Filter"></div></span>`:""}</div><div class="pb"><div class="st-bar" id="unitBar"></div><div class="tgrid" id="stG" style="margin-top:12px"></div></div></div>
+      <div class="panel"><div class="ph"><h3>${t(isW?"turbines":"inverters")}</h3><span class="sub">${t("lastValid")}</span>${s.id==="LXS"||s.id==="VHO"?`<span class="act"><div class="inp" style="height:30px;width:180px">${ic("search","sm")}<input id="uq" placeholder="INV-…" aria-label="Filter"></div></span>`:""}</div><div class="pb"><div class="st-bar" id="unitBar" data-live></div><div class="tgrid" id="stG" data-live style="margin-top:12px"></div></div></div>
     </div>
     <div class="grid" style="gap:14px;align-content:start;min-width:0">
       <div class="panel"><div class="ph"><h3>${t("hourly")}</h3><span class="sub">${t("blankFut")}</span></div><div class="pb"><div class="chart" id="stC" style="height:300px"></div></div></div>
-      <div class="panel"><div class="ph"><h3>${t("activeAl")}</h3><span class="sub" id="stAlN"></span><span class="act">${can("alarm")?`<button class="btn sm" data-go="alarms">${t("toAlarms")}</button>`:""}</span></div><div class="pb flush tw" id="stAl"></div></div>
+      <div class="panel"><div class="ph"><h3>${t("activeAl")}</h3><span class="sub" id="stAlN"></span><span class="act">${can("alarm")?`<button class="btn sm" data-go="alarms">${t("toAlarms")}</button>`:""}</span></div><div class="pb flush tw" id="stAl" data-live></div></div>
     </div>
   </div>`;
   const ch=mkChart($("#stC"),{});
@@ -120,22 +120,22 @@ PAGES.station=(el,id)=>{
       series:[{name:t("actE"),type:"bar",data:L0.hrs.map((x,h)=>h<=cur?+x.e.toFixed(2):null),itemStyle:{color:isW?css("--wind"):css("--solar"),borderRadius:[3,3,0,0]},barWidth:"55%"},
         {name:t("thE"),type:"scatter",symbol:"rect",symbolSize:[12,2],data:L0.hrs.map((x,h)=>h<=cur?+x.th.toFixed(2):null),itemStyle:{color:css("--text-2")}},
         {name:isW?t("windSpd"):t("irr"),type:"line",yAxisIndex:1,smooth:.35,showSymbol:false,data:L0.hrs.map((x,h)=>h<=cur?+x.w.toFixed(isW?2:0):null),lineStyle:{width:2,color:css("--accent")},itemStyle:{color:css("--accent")}}]},true); }
-  function upd(){ const L0=LIVE.st[s.id]; head(); const hrs=(Date.now()-dayStart(Date.now()))/HOUR; const loss=Math.max(0,L0.eth-L0.e);
+  function upd(){ const L0=LIVE.st[s.id]; head(); const sp=(f,c)=>s.notOper?"":spark(f==="p"?trendP([s.id]):trendHrs([s.id],f),c,{title:f==="p"?t("lvTr3h"):t("lvTrD"),zero:f!=="w"&&f!=="p"}); const hrs=(Date.now()-dayStart(Date.now()))/HOUR; const loss=Math.max(0,L0.eth-L0.e);
     $("#stLive").innerHTML= s.notOper? `<span class="chip bg-off">${t("st_comm")}</span>` : `<i></i>${t("updated",{t:fmtTime(new Date()),s:L0.updAgo})}`;
     const pct=s.notOper?0:100*L0.p/acCap(s);
     const tiles = isW? [
-      kpi("zap","",t("pNow"), s.notOper?"—":nf(L0.p,2),"MW", `${nf(pct,1)} % / ${nf(s.cap,2)} MW`, `<div class="bar"><i style="width:${pct}%"></i></div>`),
-      kpi("wind","bg-wind",t("windNow"), s.notOper?"—":nf(L0.v,2),"m/s", s.notOper?"—":t("windSrc")+` · ${Math.round(L0.dir)}°`),
-      kpi("sun","bg-solar",t("eDay"), s.notOper?"—":nf(L0.e,1),"MWh", s.notOper?"—":t("theoryX",{e:nf(L0.eth,1)})),
-      kpi("down","bg-crit",t("eLoss"), s.notOper?"—":nf(loss,1),"MWh", s.notOper?"—":t("lossPct",{p:nf(L0.eth?100*loss/L0.eth:0,1)})),
+      kpi("zap","",t("pNow"), s.notOper?"—":nf(L0.p,2),"MW", `${nf(pct,1)} % / ${nf(s.cap,2)} MW`, sp("p","var(--accent)")+`<div class="bar"><i style="width:${pct}%"></i></div>`),
+      kpi("wind","bg-wind",t("windNow"), s.notOper?"—":nf(L0.v,2),"m/s", s.notOper?"—":t("windSrc")+` · ${Math.round(L0.dir)}°`, sp("w","var(--wind)")),
+      kpi("sun","bg-solar",t("eDay"), s.notOper?"—":nf(L0.e,1),"MWh", s.notOper?"—":t("theoryX",{e:nf(L0.eth,1)}), sp("e","var(--solar)")),
+      kpi("down","bg-crit",t("eLoss"), s.notOper?"—":nf(loss,1),"MWh", s.notOper?"—":t("lossPct",{p:nf(L0.eth?100*loss/L0.eth:0,1)}), sp("loss","var(--crit)")),
       kpi("gauge","bg-maint",t("cf"), s.notOper?"—":nf(cfToday(s),1),"%", t("since0")),
       kpi("okc","bg-ok",t("availIEC"), L0.avail==null?"—":nf(L0.avail,2),"%", "IEC 61400-26 (T)"),
       kpi("clock","bg-wind",t("eqHours"), s.notOper?"—":nf(L0.e/s.cap,2),"h", t("today")),
       kpi("plug","bg-solar",t("aux"), s.notOper?"—":nf(L0.aux,2),"%", t("auxS")) ] : [
-      kpi("zap","",t("pNow"), nf(L0.p,2),"MW", `${nf(pct,1)} % / ${nf(acCap(s),2)} MWac · ${nf(s.capDC,3)} MWp`, `<div class="bar"><i style="width:${pct}%"></i></div>`),
-      kpi("sun","bg-solar",t("poa"), nf(L0.g,0),"W/m²", t("weatherSt",{w:s.wx})),
-      kpi("sun","bg-solar",t("eDay"), nf(L0.e,1),"MWh", t("theoryX",{e:nf(L0.eth,1)})),
-      kpi("down","bg-crit",t("eLoss"), nf(loss,1),"MWh", t("lossPct",{p:nf(L0.eth?100*loss/L0.eth:0,1)})),
+      kpi("zap","",t("pNow"), nf(L0.p,2),"MW", `${nf(pct,1)} % / ${nf(acCap(s),2)} MWac · ${nf(s.capDC,3)} MWp`, sp("p","var(--accent)")+`<div class="bar"><i style="width:${pct}%"></i></div>`),
+      kpi("sun","bg-solar",t("poa"), nf(L0.g,0),"W/m²", t("weatherSt",{w:s.wx}), sp("w","var(--solar)")),
+      kpi("sun","bg-solar",t("eDay"), nf(L0.e,1),"MWh", t("theoryX",{e:nf(L0.eth,1)}), sp("e","var(--solar)")),
+      kpi("down","bg-crit",t("eLoss"), nf(loss,1),"MWh", t("lossPct",{p:nf(L0.eth?100*loss/L0.eth:0,1)}), sp("loss","var(--crit)")),
       kpi("gauge","bg-maint",t("cf"), nf(cfToday(s),1),"%", t("since0")),
       kpi("okc","bg-ok",t("availIEC"), nf(L0.avail,2),"%", "IEC 61724 (T)"),
       kpi("clock","bg-wind",t("eqHours"), nf(L0.e/s.capDC,2),"h", t("today")),
@@ -156,7 +156,7 @@ PAGES.station=(el,id)=>{
   THREE3D.station($("#st3d"), s).then(sc=>{ if(sc){ if(S.page!=="station"||S.param!==id){ sc.dispose(); return; } S.scenes.push(sc); sc.onPick=uid=>openUnit(s.id,uid); } });
 };
 function alarmRow(a, compact){ const ackCell = a.acked? `<span class="muted">${esc(a.ackBy)}</span>` : (can("ack")? `<button class="btn sm" data-ack="${a.id}">${t("ack")}</button>` : `<span class="c-crit" title="${t("noPermAck")}">${t("unacked")}</span>`);
-  return `<tr><td class="c-sev">${sevChip(a.sev)}</td>${compact?"":`<td class="c-st">${esc(stName(ST[a.st]))}</td>`}<td class="mono c-dev">${esc(a.dev)}</td><td class="c-desc" style="white-space:normal;min-width:200px">${esc(alarmText(a))}</td><td class="num c-t">${fmtDT(new Date(a.t))}</td>${compact?"":`<td class="num c-clr">${a.cleared?fmtDT(new Date(a.clrT)):`<span class="chip bg-crit">${t("active")}</span>`}</td>`}<td class="c-ack">${ackCell}</td></tr>`; }
+  return `<tr data-k="${a.id}"${Date.now()-a.t<20e3?' class="al-new"':""}><td class="c-sev">${sevChip(a.sev)}</td>${compact?"":`<td class="c-st">${esc(stName(ST[a.st]))}</td>`}<td class="mono c-dev">${esc(a.dev)}</td><td class="c-desc" style="white-space:normal;min-width:200px">${esc(alarmText(a))}</td><td class="num c-t">${fmtDT(new Date(a.t))}</td>${compact?"":`<td class="num c-clr">${a.cleared?fmtDT(new Date(a.clrT)):`<span class="chip bg-crit">${t("active")}</span>`}</td>`}<td class="c-ack">${ackCell}</td></tr>`; }
 function bindAck(root, after){ root.addEventListener("click",e=>{ const b=e.target.closest("[data-ack]"); if(!b) return; const a=ALARMS.find(x=>x.id===+b.dataset.ack); if(!a) return; if(!can("ack")){ toast(t("noPermAck"),"","warn"); audit("a_ack",a.dev,"denied"); return; } a.acked=true; a.ackBy=S.user.u; a.ackT=Date.now(); audit("a_ack",`${a.st} · ${a.dev}`,"ok"); toast(t("ackDone",{d:`${a.st} · ${a.dev}`}),alarmText(a),"ok"); after&&after(); renderShell(); }); }
 
 // ---------- Unit drawer ----------
@@ -164,10 +164,10 @@ let DRAWER=null;
 function closeDrawer(){ if(DRAWER){ DRAWER.sc&&DRAWER.sc.dispose(); clearInterval(DRAWER.iv); DRAWER.ch&&DRAWER.ch.dispose(); } DRAWER=null; $("#drawerHost").innerHTML=""; }
 function openUnit(stId, uid){
   closeDrawer(); const s=ST[stId]; const isW=s.type==="wind"; const host=$("#drawerHost");
-  host.innerHTML=`<div class="scrim" id="drS"></div><aside class="drawer" role="dialog" aria-modal="true" aria-label="${uid}"><div class="dr-h">${ic(isW?"turbine":"panel","lg")}<div style="flex:1;min-width:0"><h3>${uid}</h3><div class="muted" style="font-size:12px">${esc(L(s.full))} · ${t(isW?"tDetail":"iDetail")}</div></div><span id="drSt"></span><button class="ibtn" id="drX" aria-label="${t("close")}">${ic("x")}</button></div>
-    <div class="dr-b"><div class="dr-3d" id="dr3d"><div class="twin-load">${t("loading3d")}</div></div><div class="mgrid" id="drM"></div><dl class="dl" id="drI"></dl><div class="panel"><div class="ph"><h3>${t("todayP")}</h3></div><div class="pb"><div class="chart sm" id="drC"></div></div></div>
+  host.innerHTML=`<div class="scrim" id="drS"></div><aside class="drawer" role="dialog" aria-modal="true" aria-label="${uid}"><div class="dr-h">${ic(isW?"turbine":"panel","lg")}<div style="flex:1;min-width:0"><h3>${uid}</h3><div class="muted" style="font-size:12px">${esc(L(s.full))} · ${t(isW?"tDetail":"iDetail")}</div></div><span id="drSt" data-live></span><button class="ibtn" id="drX" aria-label="${t("close")}">${ic("x")}</button></div>
+    <div class="dr-b"><div class="dr-3d" id="dr3d"><div class="twin-load">${t("loading3d")}</div></div><div class="mgrid" id="drM" data-live></div><dl class="dl" id="drI" data-live></dl><div class="panel"><div class="ph"><h3>${t("todayP")}</h3></div><div class="pb"><div class="chart sm" id="drC"></div></div></div>
     ${can("station")?`<button class="btn" id="drTwin">${ic("cube","sm")} ${t("openTwin")}</button>`:""}</div></aside>`;
-  $("#drS").onclick=closeDrawer; $("#drX").onclick=closeDrawer; $("#drTwin") && ($("#drTwin").onclick=()=>{ const p=stId+":"+uid; closeDrawer(); go("twin",p); });
+  liveify(host); $("#drS").onclick=closeDrawer; $("#drX").onclick=closeDrawer; $("#drTwin") && ($("#drTwin").onclick=()=>{ const p=stId+":"+uid; closeDrawer(); go("twin",p); });
   DRAWER={};
   const idx=s.units.findIndex(u=>u.id===uid); const k=idx+1;
   function upd(){ const u=LIVE.st[s.id].units[idx]; const d=unitDerived(s,u,idx); const st=u.st;
@@ -228,8 +228,8 @@ PAGES.twin=(el,param)=>{
   el.innerHTML=`<div class="grid g-twin">
     <div class="panel"><div class="ph"><h3>${t("selEq")}</h3></div><div class="pb" style="padding-bottom:8px;flex:none">${stSelect(sid,"twSt","none")}</div><div class="eq-list" id="twL"></div></div>
     <div class="twin-big" id="tw3d"><div class="twin-load">${t("loading3d")}</div></div>
-    <div class="grid twin-info" style="gap:14px;align-content:start"><div class="panel"><div class="ph"><h3 id="twT"></h3><span class="act" id="twSt2"></span></div><div class="pb"><div class="mgrid" id="twM" style="grid-template-columns:repeat(2,minmax(0,1fr))"></div></div></div>
-    <div class="panel"><div class="ph"><h3>${t("components")}</h3><span class="sub">${t("hIdx")}</span></div><div class="pb"><div class="comp-list" id="twC"></div></div></div>
+    <div class="grid twin-info" style="gap:14px;align-content:start"><div class="panel"><div class="ph"><h3 id="twT"></h3><span class="act" id="twSt2" data-live></span></div><div class="pb"><div class="mgrid" id="twM" data-live style="grid-template-columns:repeat(2,minmax(0,1fr))"></div></div></div>
+    <div class="panel"><div class="ph"><h3>${t("components")}</h3><span class="sub">${t("hIdx")}</span></div><div class="pb"><div class="comp-list" id="twC" data-live></div></div></div>
     <div class="faint" style="font-size:11.5px">${ic("info","sm")} ${t("twinNote")}</div></div></div>`;
   $("#twSt").innerHTML=scopeIds().map(i=>`<option value="${i}" ${i===sid?"selected":""}>${esc(stName(ST[i]))}</option>`).join("");
   function list(){ $("#twL").innerHTML=s.feeders.map(([f,ids])=>`<div class="grp">${s.type==="wind"?t("feeder",{n:f}):s.id==="VHO"?t("block",{n:f}):t("roof",{n:f})}</div>`+ids.map(id=>{ const st=unitState(s,id); return `<button data-u="${id}" class="${id===uid?"on":""}"><span class="dot ${ST_CLS[st]==="curt"?"ok":ST_CLS[st]==="maint"?"warn":ST_CLS[st]}"></span>${id}<span class="faint" style="margin-left:auto;font-size:11px">${t("st_"+st)}</span></button>`; }).join("")).join(""); }
